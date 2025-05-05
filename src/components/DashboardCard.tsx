@@ -1,4 +1,5 @@
 import React from "react";
+import HealthBar from "./HealthBar.tsx";
 
 type DashboardCardProps = {
     title: string;
@@ -47,52 +48,51 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                 </button>
             </div>
 
-            {/* Bottom Row: Label + Tooltip + Icons or Value */}
+            {/* Bottom Row: Label + Tooltip + Icons or subValue */}
+            {/* Bottom Row: Label + Tooltip + Icons + subValue */}
             <div className="flex justify-between items-center mt-auto pt-2 text-sm text-gray-400">
-                <div className="flex justify-between gap-2 w-full">
-                    {subLabel && (
-                        <div className="flex items-center gap-1">
-                            <span>{subLabel}</span>
-                            {tooltip && (
-                                <img
-                                    src="/dashboard-tooltip-icon.svg"
-                                    alt="tooltip"
-                                    width={14}
-                                    height={14}
-                                    title={tooltip}
-                                />
-                            )}
-                        </div>
-                    )}
-
-                    {tokenIcons && tokenIcons.length > 0 && (
-                        <div className="flex items-center">
-                            {tokenIcons.map((src, i) => (
-                                <img
-                                    key={i}
-                                    src={src}
-                                    alt={`token-${i}`}
-                                    width={20}
-                                    height={20}
-                                    className={`border-0 border-white ${
-                                        i !== 0 ? "-ml-2" : ""
-                                    }`}
-                                />
-                            ))}
-                        </div>
+                {/* Label + Tooltip */}
+                <div className="flex items-center gap-1">
+                    {subLabel && <span>{subLabel}</span>}
+                    {tooltip && (
+                        <img
+                            src="/dashboard-tooltip-icon.svg"
+                            alt="tooltip"
+                            width={14}
+                            height={14}
+                            title={tooltip}
+                        />
                     )}
                 </div>
 
-                {!showHealthBar && subValue && (
-                    <span className="text-white">{subValue}</span>
+                {/* subValue (even if showHealthBar is true) */}
+                {subValue && (
+                    <span className="text-white text-sm font-medium">{subValue}</span>
                 )}
 
-                {showHealthBar && (
-                    <span className="text-xs text-white font-semibold">
-      {subValue || "100%"}
-    </span>
+                {/* Token Icons */}
+                {tokenIcons && tokenIcons.length > 0 && (
+                    <div className="flex items-center">
+                        {tokenIcons.map((src, i) => (
+                            <img
+                                key={i}
+                                src={src}
+                                alt={`token-${i}`}
+                                width={20}
+                                height={20}
+                                className={`border-0 border-white ${i !== 0 ? "-ml-2" : ""}`}
+                            />
+                        ))}
+                    </div>
                 )}
             </div>
+
+            {/* Health Bar underneath */}
+            {showHealthBar && (
+                <div className="w-full">
+                    <HealthBar percentage={Number(subValue?.replace("%", "") || 100)} />
+                </div>
+            )}
 
         </div>
     );

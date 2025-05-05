@@ -3,9 +3,9 @@ import CustomBtn1 from "./CustomBtn1.tsx";
 
 const DashboardPortfolioTable = () => {
     const data = [
-        { icon: "/Token-Logos/usdc-base.svg", symbol: "USDC", amount: "9.1K", usd: "$9.1k", apy: "6.46%", status: "Collateral" },
+        { icon: "/Token-Logos/usdc-base.svg", symbol: "USDC", amount: "9.1K", usd: "$9.1k", apy: "0.00%", status: "Collateral" },
         { icon: "/Token-Logos/usdt-base.svg", symbol: "USDT", amount: "9.1K", usd: "$9.1k", apy: "5.31%", status: "Not Collateral" },
-        { icon: "/Token-Logos/weth-base.svg", symbol: "WETH", amount: "12", usd: "$21.5k", apy: "5.30%", status: "Collateral" },
+        { icon: "/Token-Logos/weth-base.svg", symbol: "WETH", amount: "12", usd: "$21.5k", apy: "0.00%", status: "Collateral" },
         { icon: "/Token-Logos/eth-base.svg", symbol: "ETH", amount: "3", usd: "$5.3k", apy: "4.57%", status: "Not Collateral" },
     ];
 

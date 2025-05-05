@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import LendBorrowRow from "./LendBorrowRow";
-import FilterModal from "./FilterModal"; // we’ll stub this for now
-import Dropdown from "./TokenDropdown";  // stub this too
+import FilterModal from "./FilterModal";
+import Dropdown from "./TokenDropdown";
 
 const sampleData = [
     {

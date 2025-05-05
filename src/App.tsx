@@ -31,13 +31,14 @@ function App() {
   return (
     <>
         <div className="w-full">
-            <HealthBar percentage={95} />
+            <HealthBar percentage={50} />
             <br/>
-            <MeterGauge percentage={95} />
+            <MeterGauge percentage={100} />
             <br/>
-            <PercentageTag percentage={80} />
+            <PercentageTag percentage={100} />
             <br/>
-            <PercentageTag percentage={25} />
+            <br/>
+            <PercentageTag percentage={90} />
             <br/>
             <AssetSelector
                 onTokenSelect={(token, price) => console.log(token, price)}
@@ -124,21 +125,9 @@ function App() {
             <br/>
             <CollateralsTable />
             <br/>
-<LiquidityPoolMarkets/>
+            <LiquidityPoolMarkets/>
             <br/>
             <P2PMarket />
-
-
-
-
-
-
-
-
-
-
-
-
         </div>
     </>
   )

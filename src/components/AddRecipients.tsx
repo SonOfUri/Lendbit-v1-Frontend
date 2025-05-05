@@ -44,7 +44,7 @@ const AddRecipients: React.FC = () => {
 
     return (
         <div className="w-full max-w-md">
-            <label className="text-white font-semibold mb-2 block text-left">Add Recipients</label>
+            <label className="text-white font-semibold mb-2 block text-left">Add Recipients <span className="text-xs">(Optional for whitelisting)</span></label>
 
             <div className="space-y-2">
                 {addresses.map((addr) => (
