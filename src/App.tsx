@@ -19,6 +19,7 @@ import Borrows from "./components/plugins/Borrows.tsx";
 import CollateralsTable from "./components/plugins/CollateralsTable.tsx";
 import LiquidityPoolMarkets from "./components/plugins/LiquidityPoolMarkets.tsx";
 import P2PMarket from "./components/plugins/P2PMarket.tsx";
+import Navbar from "./components/plugins/Navbar.tsx";
 
 import './App.css';
 
@@ -31,6 +32,8 @@ function App() {
   return (
     <>
         <div className="w-full">
+            <Navbar />
+            <br />
             <HealthBar percentage={50} />
             <br/>
             <MeterGauge percentage={100} />
