@@ -1,0 +1,33 @@
+import React from "react";
+import DashboardBorrowPowerCard from "./DashboardBorrowPowerCard";
+
+type PositionsBorrowPowerCardProps = {
+    percentage: number;
+    totalCollateral: string;
+    availableToBorrow: string;
+};
+
+const PositionsBorrowPowerCard: React.FC<PositionsBorrowPowerCardProps> = ({
+                                                             percentage,
+                                                             totalCollateral,
+                                                             availableToBorrow,
+                                                         }) => {
+    return (
+        <div className="rounded-md bg-black rounded-md text-white  w-full">
+            {/* Top summary section */}
+            <div className="flex justify-between text-sm p-4 rounded-t-md font-light px-2 bg-[#191818]">
+                <p>
+                    Total Collateral: <span className="font-semibold">{totalCollateral}</span>
+                </p>
+                <p>
+                    Available to Borrow: <span className="font-semibold">{availableToBorrow}</span>
+                </p>
+            </div>
+
+            {/* Core Borrow Power chart */}
+            <DashboardBorrowPowerCard percentage={percentage} />
+        </div>
+    );
+};
+
+export default PositionsBorrowPowerCard;

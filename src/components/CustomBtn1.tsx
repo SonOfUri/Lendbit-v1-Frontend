@@ -6,7 +6,7 @@ type CustomBtnProps = {
     variant?: "primary" | "secondary";
 };
 
-const CustomBtn: React.FC<CustomBtnProps> = ({ label, onClick, variant = "primary" }) => {
+const CustomBtn1: React.FC<CustomBtnProps> = ({ label, onClick, variant = "primary" }) => {
     const base = "px-3 py-1 rounded text-sm font-medium";
     const styles =
         variant === "primary"
@@ -20,4 +20,4 @@ const CustomBtn: React.FC<CustomBtnProps> = ({ label, onClick, variant = "primar
     );
 };
 
-export default CustomBtn;
+export default CustomBtn1;

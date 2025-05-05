@@ -9,12 +9,24 @@ import LoanControl from "./components/LoanControl.tsx";
 import AddRecipients from "./components/AddRecipients.tsx";
 import MetricStatCard from "./components/MetricStatcard.tsx";
 import DashboardCard from "./components/DashboardCard.tsx";
-import DashboardPortfolioTable from "./components/DashboardPortfoliotable.tsx";
+import DashboardPortfolioTable from "./components/DashboardPortfolioTable.tsx";
+import DashboardBorrowsTable from "./components/DashboardBorrowsCard.tsx";
+import DashboardBorrowPowerCard from "./components/DashboardBorrowPowerCard.tsx";
+import TransactionHistory from "./components/TransactionHistory.tsx";
+import PositionsBorrowPowerCard from "./components/PositionsBorrowPowerCard.tsx";
+import Supplies from "./components/Supplies.tsx";
+import Borrows from "./components/Borrows.tsx";
+import CollateralsTable from "./components/CollateralsTable.tsx";
+import LiquidityPoolMarkets from "./components/LiquidityPoolMarkets.tsx";
+import P2PMarket from "./components/P2PMarket.tsx";
+
+import './App.css';
 
 
-import './App.css'
 
 function App() {
+
+
 
   return (
     <>
@@ -93,6 +105,28 @@ function App() {
             <br/>
 
             <DashboardPortfolioTable />
+            <br/>
+            <DashboardBorrowsTable />
+            <br/>
+            <DashboardBorrowPowerCard percentage={100} />
+    <br/>
+            <TransactionHistory />
+            <br/>
+            <PositionsBorrowPowerCard
+                percentage={20}
+                totalCollateral="$12,345.67"
+                availableToBorrow="$2,345.67"
+            />
+            <br/>
+            <Supplies />
+            <br/>
+            <Borrows />
+            <br/>
+            <CollateralsTable />
+            <br/>
+<LiquidityPoolMarkets/>
+            <br/>
+            <P2PMarket />
 
 
 

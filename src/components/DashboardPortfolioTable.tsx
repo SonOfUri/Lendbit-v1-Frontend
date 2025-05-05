@@ -1,45 +1,45 @@
-import { useState } from "react";
 import TokenTagSm from "./TokenTagSm";
-import CustomBtn from "./CustomBtn.tsx";
+import CustomBtn1 from "./CustomBtn1.tsx";
 
 const DashboardPortfolioTable = () => {
-    const [collateralToggles, setCollateralToggles] = useState<{ [key: string]: boolean }>({});
+    const data = [
+        { icon: "/Token-Logos/usdc-base.svg", symbol: "USDC", amount: "9.1K", usd: "$9.1k", apy: "6.46%", status: "Collateral" },
+        { icon: "/Token-Logos/usdt-base.svg", symbol: "USDT", amount: "9.1K", usd: "$9.1k", apy: "5.31%", status: "Not Collateral" },
+        { icon: "/Token-Logos/weth-base.svg", symbol: "WETH", amount: "12", usd: "$21.5k", apy: "5.30%", status: "Collateral" },
+        { icon: "/Token-Logos/eth-base.svg", symbol: "ETH", amount: "3", usd: "$5.3k", apy: "4.57%", status: "Not Collateral" },
+    ];
 
     const toggleCollateral = (symbol: string) => {
-        setCollateralToggles((prev) => ({ ...prev, [symbol]: !prev[symbol] }));
+        const index = data.findIndex((item) => item.symbol === symbol);
+        if (index !== -1) {
+            data[index].status = data[index].status === "Collateral" ? "Not Collateral" : "Collateral";
+        }
     };
-
-    const data = [
-        { icon: "/Token-Logos/usdc-base.svg", symbol: "USDC", amount: "9.1K", usd: "$9.1k", apy: "6.46%" },
-        { icon: "/Token-Logos/usdt-base.svg", symbol: "USDT", amount: "9.1K", usd: "$9.1k", apy: "5.31%" },
-        { icon: "/Token-Logos/weth-base.svg", symbol: "WETH", amount: "12", usd: "$21.5k", apy: "5.30%" },
-        { icon: "/Token-Logos/eth-base.svg", symbol: "ETH", amount: "3", usd: "$5.3k", apy: "4.57%" },
-    ];
 
     return (
         <div className="text-white w-full">
             <div className="flex justify-between items-center mb-2">
                 <h2 className="text-xl font-bold">My Portfolio</h2>
-
             </div>
-            <div className="text-sm text-gray-300 flex justify-between p-4 bg-black">
+
+            <div className="text-sm text-gray-300 flex justify-between p-4 rounded-t-md bg-black">
                 <div className="text-sm text-gray-400 mb-2">Total Balance: <span className="font-semibold text-white">$12,345.67</span></div>
                 <div className="text-sm text-gray-400 mb-2"> Max Withdrawal:  <span className="font-semibold text-white"> $2,345.67 </span></div>
             </div>
 
-            <div className="border-t border-gray-700 bg-black">
-                <div className="grid grid-cols-5 gap-4 py-2 font-semibold text-sm">
+            <div className="border-t border-gray-700 p-4 bg-black rounded-b-md">
+                <div className="grid grid-cols-5 gap-4 py-2 font-semibold text-sm text-left">
                     <span>Assets</span>
                     <span>Deposit</span>
                     <span>APY</span>
                     <span>Collateral</span>
-                    <span className="text-right">Actions</span>
+                    <span>Actions</span>
                 </div>
 
-                {data.map(({ icon, symbol, amount, usd, apy }) => (
+                {data.map(({ icon, symbol, amount, usd, apy, status }) => (
                     <div
                         key={symbol}
-                        className="grid grid-cols-5 gap-4 py-3 items-center "
+                        className="grid grid-cols-5 gap-4 py-3 items-center text-left"
                     >
                         <TokenTagSm icon={icon} symbol={symbol} />
 
@@ -52,16 +52,19 @@ const DashboardPortfolioTable = () => {
 
                         <button onClick={() => toggleCollateral(symbol)}>
                             <img
-                                src={collateralToggles[symbol] ? "/toggle-on.svg" : "/toggle-off.svg"}
+                                src={status === "Collateral" ? "/toggle-on.svg" : "/toggle-off.svg"}
                                 alt="Toggle"
                                 width={28}
                                 height={28}
                             />
                         </button>
 
-                        <div className="flex gap-2 justify-end">
-                            <CustomBtn label="Withdraw" variant="secondary" />
-                            <CustomBtn label={symbol === "USDC" || symbol === "WETH" ? "Deposit" : "Supply"} variant="primary" />
+                        <div className="flex gap-2 justify-start">
+                            <CustomBtn1 label="Withdraw" variant="secondary" />
+                            <CustomBtn1
+                                label={status === "Collateral" ? "Deposit" : "Supply"}
+                                variant="primary"
+                            />
                         </div>
                     </div>
                 ))}
