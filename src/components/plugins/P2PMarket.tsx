@@ -1,7 +1,7 @@
 import { useState } from "react";
-import LendBorrowRow from "./LendBorrowRow";
-import FilterModal from "./FilterModal";
-import Dropdown from "./TokenDropdown";
+import LendBorrowRow from "./LendBorrowRow.tsx";
+import FilterModal from "./FilterModal.tsx";
+import Dropdown from "./TokenDropdown.tsx";
 
 const sampleData = [
     {

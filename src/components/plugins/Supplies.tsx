@@ -1,8 +1,8 @@
 import { useState } from "react";
-import LiquidityBorrowsTable from "./LiquidityBorrowsTable";
-import P2PBorrowOrdersTable from "./P2PBorrowOrdersTable";
+import LiquiditySuppliesTable from "./LiquiditySuppliesTable.tsx";
+import P2PLendOrdersTable from "./P2PLendOrdersTable.tsx";
 
-const Borrows = () => {
+const Supplies = () => {
     const [isLPSelected, setIsLPSelected] = useState(true);
 
     return (
@@ -28,9 +28,9 @@ const Borrows = () => {
                 </div>
             </div>
 
-            {isLPSelected ? <LiquidityBorrowsTable /> : <P2PBorrowOrdersTable />}
+            {isLPSelected ? <LiquiditySuppliesTable /> : <P2PLendOrdersTable />}
         </div>
     );
 };
 
-export default Borrows;
+export default Supplies;

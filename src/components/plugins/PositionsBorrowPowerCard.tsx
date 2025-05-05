@@ -1,5 +1,5 @@
 import React from "react";
-import DashboardBorrowPowerCard from "./DashboardBorrowPowerCard";
+import DashboardBorrowPowerCard from "./DashboardBorrowPowerCard.tsx";
 
 type PositionsBorrowPowerCardProps = {
     percentage: number;

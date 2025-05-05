@@ -1,5 +1,5 @@
 import React from "react";
-import TransactionRow from "./TransactionRow";
+import TransactionRow from "./TransactionRow.tsx";
 
 const TransactionHistory: React.FC = () => {
     const transactions = [

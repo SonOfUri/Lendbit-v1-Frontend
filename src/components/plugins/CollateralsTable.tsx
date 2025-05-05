@@ -1,6 +1,6 @@
 import React from "react";
-import TokenTagSm from "./TokenTagSm";
-import CustomBtn1 from "./CustomBtn1";
+import TokenTagSm from "./TokenTagSm.tsx";
+import CustomBtn1 from "./CustomBtn1.tsx";
 
 const CollateralsTable: React.FC = () => {
     const data = [

@@ -1,4 +1,4 @@
-import TokenTagSm from "./TokenTagSm";
+import TokenTagSm from "./TokenTagSm.tsx";
 import CustomBtn1 from "./CustomBtn1.tsx";
 
 const DashboardPortfolioTable = () => {

@@ -1,5 +1,5 @@
-import TokenTagSm from "./TokenTagSm";
-import CustomBtn1 from "./CustomBtn1";
+import TokenTagSm from "./TokenTagSm.tsx";
+import CustomBtn1 from "./CustomBtn1.tsx";
 
 const DashboardBorrowsTable = () => {
     const data = [

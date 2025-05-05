@@ -1,4 +1,4 @@
-import TokenTagLg from "./TokenTagLg";
+import TokenTagLg from "./TokenTagLg.tsx";
 import CustomBtn1 from "./CustomBtn1.tsx";
 
 type Props = {

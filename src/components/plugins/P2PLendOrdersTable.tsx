@@ -1,6 +1,6 @@
 import { useState } from "react";
-import TokenTagSm from "./TokenTagSm";
-import CustomBtn1 from "./CustomBtn1";
+import TokenTagSm from "./TokenTagSm.tsx";
+import CustomBtn1 from "./CustomBtn1.tsx";
 
 const P2PLendOrdersTable = () => {
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -11,7 +11,7 @@ const P2PLendOrdersTable = () => {
             symbol: "USDC",
             amount: "9.1K",
             usd: "$9.1k",
-            apr: "6.46%",
+            apy: "6.46%",
             pool: "0xer...asj",
             status: "open",
             expiry: "12 Day(s)",
@@ -21,7 +21,7 @@ const P2PLendOrdersTable = () => {
             symbol: "USDT",
             amount: "9.1K",
             usd: "$9.1k",
-            apr: "5.31%",
+            apy: "5.31%",
             pool: "0xas...12s",
             status: "open",
             expiry: "23 Day(s)",
@@ -31,7 +31,7 @@ const P2PLendOrdersTable = () => {
             symbol: "WETH",
             amount: "12",
             usd: "$21.5k",
-            apr: "5.30%",
+            apy: "5.30%",
             pool: "0xas...12s",
             status: "open",
             expiry: "365 Day(s)",
@@ -41,7 +41,7 @@ const P2PLendOrdersTable = () => {
             symbol: "ETH",
             amount: "3",
             usd: "$5.3k",
-            apr: "4.57%",
+            apy: "4.57%",
             pool: "0xer...asj",
             status: "closed",
             expiry: "1 Day(s)",
@@ -54,23 +54,23 @@ const P2PLendOrdersTable = () => {
 
     return (
         <div className="w-full">
-            <h2 className="text-xl font-bold mb-3 text-left">My Borrow Orders</h2>
+            <h2 className="text-xl font-bold mb-3 text-left">My Lend Orders</h2>
 
-            <div className="grid grid-cols-7 gap-4 p-4 font-semibold text-sm text-left text-white bg-[#181919] rounded-t-md">
+            <div className="grid grid-cols-7 gap-4  font-semibold text-sm text-left text-white bg-[#191818] p-4 rounded-t-md">
                 <span>Assets</span>
                 <span>Amount</span>
-                <span>APR</span>
+                <span>APY</span>
                 <span>Pool ID</span>
                 <span>Status</span>
                 <span>Expiry</span>
                 <span></span>
             </div>
 
-            <div className="bg-black rounded-b-md p-4">
-                {data.map(({ icon, symbol, amount, usd, apr, pool, status, expiry }) => (
+            <div className="bg-black p-4 rounded-b-md">
+                {data.map(({ icon, symbol, amount, usd, apy, pool, status, expiry }) => (
                     <div
                         key={symbol + pool}
-                        className="grid grid-cols-7 gap-4 py-3 text-sm items-center border-b border-gray-800 relative text-left"
+                        className="grid grid-cols-7 gap-4 py-3 text-sm items-center relative text-left"
                     >
                         <TokenTagSm icon={icon} symbol={symbol} />
 
@@ -79,7 +79,7 @@ const P2PLendOrdersTable = () => {
                             <span className="text-xs text-gray-400">{usd}</span>
                         </div>
 
-                        <div className="font-semibold">{apr}</div>
+                        <div className="font-semibold">{apy}</div>
                         <span>{pool}</span>
                         <span>{status}</span>
                         <span>{expiry}</span>

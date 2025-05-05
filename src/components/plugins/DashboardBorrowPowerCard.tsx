@@ -1,7 +1,7 @@
 // DashboardBorrowPowerCard.tsx
 import React from "react";
-import MeterGauge from "./MeterGauge";
-import PercentageTag from "./PercentageTag";
+import MeterGauge from "./MeterGauge.tsx";
+import PercentageTag from "./PercentageTag.tsx";
 
 type DashboardBorrowPowerPropsCard = {
     percentage: number; // e.g. 80

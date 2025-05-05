@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TokenTagSm from "./TokenTagSm";
+import TokenTagSm from "./TokenTagSm.tsx";
 
 type TokenItem = {
     symbol: string;

@@ -1,4 +1,4 @@
-import LiquidityMarketCard from "./LiquidityMarketCard";
+import LiquidityMarketCard from "./LiquidityMarketCard.tsx";
 
 const ExampleLiquidityMarkets = () => {
     const pools = [
