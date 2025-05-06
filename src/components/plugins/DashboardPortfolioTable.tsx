@@ -18,7 +18,7 @@ const DashboardPortfolioTable = () => {
 
     return (
         <div className="text-white w-full">
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-2 px-2">
                 <h2 className="text-xl font-bold">My Portfolio</h2>
             </div>
 

@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.5",
+    "@tanstack/react-query": "^5.75.4",
+    "@tanstack/react-query-devtools": "^5.75.4",
     "clsx": "^2.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

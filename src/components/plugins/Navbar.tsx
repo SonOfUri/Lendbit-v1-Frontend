@@ -34,7 +34,7 @@ const Navbar = () => {
             {/* Nav Links */}
             <div className="hidden md:flex gap-6 text-sm u-class-nav">
                 {[
-                    { to: "/dashboard", label: "Dashboard" },
+                    { to: "/", label: "Dashboard" },
                     { to: "/markets", label: "Markets" },
                     { to: "/positions", label: "Positions" },
                     { to: "/supply-borrow", label: "Supply/Borrow" },
