@@ -43,9 +43,9 @@ const LiquidityBorrowsTable = () => {
 
     return (
         <div className="w-full">
-            <h2 className="text-xl font-bold mb-3 text-left">Borrows</h2>
+            <h2 className="text-xl font-bold text-left py-4">Borrows</h2>
 
-            <div className="grid grid-cols-6 gap-4  font-semibold text-sm text-left text-white p-4 bg-[#181919] rounded-t-md ">
+            <div className="grid grid-cols-6 gap-4  font-semibold text-sm text-left text-white p-4 bg-[#181919] rounded-t-md noise shadow-1">
                 <span>Assets</span>
                 <span>Amount</span>
                 <span>APR</span>
@@ -54,7 +54,7 @@ const LiquidityBorrowsTable = () => {
                 <span>Actions</span>
             </div>
 
-            <div className="bg-black rounded-b-md p-4">
+            <div className="bg-black rounded-b-md p-4 overflow-x-scroll noise shadow-1">
                 {data.map(({ icon, symbol, amount, usd, apr, cost, date }) => (
                     <div
                         key={symbol}

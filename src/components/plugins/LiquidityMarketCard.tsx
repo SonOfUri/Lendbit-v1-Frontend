@@ -40,7 +40,7 @@ const LiquidityPoolCard: React.FC<Props> = ({
     };
 
     return (
-        <div className="bg-[#111] text-white rounded-xl p-4 w-full max-w-sm flex flex-col justify-between shadow-md">
+        <div className="bg-black text-white rounded-xl p-4 w-full max-w-sm flex flex-col justify-between shadow-md noise shadow-1">
             <div className="flex justify-between items-start mb-4">
                 <TokenTagLg icon={icon} name={tokenName} symbol={tokenSymbol} />
 

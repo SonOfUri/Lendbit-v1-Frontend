@@ -60,10 +60,10 @@ const DashboardBorrowsTable = () => {
     ];
 
     return (
-        <div className="text-white w-full">
+        <div className="text-white w-full h-full">
             <h2 className="text-xl font-bold mb-2 text-left px-2">Borrows</h2>
 
-            <div className="bg-black rounded-md p-4">
+            <div className="bg-black rounded-md p-4 overflow-y-auto max-h-[360px] noise shadow-1 ">
                 <div className="grid grid-cols-6 gap-4 py-2 font-semibold text-sm text-left">
                     <span>Assets</span>
                     <span>Borrow</span>

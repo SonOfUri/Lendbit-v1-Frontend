@@ -54,9 +54,9 @@ const P2PLendOrdersTable = () => {
 
     return (
         <div className="w-full">
-            <h2 className="text-xl font-bold mb-3 text-left">My Lend Orders</h2>
+            <h2 className="text-xl font-bold text-left py-4">My Lend Orders</h2>
 
-            <div className="grid grid-cols-7 gap-4  font-semibold text-sm text-left text-white bg-[#191818] p-4 rounded-t-md">
+            <div className="grid grid-cols-7 gap-4  font-semibold text-sm text-left text-white bg-[#191818] p-4 rounded-t-md noise shadow-1">
                 <span>Assets</span>
                 <span>Amount</span>
                 <span>APY</span>
@@ -66,7 +66,7 @@ const P2PLendOrdersTable = () => {
                 <span></span>
             </div>
 
-            <div className="bg-black p-4 rounded-b-md">
+            <div className="bg-black p-4 rounded-b-md noise shadow-1">
                 {data.map(({ icon, symbol, amount, usd, apy, pool, status, expiry }) => (
                     <div
                         key={symbol + pool}

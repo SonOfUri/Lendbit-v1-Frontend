@@ -1,9 +1,13 @@
 
 import { Route, Routes } from 'react-router-dom';
-import './App.css';
 import Dashboard from './pages/dashboard';
 import Markets from './pages/markets';
+import Positions from './pages/positions';
 import Plugins from './pages/plugins';
+import SupplyBorrow from "./pages/transact";
+
+import './App.css';
+
 
 
 function App() {
@@ -12,6 +16,10 @@ function App() {
     <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/markets" element={<Markets />} />
+        <Route path="/positions" element={<Positions />} />
+
+        <Route path="/transact" element={<SupplyBorrow />} />
+
         {/* <Route path="/create/:id" element={<CreateOrder />} />
         <Route path="/supply-borrow/:id" element={<Transact />} />
         <Route path="/rewards" element={<Rewards />} />

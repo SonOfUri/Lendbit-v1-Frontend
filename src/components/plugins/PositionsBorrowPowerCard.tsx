@@ -13,9 +13,9 @@ const PositionsBorrowPowerCard: React.FC<PositionsBorrowPowerCardProps> = ({
                                                              availableToBorrow,
                                                          }) => {
     return (
-        <div className="rounded-md bg-black rounded-md text-white  w-full">
+        <div className="rounded-md bg-black rounded-md text-white  w-full noise shadow-1">
             {/* Top summary section */}
-            <div className="flex justify-between text-sm p-4 rounded-t-md font-light px-2 bg-[#191818]">
+            <div className="flex justify-between text-sm p-4 rounded-t-md font-light px-2 bg-[#181919]">
                 <p>
                     Total Collateral: <span className="font-semibold">{totalCollateral}</span>
                 </p>

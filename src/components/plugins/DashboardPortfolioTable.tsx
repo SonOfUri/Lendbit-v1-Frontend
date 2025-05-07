@@ -17,58 +17,62 @@ const DashboardPortfolioTable = () => {
     };
 
     return (
-        <div className="text-white w-full">
+        <div className="text-white w-full h-full ">
             <div className="flex justify-between items-center mb-2 px-2">
                 <h2 className="text-xl font-bold">My Portfolio</h2>
             </div>
 
-            <div className="text-sm text-gray-300 flex justify-between p-4 rounded-t-md bg-black">
-                <div className="text-sm text-gray-400 mb-2">Total Balance: <span className="font-semibold text-white">$12,345.67</span></div>
-                <div className="text-sm text-gray-400 mb-2"> Max Withdrawal:  <span className="font-semibold text-white"> $2,345.67 </span></div>
-            </div>
-
-            <div className="border-t border-gray-700 p-4 bg-black rounded-b-md">
-                <div className="grid grid-cols-5 gap-4 py-2 font-semibold text-sm text-left">
-                    <span>Assets</span>
-                    <span>Deposit</span>
-                    <span>APY</span>
-                    <span>Collateral</span>
-                    <span>Actions</span>
+            <div className="noise shadow-1 rounded-md">
+                <div className="text-sm text-gray-300 flex justify-between p-4 rounded-t-md bg-black noise shadow-1 ">
+                    <div className="text-sm text-gray-400 mb-2">Total Balance: <span className="font-semibold text-white">$12,345.67</span></div>
+                    <div className="text-sm text-gray-400 mb-2"> Max Withdrawal:  <span className="font-semibold text-white"> $2,345.67 </span></div>
                 </div>
 
-                {data.map(({ icon, symbol, amount, usd, apy, status }) => (
-                    <div
-                        key={symbol}
-                        className="grid grid-cols-5 gap-4 py-3 items-center text-left"
-                    >
-                        <TokenTagSm icon={icon} symbol={symbol} />
-
-                        <div className="flex flex-col">
-                            <span className="font-bold text-sm">{amount}</span>
-                            <span className="text-xs text-gray-400">{usd}</span>
-                        </div>
-
-                        <div className="font-semibold text-sm">{apy}</div>
-
-                        <button onClick={() => toggleCollateral(symbol)}>
-                            <img
-                                src={status === "Collateral" ? "/toggle-on.svg" : "/toggle-off.svg"}
-                                alt="Toggle"
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-
-                        <div className="flex gap-2 justify-start">
-                            <CustomBtn1 label="Withdraw" variant="secondary" />
-                            <CustomBtn1
-                                label={status === "Collateral" ? "Deposit" : "Supply"}
-                                variant="primary"
-                            />
-                        </div>
+                <div className="border-t border-gray-700 p-4 bg-black rounded-b-md overflow-x-auto overflow-y-auto max-h-[300px]">
+                    <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1.5fr] gap-4 py-2 font-semibold text-sm text-left">
+                        <span>Assets</span>
+                        <span>Deposit</span>
+                        <span>APY</span>
+                        <span>Collateral</span>
+                        <span>Actions</span>
                     </div>
-                ))}
+
+                    {data.map(({ icon, symbol, amount, usd, apy, status }) => (
+                        <div
+                            key={symbol}
+                            className="grid grid-cols-[1fr_1fr_1fr_1fr_1.5fr] gap-4 py-3 items-center text-left"
+                        >
+                            <TokenTagSm icon={icon} symbol={symbol} />
+
+                            <div className="flex flex-col">
+                                <span className="font-bold text-sm">{amount}</span>
+                                <span className="text-xs text-gray-400">{usd}</span>
+                            </div>
+
+                            <div className="font-semibold text-sm">{apy}</div>
+
+                            <button onClick={() => toggleCollateral(symbol)}>
+                                <img
+                                    src={status === "Collateral" ? "/toggle-on.svg" : "/toggle-off.svg"}
+                                    alt="Toggle"
+                                    width={28}
+                                    height={28}
+                                />
+                            </button>
+
+                            <div className="flex gap-2 justify-start">
+                                <CustomBtn1 label="Withdraw" variant="secondary" />
+                                <CustomBtn1
+                                    label={status === "Collateral" ? "Deposit" : "Supply"}
+                                    variant="primary"
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
+
+
         </div>
     );
 };

@@ -25,7 +25,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                                                          showHealthBar = false,
                                                      }) => {
     return (
-        <div className="bg-black rounded-md p-4 text-white w-full flex flex-col justify-between gap-2 min-h-[120px]">
+        <div className="bg-black rounded-md p-4 text-white w-full flex flex-col justify-between gap-2 min-h-[120px] noise shadow-1 ">
             {/* Header: Title + Action */}
             <div className="flex justify-between items-start">
                 <div>

@@ -6,20 +6,37 @@ import TransactionHistory from "../../components/plugins/TransactionHistory"
 
 const Dashboard = () => {
   return (
-    <div className="w-full py-8">
-        <DashboardCards />
-        <div className="flex justify-between text-center gap-12 mt-12">
-            <DashboardPortfolioTable />
-            
-            <DashboardBorrowsTable />
-        </div>
-        
-        <div className="flex justify-between text-center gap-12 mt-12">
-            <DashboardBorrowPowerCard percentage={80} />
-            
-            <TransactionHistory />
-        </div>
-    </div>
+    // <div className="w-full py-2">
+    //     <DashboardCards />
+    //     <div className="flex justify-between text-center gap-12 mt-12">
+    //         <DashboardPortfolioTable />
+    //
+    //         <DashboardBorrowsTable />
+    //     </div>
+    //
+    //     <div className="flex justify-between text-center gap-12 mt-12">
+    //         <DashboardBorrowPowerCard percentage={80} />
+    //
+    //         <TransactionHistory />
+    //     </div>
+    // </div>
+
+      <div className="w-full px-4 py-2 flex flex-col gap-6  text-white">
+          {/* === Top Row Cards === */}
+          <DashboardCards />
+
+          {/* === Middle Row Tables === */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+              <div className="h-full"><DashboardPortfolioTable /></div>
+              <div className="h-full"><DashboardBorrowsTable /></div>
+          </div>
+
+          {/* === Bottom Row Insights === */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <DashboardBorrowPowerCard percentage={100} />
+              <TransactionHistory />
+          </div>
+      </div>
   )
 }
 

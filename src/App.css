@@ -1,12 +1,95 @@
 @import "tailwindcss";
 
 #root {
-  max-width: 1780px;
+  /*max-width: 1780px;*/
   max-height: 100vh;
   width: 100%;
   margin: 0 auto;
   padding: 0;
   text-align: center;
+}
+
+
+/* Hide scrollbars but keep content accessible */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer & Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Allow invisible scrolling */
+* {
+  overflow-x: none; /* Enable horizontal scrolling */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
+}
+
+/* Shadow */
+.shadow-1 {
+  box-shadow: 2px -3px 25px -4px rgba(255,255,255,0.16);
+  -webkit-box-shadow: 2px -3px 25px -4px rgba(255,255,255,0.16);
+  -moz-box-shadow: 2px -3px 25px -4px rgba(255,255,255,0.16);
+}
+
+
+/*NOISE*/
+
+
+.noise{
+  position: relative;
+  overflow: hidden;
+}
+
+.noise:after{
+  content: "";
+  background: url("/noise.png")  repeat;
+  mix-blend-mode: overlay;
+  position: absolute;
+  inset: 0;
+  opacity: .9;
+  z-index: 1;
+  background-size: 128px;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+
+.noise-2{
+  position: relative;
+}
+
+.noise-2:after{
+  content: "";
+  background: url("/noise.png") repeat;
+  mix-blend-mode: overlay;
+  position: absolute;
+  inset: 0;
+  opacity: .5;
+  z-index: 1;
+  background-size: 128px;
+  border-radius: inherit;
+  pointer-events: none;
+
+}
+
+.noise-3{
+  position: relative;
+}
+
+.noise-3:after{
+  content: "";
+  background: url("/noise.png") repeat;
+  mix-blend-mode: overlay;
+  position: absolute;
+  inset: 0;
+  opacity: .2;
+  z-index: 1;
+  background-size: 128px;
+  border-radius: inherit;
+  pointer-events: none;
+
 }
 
 
