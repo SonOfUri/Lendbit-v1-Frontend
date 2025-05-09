@@ -41,7 +41,7 @@ const LoanControl: React.FC<LoanControlProps> = ({ amount, type, tokenSymbol }) 
     const label = type === "APY" ? "Net Profit" : "Net Cost";
 
     return (
-        <div className="bg-[#191818] text-white p-4 rounded-md w-[85%] max-w-sm">
+        <div className="bg-[#191818] text-white p-4 rounded-md w-full max-w-sm">
             <div className="flex justify-between items-center text-sm text-gray-400 mb-1">
                 <span>Order Value • {label}</span>
                 <span className="flex justify-between gap-1"> {tokenSymbol}  <img src="/arrows.svg" alt="Arrows" width={8} height={8} /></span>

@@ -5,7 +5,8 @@ import App from "./App.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Background from "./components/shared/background.tsx";
-import Navbar from "./components/plugins/Navbar.tsx";
+import Navbar from "./components/shared/Navbar.tsx";
+import { Toaster } from "sonner";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ createRoot(document.getElementById("root")!).render(
             <Navbar />
             <App />
           </div>
+          <Toaster richColors position="bottom-right" />
         </main>
         </section>
 		</Router>

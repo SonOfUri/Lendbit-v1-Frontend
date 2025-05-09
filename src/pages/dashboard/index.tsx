@@ -1,4 +1,4 @@
-import DashboardCards from "../../components/dashboard/dashboardCards"
+import DashboardCards from "../../components/Dashboard/dashboardCards"
 import DashboardBorrowPowerCard from "../../components/plugins/DashboardBorrowPowerCard"
 import DashboardBorrowsTable from "../../components/plugins/DashboardBorrowsCard"
 import DashboardPortfolioTable from "../../components/plugins/DashboardPortfolioTable"
@@ -6,22 +6,8 @@ import TransactionHistory from "../../components/plugins/TransactionHistory"
 
 const Dashboard = () => {
   return (
-    // <div className="w-full py-2">
-    //     <DashboardCards />
-    //     <div className="flex justify-between text-center gap-12 mt-12">
-    //         <DashboardPortfolioTable />
-    //
-    //         <DashboardBorrowsTable />
-    //     </div>
-    //
-    //     <div className="flex justify-between text-center gap-12 mt-12">
-    //         <DashboardBorrowPowerCard percentage={80} />
-    //
-    //         <TransactionHistory />
-    //     </div>
-    // </div>
 
-      <div className="w-full px-4 py-2 flex flex-col gap-6  text-white">
+    <div className="w-full px-4 py-2 flex flex-col gap-6  text-white">
           {/* === Top Row Cards === */}
           <DashboardCards />
 

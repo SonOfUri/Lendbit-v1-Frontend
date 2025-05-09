@@ -1,4 +1,3 @@
-import Navbar from "../../components/plugins/Navbar"
 import HealthBar from "../../components/plugins/HealthBar.tsx";
 import MeterGauge from "../../components/plugins/MeterGauge.tsx";
 import PercentageTag from "../../components/plugins/PercentageTag.tsx";
@@ -24,8 +23,6 @@ import P2PMarket from "../../components/plugins/P2PMarket.tsx";
 const Plugins = () => {
   return (
      <div className="w-full">
-            <Navbar />
-            <br />
             <HealthBar percentage={50} />
             <br/>
             <MeterGauge percentage={100} />
