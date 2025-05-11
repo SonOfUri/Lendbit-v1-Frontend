@@ -12,7 +12,7 @@ import { ErrorDecoder } from "ethers-decode-error";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 
-const useCloseListingAd = (
+const useCloseRequest = (
     _requestId: number,
 ) => {
     const { chainId } = useWeb3ModalAccount();
@@ -37,13 +37,13 @@ const useCloseListingAd = (
             toastId = toast.loading(`closing ads position...`);
 
 
-            const transaction = await contract.closeListingAd(
+            const transaction = await contract.closeRequest(
                 _requestId,
             );
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`ads position of ${_requestId} closed!`, {
+                toast.success(`request of id #${_requestId} closed!`, {
                     id: toastId,
                 });
                 queryClient.invalidateQueries({ queryKey: ["allLoanListings"] });
@@ -55,10 +55,10 @@ const useCloseListingAd = (
                 toast.error(`ads closing failed: ${decodedError.reason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
-                toast.error("Closing Ad failed: Unknown error", { id: toastId });
+                toast.error("Closing request failed: Unknown error", { id: toastId });
             }
         }
     }, [chainId, walletProvider, _requestId, queryClient, errorDecoder]);
 };
 
-export default useCloseListingAd;
+export default useCloseRequest;

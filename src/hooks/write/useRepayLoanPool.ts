@@ -10,17 +10,15 @@ import {
     getERC20Contract,
     getLendbitContract,
 } from "../../api/contractsInstance";
-import lenbit from "../../abi/LendBit.json";
+import lendbit from "../../abi/LendBit.json";
 import { ethers, MaxUint256 } from "ethers";
 import { ErrorDecoder } from "ethers-decode-error";
 import { envVars } from "../../constants/config/envVars";
 import useCheckAllowances from "../read/useCheckAllowances";
-import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 
-const useRepayP2P = (
+const useRepayPool = (
     _amount: string,
-    _requestId: number,
     tokenTypeAddress: string,
     tokenDecimal: number,
 ) => {
@@ -28,9 +26,7 @@ const useRepayP2P = (
     const { walletProvider } = useWeb3ModalProvider();
     const { data: allowanceVal = 0, isLoading } = useCheckAllowances(tokenTypeAddress);
 
-    const queryClient = useQueryClient();
-
-    const errorDecoder = ErrorDecoder.create([lenbit]);
+    const errorDecoder = ErrorDecoder.create([lendbit]);
 
     return useCallback(async () => {
         if (!isSupportedChain(chainId)) return toast.warning("SWITCH NETWORK");
@@ -38,12 +34,10 @@ const useRepayP2P = (
 
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
         const signer = await readWriteProvider.getSigner();
-        const contract = getLendbitContract(signer, lenbit);
+        const contract = getLendbitContract(signer, lendbit);
         const erc20contract = getERC20Contract(signer, tokenTypeAddress);
 
         const _weiAmount = ethers.parseUnits(_amount, tokenDecimal);
-
-        // console.log("amount", _amount, "_weiAmount", _weiAmount);
 
         let toastId: string | number | undefined;
 
@@ -52,6 +46,7 @@ const useRepayP2P = (
 
             if (allowanceVal == 0 || allowanceVal < Number(_amount)) {
                 toast.loading(`Approving tokens...`, { id: toastId });
+
                 const allowance = await erc20contract.approve(
                     envVars.lendbitContractAddress,
                     MaxUint256
@@ -64,18 +59,17 @@ const useRepayP2P = (
 
             toast.loading(`Processing repayment of ${_amount}...`, { id: toastId })
 
-            const transaction = await contract.repayLoan(
-                _requestId,
+
+            const transaction = await contract.repay(
+                tokenTypeAddress,
                 _weiAmount
             );
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`loan ${_requestId} successfully repayed!`, {
+                toast.success(`loan of ${_amount} successfully repayed!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["userActiveRequests"] });
-
             }
         } catch (error: unknown) {
             try {
@@ -87,7 +81,7 @@ const useRepayP2P = (
                 toast.error("Repayment failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, _requestId, queryClient, errorDecoder]);
+    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, errorDecoder]);
 };
 
-export default useRepayP2P;
+export default useRepayPool;

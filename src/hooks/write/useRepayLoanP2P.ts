@@ -6,91 +6,86 @@ import { useCallback } from "react";
 import { isSupportedChain } from "../../constants/utils/chains";
 import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
-import useCheckAllowances from "../read/useCheckAllowances";
 import {
     getERC20Contract,
     getLendbitContract,
 } from "../../api/contractsInstance";
-import lendbit from "../../abi/LendBit.json";
-import erc20 from "../../abi/erc20.json";
+import lenbit from "../../abi/LendBit.json";
 import { ethers, MaxUint256 } from "ethers";
-import { envVars } from "../../constants/config/envVars";
 import { ErrorDecoder } from "ethers-decode-error";
-import { useNavigate } from "react-router-dom";
+import { envVars } from "../../constants/config/envVars";
+import useCheckAllowances from "../read/useCheckAllowances";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 
-const useDepositCollateral = (
-    tokenTypeAddress: string,
+const useRepayP2P = (
     _amount: string,
+    _requestId: number,
+    tokenTypeAddress: string,
     tokenDecimal: number,
-    tokenName: string,
 ) => {
     const { chainId } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
     const { data: allowanceVal = 0, isLoading } = useCheckAllowances(tokenTypeAddress);
-    const navigate = useNavigate();
+
     const queryClient = useQueryClient();
 
-    const errorDecoder = ErrorDecoder.create([lendbit, erc20]);
+    const errorDecoder = ErrorDecoder.create([lenbit]);
 
     return useCallback(async () => {
         if (!isSupportedChain(chainId)) return toast.warning("SWITCH NETWORK");
         if (isLoading) return toast.loading("Checking allowance...");
 
-
-
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
         const signer = await readWriteProvider.getSigner();
+        const contract = getLendbitContract(signer, lenbit);
         const erc20contract = getERC20Contract(signer, tokenTypeAddress);
-        const contract = getLendbitContract(signer, lendbit);
 
         const _weiAmount = ethers.parseUnits(_amount, tokenDecimal);
+
         let toastId: string | number | undefined;
 
         try {
-            toastId = toast.loading(`Processing deposit collateral transaction...`);
+            toastId = toast.loading(`Processing repayments...`);
 
-            // **Check Allowance and Approve if Needed**
-            if (allowanceVal === 0 || allowanceVal < Number(_weiAmount)) {
-                toast.loading(`Approving ${tokenName} tokens...`, { id: toastId });
-
+            if (allowanceVal == 0 || allowanceVal < Number(_amount)) {
+                toast.loading(`Approving tokens...`, { id: toastId });
                 const allowance = await erc20contract.approve(
                     envVars.lendbitContractAddress,
                     MaxUint256
                 );
                 const allowanceReceipt = await allowance.wait();
 
-                if (!allowanceReceipt.status) {
+                if (!allowanceReceipt.status)
                     return toast.error("Approval failed!", { id: toastId });
-                }
             }
 
-            toast.loading(`Processing deposit of ${_amount}${tokenName} as collateral...`, { id: toastId })
+            toast.loading(`Processing repayment of ${_amount}...`, { id: toastId })
 
-            // **Proceed with Deposit**
-            const transaction = await contract.depositCollateral(tokenTypeAddress, _weiAmount);
+            const transaction = await contract.repayLoan(
+                _requestId,
+                _weiAmount
+            );
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`${_amount}${tokenName} successfully deposited as collateral!`, {
+                toast.success(`loan ${_requestId} successfully repayed!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["userUtilities"] });
-                queryClient.invalidateQueries({ queryKey: ["userPosition"] });
-                navigate("/")
+                queryClient.invalidateQueries({ queryKey: ["userActiveRequests"] });
+
             }
         } catch (error: unknown) {
             try {
                 const decodedError = await errorDecoder.decode(error);
                 console.error("Transaction failed:", decodedError.reason);
-                toast.error(`Transaction failed: ${decodedError.reason}`, { id: toastId });
+                toast.error(`Repayment failed: ${decodedError.reason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
-                toast.error("Transaction failed: Unknown error", { id: toastId });
+                toast.error("Repayment failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, tokenName, queryClient, navigate, errorDecoder]);
+    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, _requestId, queryClient, errorDecoder]);
 };
 
-export default useDepositCollateral;
+export default useRepayP2P;

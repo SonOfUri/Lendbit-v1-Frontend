@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 
-const useDepositCollateral = (
+const useWithdrawCollateral = (
     tokenTypeAddress: string,
     _amount: string,
     tokenDecimal: number,
@@ -28,7 +28,6 @@ const useDepositCollateral = (
 ) => {
     const { chainId } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
-    const { data: allowanceVal = 0, isLoading } = useCheckAllowances(tokenTypeAddress);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -36,44 +35,26 @@ const useDepositCollateral = (
 
     return useCallback(async () => {
         if (!isSupportedChain(chainId)) return toast.warning("SWITCH NETWORK");
-        if (isLoading) return toast.loading("Checking allowance...");
-
 
 
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
         const signer = await readWriteProvider.getSigner();
-        const erc20contract = getERC20Contract(signer, tokenTypeAddress);
         const contract = getLendbitContract(signer, lendbit);
 
         const _weiAmount = ethers.parseUnits(_amount, tokenDecimal);
         let toastId: string | number | undefined;
 
         try {
-            toastId = toast.loading(`Processing deposit collateral transaction...`);
+            toastId = toast.loading(`Processing withdraw collateral transaction...`);
 
-            // **Check Allowance and Approve if Needed**
-            if (allowanceVal === 0 || allowanceVal < Number(_weiAmount)) {
-                toast.loading(`Approving ${tokenName} tokens...`, { id: toastId });
+            toast.loading(`Processing withdrawal of ${_amount}${tokenName}...`, { id: toastId })
 
-                const allowance = await erc20contract.approve(
-                    envVars.lendbitContractAddress,
-                    MaxUint256
-                );
-                const allowanceReceipt = await allowance.wait();
-
-                if (!allowanceReceipt.status) {
-                    return toast.error("Approval failed!", { id: toastId });
-                }
-            }
-
-            toast.loading(`Processing deposit of ${_amount}${tokenName} as collateral...`, { id: toastId })
-
-            // **Proceed with Deposit**
-            const transaction = await contract.depositCollateral(tokenTypeAddress, _weiAmount);
+            // **Proceed with withdraw**
+            const transaction = await contract.withdrawCollateral(tokenTypeAddress, _weiAmount);
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`${_amount}${tokenName} successfully deposited as collateral!`, {
+                toast.success(`${_amount}${tokenName} successfully withdrawn!`, {
                     id: toastId,
                 });
                 queryClient.invalidateQueries({ queryKey: ["userUtilities"] });
@@ -90,7 +71,7 @@ const useDepositCollateral = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, tokenName, queryClient, navigate, errorDecoder]);
+    }, [chainId, walletProvider, tokenTypeAddress, _amount, tokenDecimal, tokenName, queryClient, navigate, errorDecoder]);
 };
 
-export default useDepositCollateral;
+export default useWithdrawCollateral;

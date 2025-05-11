@@ -6,38 +6,34 @@ import { useCallback } from "react";
 import { isSupportedChain } from "../../constants/utils/chains";
 import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
-import useCheckAllowances from "../read/useCheckAllowances";
-import {
-    getERC20Contract,
-    getLendbitContract,
-} from "../../api/contractsInstance";
+import { getERC20Contract, getLendbitContract } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import erc20 from "../../abi/erc20.json";
 import { ethers, MaxUint256 } from "ethers";
-import { envVars } from "../../constants/config/envVars";
 import { ErrorDecoder } from "ethers-decode-error";
-import { useNavigate } from "react-router-dom";
+import useCheckAllowances from "../read/useCheckAllowances";
+import { envVars } from "../../constants/config/envVars";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 
-const useDepositCollateral = (
-    tokenTypeAddress: string,
+const useSupplyLiquidity = (
     _amount: string,
+    tokenTypeAddress: string,
     tokenDecimal: number,
     tokenName: string,
 ) => {
     const { chainId } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
-    const { data: allowanceVal = 0, isLoading } = useCheckAllowances(tokenTypeAddress);
-    const navigate = useNavigate();
-    const queryClient = useQueryClient();
 
     const errorDecoder = ErrorDecoder.create([lendbit, erc20]);
+    const { data: allowanceVal = 0, isLoading } = useCheckAllowances(tokenTypeAddress);
+    const queryClient = useQueryClient();
+
 
     return useCallback(async () => {
+        let toastId: string | number | undefined;
         if (!isSupportedChain(chainId)) return toast.warning("SWITCH NETWORK");
         if (isLoading) return toast.loading("Checking allowance...");
-
 
 
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
@@ -46,14 +42,14 @@ const useDepositCollateral = (
         const contract = getLendbitContract(signer, lendbit);
 
         const _weiAmount = ethers.parseUnits(_amount, tokenDecimal);
-        let toastId: string | number | undefined;
+
 
         try {
-            toastId = toast.loading(`Processing deposit collateral transaction...`);
+            toastId = toast.loading(`Processing supply...`);
+            // console.log("AMOUNT OF SUPPLY IN WEI", _weiAmount);
 
-            // **Check Allowance and Approve if Needed**
             if (allowanceVal === 0 || allowanceVal < Number(_weiAmount)) {
-                toast.loading(`Approving ${tokenName} tokens...`, { id: toastId });
+                toast.loading(`Approving tokens...`, { id: toastId });
 
                 const allowance = await erc20contract.approve(
                     envVars.lendbitContractAddress,
@@ -66,19 +62,19 @@ const useDepositCollateral = (
                 }
             }
 
-            toast.loading(`Processing deposit of ${_amount}${tokenName} as collateral...`, { id: toastId })
+            toast.loading(`Processing supply of ${_amount} ${tokenName}...`, { id: toastId })
 
-            // **Proceed with Deposit**
-            const transaction = await contract.depositCollateral(tokenTypeAddress, _weiAmount);
+            const transaction = await contract.deposit(tokenTypeAddress, _weiAmount);
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`${_amount}${tokenName} successfully deposited as collateral!`, {
+                toast.success(`${_amount}${tokenName} successfully supplied, happy earning!`, {
                     id: toastId,
                 });
                 queryClient.invalidateQueries({ queryKey: ["userUtilities"] });
+                queryClient.invalidateQueries({ queryKey: ["getAPR&APY"] });
+                queryClient.invalidateQueries({ queryKey: ["getTotalSupplyBorrow"] });
                 queryClient.invalidateQueries({ queryKey: ["userPosition"] });
-                navigate("/")
             }
         } catch (error: unknown) {
             try {
@@ -90,7 +86,7 @@ const useDepositCollateral = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, tokenName, queryClient, navigate, errorDecoder]);
+    }, [_amount, allowanceVal, chainId, errorDecoder, isLoading, queryClient, tokenDecimal, tokenName, tokenTypeAddress, walletProvider]);
 };
 
-export default useDepositCollateral;
+export default useSupplyLiquidity;
