@@ -1,28 +1,19 @@
 import React, { useState } from "react";
 import TokenTagSm from "./TokenTagSm.tsx";
+import { TokenItem } from "../../constants/types/index.ts";
 
-type TokenItem = {
-    symbol: string;
-    icon: string;
-};
 
-const tokenList: TokenItem[] = [
-    { symbol: "All Tokens", icon: "" },
-    { symbol: "USDC", icon: "/Token-Logos/usdc-base.svg" },
-    { symbol: "USDT", icon: "/Token-Logos/usdt-base.svg" },
-    { symbol: "ETH", icon: "/Token-Logos/eth-base.svg" },
-    { symbol: "WETH", icon: "/Token-Logos/weth-base.svg" },
-];
 
 type Props = {
     selected: string;
     setSelected: (val: string) => void;
+    tokenList: TokenItem[]; 
 };
 
-const TokenDropdown: React.FC<Props> = ({ selected, setSelected }) => {
+const TokenDropdown: React.FC<Props> = ({ selected, setSelected, tokenList }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    const selectedItem = tokenList.find((t) => t.symbol === selected) || tokenList[0];
+    const selectedItem = tokenList?.find((t) => t.symbol === selected) || tokenList[0];
 
     return (
         <div className="relative w-[160px]">

@@ -69,7 +69,7 @@ const ExampleLiquidityMarkets = () => {
                     icon={pool.icon}
                     tokenName={pool.name}
                     tokenSymbol={pool.symbol}
-                    riskLevel={pool.riskLevel as "low" | "mid" | "high"}
+                    riskLevel={pool.riskLevel as "low" | "mid" | "high" | "medium"}
                     totalSupplied={pool.totalSupplied}
                     supplyApy={pool.supplyApy}
                     totalBorrowed={pool.totalBorrowed}
