@@ -48,7 +48,7 @@ const AddRecipients: React.FC = () => {
 
             <div className="space-y-2">
                 {addresses.map((addr) => (
-                    <div key={addr} className="flex items-center justify-between bg-black border border-white text-white px-3 py-2 rounded-md text-sm">
+                    <div key={addr} className="flex items-center justify-between bg-[#050505] border border-white text-white px-3 py-2 rounded-md text-sm">
                         <span className="truncate">{addr}</span>
                         <button
                             onClick={() => removeAddress(addr)}

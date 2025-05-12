@@ -50,7 +50,7 @@ const SupplyBorrow = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Left Panel */}
-                    <div className="bg-black p-4 rounded-xl h-fit noise shadow-1">
+                    <div className="bg-[#050505] p-4 rounded-xl h-fit noise shadow-1">
                         <p className="text-gray-500 mb-2 text-left">{mode === "supply" ? "I will deposit" : "I will borrow"}</p>
 
                         <div className="bg-[#181919] rounded-md p-2">
@@ -72,7 +72,7 @@ const SupplyBorrow = () => {
                                         {dummyTokens.map((token) => (
                                             <div
                                                 key={token.token}
-                                                className="p-2 hover:bg-black flex gap-2 items-center"
+                                                className="p-2 hover:bg-[#050505] flex gap-2 items-center"
                                                 onClick={() => {
                                                     setSelectedToken(token);
                                                     setDropdownOpen(false);
@@ -109,7 +109,7 @@ const SupplyBorrow = () => {
                     </div>
 
                     {/* Right Panel */}
-                    <div className="bg-black p-4 rounded-xl noise shadow-1">
+                    <div className="bg-[#050505] p-4 rounded-xl noise shadow-1">
                         <p className="text-gray-500 mb-2 text-left">Overview</p>
 
                         <div className="bg-[#181919] rounded-md p-2">

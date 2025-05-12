@@ -14,7 +14,7 @@ createRoot(document.getElementById("root")!).render(
 	// <StrictMode>
 	<QueryClientProvider client={queryClient}>
     <Router>
-      <section className={`w-full relative px-2 py-2 bg-black overflow-hidden`}>       
+      <section className={`w-full relative overflow-hidden`}>
         <Background />
         <main className="w-full h-screen overflow-y-auto absolute left-0 top-0 z-10">
           <div className="max-w-[1542px] mx-auto mt-3">

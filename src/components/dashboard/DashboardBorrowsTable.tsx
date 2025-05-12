@@ -84,7 +84,7 @@ const DashboardBorrowsTable = ({ dashboardData }: DashboardCardsProps) => {
 		<div className="text-white w-full h-full">
 			<h2 className="text-xl font-bold mb-2 text-left px-2">Borrows</h2>
 
-			<div className="bg-black rounded-md overflow-hidden shadow-1 noise">
+			<div className="bg-[#050505] rounded-md overflow-hidden shadow-1 noise">
 				<div className="grid grid-cols-6 gap-4 py-3 px-4 font-semibold text-sm text-left">
 					<span>Assets</span>
 					<span>Borrow</span>

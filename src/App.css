@@ -2,11 +2,16 @@
 
 #root {
   /*max-width: 1780px;*/
-  max-height: 100vh;
-  width: 100%;
+  /*max-height: 100vh;*/
+  /*width: 100%;*/
   margin: 0 auto;
   padding: 0;
   text-align: center;
+}
+
+.u-class-background{
+    background-image: url("/bg.svg");
+    background-position: center;
 }
 
 
@@ -28,9 +33,11 @@
 
 /* Shadow */
 .shadow-1 {
-  box-shadow: 2px -3px 25px -4px rgba(255,255,255,0.16);
-  -webkit-box-shadow: 2px -3px 25px -4px rgba(255,255,255,0.16);
-  -moz-box-shadow: 2px -3px 25px -4px rgba(255,255,255,0.16);
+    /*-webkit-box-shadow: -1px 3px 18px -4px rgba(255,255,255,0.13);*/
+    /*box-shadow: -1px 3px 18px -4px rgba(255,255,255,0.13);*/
+
+    /*-webkit-box-shadow: -1px 3px 18px -4px rgba(24,25,25,0.65);*/
+    /*box-shadow: -1px 3px 18px -4px rgba(24,25,25,0.65);*/
 }
 
 

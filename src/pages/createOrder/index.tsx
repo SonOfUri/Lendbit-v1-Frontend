@@ -48,8 +48,8 @@ const CreateOrder = () => {
 
 	return (
 		<div className="min-h-screen flex items-center lg:items-start justify-center  p-4 lg:pt-12 lg:px-4">
-			<div className="max-w-[593px] w-full bg-[#12151a] rounded-xl pb-6 pt-4">
-				<div className="max-w-[487px] mx-auto">
+			<div className="max-w-[593px] w-full bg-[#050505] rounded-xl p-4 noise">
+				<div className="max-w-[450px] mx-auto">
 					<p className="text-2xl text-white px-2 font-bold flex items-start">
 						Create
 					</p>
@@ -68,7 +68,7 @@ const CreateOrder = () => {
 							>
 								Lend Order
 								{showLendTooltip && (
-									<div className="absolute bottom-full mb-4 ml-2 bg-[#A66CFF] text-white text-xs rounded-lg p-2 w-64 z-10">
+									<div className="absolute bottom-full mb-4 ml-2 bg-[#191818] text-white text-xs rounded-lg p-2 w-64 z-10">
 										Lenders create lending pools that borrowers can borrow from.
 									</div>
 								)}
@@ -86,7 +86,7 @@ const CreateOrder = () => {
 							>
 								Borrow Order
 								{showBorrowTooltip && (
-									<div className="absolute bottom-full mb-4 ml-2 bg-[#A66CFF] text-white text-xs rounded-lg p-2 w-64 z-10">
+									<div className="absolute bottom-full mb-4 ml-2 bg-[#191818] text-white text-xs rounded-lg p-2 w-64 z-10">
 										Borrowers create borrow orders that lenders can service.
 									</div>
 								)}

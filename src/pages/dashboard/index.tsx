@@ -60,14 +60,19 @@ const Dashboard = () => {
           </div>
 
           {/* === Bottom Row Insights === */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <DashboardBorrowPowerCard
-                    available={dashboardData?.lending?.availableBorrow ?? 80}
-                    totalCollateral={dashboardData?.lending?.totalCollateral ?? 100}
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
+            <div className="lg:col-span-4">
+                <DashboardBorrowPowerCard
+                    available={dashboardData?.lending?.availableBorrow ?? 0}
+                    totalCollateral={dashboardData?.lending?.totalCollateral ?? 0}
                 />
-              <TransactionHistory />
-          </div>
-      </div>
+            </div>
+            <div className="lg:col-span-6">
+                <TransactionHistory />
+            </div>
+        </div>
+
+    </div>
   )
 }
 

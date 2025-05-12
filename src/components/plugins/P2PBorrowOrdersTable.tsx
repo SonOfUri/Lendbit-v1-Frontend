@@ -66,7 +66,7 @@ const P2PLendOrdersTable = () => {
                 <span></span>
             </div>
 
-            <div className="bg-black rounded-b-md p-4 noise shadow-1">
+            <div className="bg-[#050505] rounded-b-md p-4 noise shadow-1">
                 {data.map(({ icon, symbol, amount, usd, apr, pool, status, expiry }) => (
                     <div
                         key={symbol + pool}

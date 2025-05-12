@@ -38,7 +38,7 @@ const TransactionHistory: React.FC = () => {
     ];
 
     return (
-        <div className="w-full bg-black text-white p-4 rounded-md noise shadow-1 ">
+        <div className="w-full bg-[#050505] text-white p-4 rounded-md noise shadow-1 ">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-bold">Transaction History</h2>
                 <button className="text-[#D8EE10] font-medium text-sm flex items-center gap-1">

@@ -72,7 +72,7 @@ const Navbar = () => {
 
 	return (
 		<div className="relative custom-corner-header">
-			<nav className="w-full bg-black px-4 py-3 flex items-center justify-between text-white">
+			<nav className="w-full bg-[#050505] px-4 py-3 flex items-center justify-between text-white">
 				{/* Logo */}
 				<div className="flex items-center gap-2">
 					<img src="/logo-icon.svg" alt="Lendbit Icon" className="w-10 h-10" />

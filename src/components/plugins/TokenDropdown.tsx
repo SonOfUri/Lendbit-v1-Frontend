@@ -20,7 +20,7 @@ const TokenDropdown: React.FC<Props> = ({ selected, setSelected, tokenList }) =>
             {/* Selected Display */}
             <div
                 onClick={() => setIsOpen((prev) => !prev)}
-                className="flex items-center justify-between bg-black border border-whitegray-600 px-3 py-2 rounded cursor-pointer  max-h-[300px]"
+                className="flex items-center justify-between bg-[#050505] border border-whitegray-600 px-3 py-2 rounded cursor-pointer  max-h-[300px]"
             >
                 {selectedItem.symbol === "All Tokens" ? (
                     <span className="text-white text-sm">All Tokens</span>
@@ -32,7 +32,7 @@ const TokenDropdown: React.FC<Props> = ({ selected, setSelected, tokenList }) =>
 
             {/* Dropdown Items */}
             {isOpen && (
-                <div className="absolute mt-2 w-full bg-black border border-white rounded shadow-md z-50">
+                <div className="absolute mt-2 w-full bg-[#050505] border border-white rounded shadow-md z-50">
                     {tokenList.map((token) => (
                         <div
                             key={token.symbol}

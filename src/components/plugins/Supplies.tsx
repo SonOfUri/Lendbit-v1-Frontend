@@ -8,7 +8,7 @@ const Supplies = () => {
     return (
         <div className="text-white w-full">
             <div className="flex justify-end mb-2">
-                <div className="flex gap-1 p-1 bg-black rounded-full">
+                <div className="flex gap-1 p-1 bg-[#050505] rounded-full">
                     <button
                         onClick={() => setIsLPSelected(true)}
                         className={`px-4 py-1 rounded-full text-sm ${

@@ -55,14 +55,14 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
 					}}
 				/>
 				<div
-					className="absolute w-4 h-4 bg-black border-2 border-white rounded-full -top-1"
+					className="absolute w-4 h-4 bg-[#050505] border-2 border-white rounded-full -top-1"
 					style={{
 						left: `${(parsedMin / max) * 100}%`,
 						transform: "translateX(-50%)",
 					}}
 				/>
 				<div
-					className="absolute w-4 h-4 bg-black border-2 border-white rounded-full -top-1"
+					className="absolute w-4 h-4 bg-[#050505] border-2 border-white rounded-full -top-1"
 					style={{
 						left: `${(parsedMax / max) * 100}%`,
 						transform: "translateX(-50%)",

@@ -54,7 +54,7 @@ const LiquiditySuppliesTable = () => {
                 <span>Actions</span>
             </div>
 
-            <div className="bg-black p-4 rounded-b-md overflow-x-scroll noise shadow-1">
+            <div className="bg-[#050505] p-4 rounded-b-md overflow-x-scroll noise shadow-1">
                 {data.map(({ icon, symbol, amount, usd, apy, interest, date }) => (
                     <div
                         key={symbol}

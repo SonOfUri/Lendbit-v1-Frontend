@@ -131,14 +131,14 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
             <div className="flex justify-between items-center mb-3">
                 {/* Token Dropdown */}
                 <div
-                    className="relative bg-black text-white rounded-md p-2 flex items-center gap-2 cursor-pointer"
+                    className="relative bg-[#050505] text-white rounded-md p-2 flex items-center gap-2 cursor-pointer"
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                     <img src={selectedToken.icon} alt={selectedToken.token} width={18} height={18} />
                     <span className="text-xs">{selectedToken.token}</span>
                     <span className="text-xs">▼</span>
                     {isDropdownOpen && (
-                        <div className="absolute left-0 top-full mt-2 bg-black w-[100px] rounded z-10">
+                        <div className="absolute left-0 top-full mt-2 bg-[#050505] w-[100px] rounded z-10">
                             {dummyTokenData.map((token) => (
                                 <div
                                     key={token.token}
@@ -165,7 +165,7 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
 
                     <button
                         onClick={handleMaxClick}
-                        className="ml-2 bg-black 0hover:bg-[#000000] text-white px-2 py-1 rounded text-sm"
+                        className="ml-2 bg-[#050505] 0hover:bg-[#000000] text-white px-2 py-1 rounded text-sm"
                     >
                         Max
                     </button>

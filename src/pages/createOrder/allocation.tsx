@@ -6,8 +6,8 @@ const Allocation = () => {
 
 	return (
 		<div className="min-h-screen flex items-center lg:items-start justify-center  p-4 lg:pt-36 lg:px-4">
-			<div className="max-w-[593px] w-full bg-[#12151a] rounded-xl py-6">
-				<div className="max-w-[472px] mx-auto px-6">
+			<div className="max-w-[450px] w-full bg-[#050505] rounded-xl py-6 noise">
+				<div className="max-w-[400px] mx-auto px-6">
 					<div className="flex flex-col items-start w-full">
 						<div
 							className="my-4 flex items-center gap-2 px-2"

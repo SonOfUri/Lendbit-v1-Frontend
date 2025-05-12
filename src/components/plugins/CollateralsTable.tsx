@@ -25,11 +25,13 @@ const CollateralsTable: React.FC = () => {
     ];
 
     return (
-        <div className="w-full text-white bg-black rounded-md overflow-hidden noise shadow-1">
+        <div className="w-full text-white bg-[#050505] rounded-md overflow-hidden noise shadow-1">
             {/* Table Header */}
-            <div className="grid grid-cols-4 p-4 bg-[#181919] font-semibold text-sm text-left">
+            <div className="grid grid-cols-6 p-4 bg-[#181919] font-semibold text-sm text-left">
                 <span>Assets</span>
                 <span>Amount</span>
+                <span>Value</span>
+                <span>Collateral</span>
                 <div className="col-span-2 flex justify-start gap-8 pr-2">Actions</div>
             </div>
 
@@ -37,15 +39,29 @@ const CollateralsTable: React.FC = () => {
             {data.map(({ icon, symbol, amount, usdValue }) => (
                 <div
                     key={symbol}
-                    className="grid grid-cols-4 p-4 items-center text-sm text-left"
+                    className="grid grid-cols-6 p-4 items-center text-sm text-left"
                 >
                     {/* Token */}
                     <TokenTagSm icon={icon} symbol={symbol} />
 
-                    {/* Amount + USD */}
+                    {/* Amount */}
                     <div className="flex flex-col">
                         <span className="font-bold">{amount}</span>
-                        <span className="text-gray-400">{usdValue}</span>
+                    </div>
+
+                    {/* Value */}
+                    <div className="flex flex-col">
+                        <span className="font-bold">{usdValue}</span>
+                    </div>
+
+                    {/* Toggle */}
+                    <div className="flex flex-col">
+                        <img
+                            src="/toggle-on.svg"
+                            alt="Toggle"
+                            width={28}
+                            height={28}
+                        />
                     </div>
 
                     {/* Action Buttons */}
