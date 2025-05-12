@@ -1,12 +1,13 @@
-import DashboardCards from "../../components/Dashboard/dashboardCards"
-import DashboardBorrowsTable from "../../components/Dashboard/DashboardBorrowsTable"
-import DashboardPortfolioTable from "../../components/Dashboard/DashboardPortfolioTable"
+
 import TransactionHistory from "../../components/plugins/TransactionHistory"
 import LoadingState from "../../components/shared/LoadingState"
 import useDashboardData from "../../hooks/read/useDashboardData"
-import DashboardBorrowPowerCard from "../../components/Dashboard/DashboardBorrowPowerCard"
 import { default as DashboardPortfolioTableFromPlugins } from "../../components/plugins/DashboardPortfolioTable.tsx";
 import { default as DashboardBorrowsTableFromPlugins } from "../../components/plugins/DashboardBorrowsCard.tsx";
+import DashboardCards from "../../components/dashboard/dashboardCards.tsx";
+import DashboardPortfolioTable from "../../components/dashboard/DashboardPortfolioTable.tsx";
+import DashboardBorrowsTable from "../../components/dashboard/DashboardBorrowsTable.tsx";
+import DashboardBorrowPowerCard from "../../components/dashboard/DashboardBorrowPowerCard.tsx";
 
 
 
