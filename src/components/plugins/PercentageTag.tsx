@@ -16,7 +16,7 @@ const PercentageTag: React.FC<PercentageTagProps> = ({ percentage }) => {
 
     return (
         <div
-            className={`inline w-[50%] text-center items-center px-3 py-1 rounded-full border text-sm font-semibold ${labelColor}`}
+            className={`inline w-fit text-center items-center px-3 py-1.5 rounded-full border text-sm font-semibold ${labelColor}`}
         >
             {arrow} {safe}%
         </div>

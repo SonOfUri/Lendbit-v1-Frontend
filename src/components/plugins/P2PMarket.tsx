@@ -2,6 +2,7 @@ import { useState } from "react";
 import LendBorrowRow from "./LendBorrowRow.tsx";
 import FilterModal from "./FilterModal.tsx";
 import Dropdown from "./TokenDropdown.tsx";
+import { TokenItem } from "../../constants/types/index.ts";
 
 const sampleData = [
     {
@@ -46,6 +47,15 @@ const sampleData = [
     },
 ];
 
+const tokenList: TokenItem[] = [
+  { symbol: "All Tokens", icon: "" },
+  { symbol: "USDC", icon: "/Token-Logos/usdc-base.svg" },
+  { symbol: "USDT", icon: "/Token-Logos/usdt-base.svg" },
+  { symbol: "ETH", icon: "/Token-Logos/eth-base.svg" },
+  { symbol: "WETH", icon: "/Token-Logos/weth-base.svg" },
+  { symbol: "WBTC", icon: "/Token-Logos/wbtc-base.svg" },
+];
+
 const P2PMarket: React.FC = () => {
     const [activeTab, setActiveTab] = useState<"lend" | "borrow">("borrow");
     const [selectedToken, setSelectedToken] = useState("All Tokens");
@@ -58,7 +68,7 @@ const P2PMarket: React.FC = () => {
     return (
         <div className="w-full text-white">
             {/* Top Bar */}
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-1">
                 <div className="flex gap-2 bg-black rounded p-1">
                     <button
                         onClick={() => setActiveTab("lend")}
@@ -75,7 +85,7 @@ const P2PMarket: React.FC = () => {
                 </div>
 
                 <div className="flex gap-3 items-center">
-                    <Dropdown selected={selectedToken} setSelected={setSelectedToken} />
+                    <Dropdown selected={selectedToken} setSelected={setSelectedToken} tokenList ={tokenList} />
                     <button
                         onClick={() => setShowFilterModal(true)}
                         className="p-2 "
@@ -86,7 +96,7 @@ const P2PMarket: React.FC = () => {
             </div>
 
             {/* Table Header */}
-            <div className="grid grid-cols-7 gap-4 text-sm text-white p-4 text-left bg-[#181919] rounded-t-md">
+            <div className="grid grid-cols-7 gap-4 text-sm text-white p-4 text-left bg-[#181919] rounded-t-md noise shadow-1">
                 <span>Assets</span>
                 <span>Amount</span>
                 <span>APR</span>
@@ -97,7 +107,7 @@ const P2PMarket: React.FC = () => {
             </div>
 
             {/* Rows */}
-            <div className="bg-black rounded-b-md overflow-hidden">
+            <div className="bg-black rounded-b-md overflow-hidden noise shadow-1">
                 {filtered.map((item, index) => (
                     <LendBorrowRow
                         key={index}

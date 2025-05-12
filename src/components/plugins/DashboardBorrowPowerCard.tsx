@@ -9,7 +9,7 @@ type DashboardBorrowPowerPropsCard = {
 
 const DashboardBorrowPowerCard: React.FC<DashboardBorrowPowerPropsCard> = ({ percentage }) => {
     return (
-        <div className="flex items-center justify-between w-full p-4 bg-black rounded-md text-white">
+        <div className="flex items-center justify-between w-full p-4 bg-black rounded-md text-white noise shadow-1 ">
             {/* Left Section */}
             <div className="flex flex-col gap-2 items-center">
                 <h3 className="text-2xl font-bold">Borrow Power</h3>

@@ -25,7 +25,7 @@ const CollateralsTable: React.FC = () => {
     ];
 
     return (
-        <div className="w-full text-white bg-black rounded-2xl overflow-hidden">
+        <div className="w-full text-white bg-black rounded-md overflow-hidden noise shadow-1">
             {/* Table Header */}
             <div className="grid grid-cols-4 p-4 bg-[#181919] font-semibold text-sm text-left">
                 <span>Assets</span>
