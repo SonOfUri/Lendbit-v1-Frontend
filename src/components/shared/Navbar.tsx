@@ -89,7 +89,7 @@ const Navbar = () => {
 						{ to: "/", label: "Dashboard" },
 						{ to: "/markets", label: "Markets" },
 						{ to: "/positions", label: "Positions" },
-						{ to: "/transact", label: "Supply/Borrow" },
+						{ to: "/supply-borrow", label: "Supply/Borrow" },
 						{ to: "/create/lend", label: "Create" },
 					].map(({ to, label }) => (
 						<NavLink

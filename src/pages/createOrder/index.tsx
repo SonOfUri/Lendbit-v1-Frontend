@@ -1,20 +1,56 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AssetSelector from "../../components/plugins/AssetSelector";
 import LoanControl from "../../components/plugins/LoanControl";
 import AddRecipients from "../../components/plugins/AddRecipients";
 import { DateInputField } from "../../components/CreateOrder/DateInputField";
+import useCreateBorrowOrder from "../../hooks/write/useCreateBorrowOrder";
+import useDashboardData from "../../hooks/read/useDashboardData";
+import useTokenData from "../../hooks/read/useTokenData";
+import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import LoadingState from "../../components/shared/LoadingState";
+import ConnectPrompt from "../../components/shared/ConnectPrompt";
+import { TokenData } from "../../constants/types/tokenData";
 
 const CreateOrder = () => {
+
+	const { dashboardData, isWalletConnected, dashboardDataLoading } = useDashboardData();
+    const { tokenData, tokenDataLoading } = useTokenData();
+    const { address, isConnected } = useWeb3ModalAccount();
+
+    const { lending } = dashboardData || {};
+	const { availableBorrow = 0 } = lending || {};
+	
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const [showLendTooltip, setShowLendTooltip] = useState(false);
-    const [showBorrowTooltip, setShowBorrowTooltip] = useState(false);
+	const [showBorrowTooltip, setShowBorrowTooltip] = useState(false);
+	const [selectedToken, setSelectedToken] = useState<TokenData | null>(null);
+  	const [assetValue, setAssetValue] = useState("");
+	
+    const [availableBal, setAvailableBal] = useState(availableBorrow || 0);
     
     const [dateValue, setDateValue] = useState<string>("");
     
-    
-    
+    useEffect(() => {
+		setAvailableBal(availableBorrow || 0);
+	}, [availableBorrow]);
+
+	useEffect(() => {
+		if (tokenData && tokenData.length > 0 && !selectedToken) {
+		setSelectedToken(tokenData[0]);
+		}
+	}, [selectedToken, tokenData]);
+
+    const handleTokenSelect = (token: TokenData) => {
+		setSelectedToken(token);
+	};
+
+	const handleAssetValueChange = (value: string) => {
+		setAssetValue(value);
+	};
+
+
     const handleNavigation = () => {
 		// const missingFields = [];
 		
@@ -45,10 +81,41 @@ const CreateOrder = () => {
 		});
 	};
 
+	// const lendingRequestOrder = useCreateBorrowOrder(String(assetValue), Number(percentage), unixReturnDate, selectedToken.address, selectedToken.decimal, selectedToken.name);
+
+
+	if (dashboardDataLoading || tokenDataLoading) {
+		return (
+			<div className="w-full h-screen flex items-center justify-center">
+				<LoadingState />
+			</div>
+		);
+	}
+
+    if (!isWalletConnected && !isConnected) {
+        return (
+            <div className="font-kaleko py-6 h-screen">
+                <div className="w-full m-auto">
+                    <h3 className="text-lg text-white px-2 mb-2">
+                        {id == "lend" ? "Create Lend Order" : "Create Borrow Order"}
+                    </h3>
+                    <ConnectPrompt />
+                </div>      
+            </div>
+        );
+    }
+
+    if (!tokenData || tokenData.length === 0 ) {
+        return (
+            <div className="w-full h-screen flex items-center justify-center">
+                <p className="text-white">No tokens available</p>
+            </div>
+        );
+    }
 
 	return (
 		<div className="min-h-screen flex items-center lg:items-start justify-center  p-4 lg:pt-12 lg:px-4">
-			<div className="max-w-[593px] w-full bg-[#050505] rounded-xl p-4 noise">
+			<div className="max-w-[593px] w-full bg-[#050505] rounded-xl p-4 noise ">
 				<div className="max-w-[450px] mx-auto">
 					<p className="text-2xl text-white px-2 font-bold flex items-start">
 						Create
@@ -98,13 +165,18 @@ const CreateOrder = () => {
 						<div className="flex flex-col items-start w-full overflow-hidden">
 							<p className="font-semibold mb-1 text-white">Select Asset</p>
 							<div className="w-full">
-								<AssetSelector
-									onTokenSelect={(token, price) => console.log(token, price)}
-									onAssetValueChange={(val) => console.log("Value:", val)}
-									assetValue="1.5"
-									userAddress="0x123"
-									actionType="supply"
-								/>
+								{selectedToken && (
+									<AssetSelector
+									onTokenSelect={handleTokenSelect}
+									onAssetValueChange={handleAssetValueChange}
+									assetValue={assetValue}
+									userAddress={address}
+									actionType={id === "lend" ? "supply" : "borrow"}
+									tokenData={tokenData}
+									selectedToken={selectedToken}
+									availableBal = {availableBal}
+									/>
+								)}
 							</div>
 						</div>
 					</div>

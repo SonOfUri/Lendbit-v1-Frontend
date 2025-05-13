@@ -21,12 +21,12 @@ const useCreateBorrowOrder = (
     _returnDate: number,
     tokenTypeAddress: string,
     tokenDecimal: number,
-    expirationDate: number,
+    // expirationDate: number,
     tokenName: string,
     // collateralTokens: string[],
     // collateralAmounts: number[],
 ) => {
-    const { chainId } = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
     const queryClient = useQueryClient();
     const errorDecoder = ErrorDecoder.create([lendbit, erc20]);
@@ -55,7 +55,10 @@ const useCreateBorrowOrder = (
                 toast.success(`${_amount} ${tokenName} lending request successfully created!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["allBorrowRequests"] });
+                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
+                queryClient.invalidateQueries({ queryKey: ["market"] });
+                queryClient.invalidateQueries({ queryKey: ["position"] });
+                queryClient.invalidateQueries({ queryKey: ["tokens"] });
                 navigate("/")
             }
         } catch (error: unknown) {
@@ -68,7 +71,7 @@ const useCreateBorrowOrder = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, walletProvider, _amount, tokenDecimal, _interest, _returnDate, expirationDate, tokenTypeAddress, tokenName, queryClient, navigate, errorDecoder]);
+    }, [chainId, walletProvider, _amount, tokenDecimal, _interest, _returnDate, tokenTypeAddress, tokenName, queryClient, address, navigate, errorDecoder]);
 };
 
 export default useCreateBorrowOrder;

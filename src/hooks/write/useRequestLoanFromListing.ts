@@ -18,7 +18,7 @@ import { Eip1193Provider } from "ethers";
 const useRequestLoanFromListing = (
 
 ) => {
-    const { chainId } = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
 
     const errorDecoder = ErrorDecoder.create([lendbit, erc20]);
@@ -51,8 +51,9 @@ const useRequestLoanFromListing = (
                 toast.success(`${_amount} successfully borrowed!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["allLoanListings"] });
-                queryClient.invalidateQueries({ queryKey: ["userActiveRequests"] });
+                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
+                queryClient.invalidateQueries({ queryKey: ["market"] });
+                queryClient.invalidateQueries({ queryKey: ["position"] });
 
                 navigate("/")
             }
@@ -66,7 +67,7 @@ const useRequestLoanFromListing = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, errorDecoder, navigate, queryClient, walletProvider]);
+    }, [address, chainId, errorDecoder, navigate, queryClient, walletProvider]);
 };
 
 export default useRequestLoanFromListing;

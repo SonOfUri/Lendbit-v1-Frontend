@@ -4,11 +4,12 @@ import Dashboard from './pages/dashboard';
 import Markets from './pages/markets';
 import Positions from './pages/positions';
 import Plugins from './pages/plugins';
-import SupplyBorrow from "./pages/transact";
+import SupplyBorrow from "./pages/supplyBorrow";
 
 import './App.css';
 import CreateOrder from './pages/createOrder';
 import Allocation from './pages/createOrder/allocation';
+import Transact from './pages/transact';
 
 
 
@@ -19,14 +20,13 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/markets" element={<Markets />} />
         <Route path="/positions" element={<Positions />} />
-        <Route path="/transact" element={<SupplyBorrow />} />
-
+        <Route path="/supply-borrow" element={<SupplyBorrow />} />
+        
+        <Route path="/transact/:id" element={<Transact />} />
         <Route path="/create/:id" element={<CreateOrder />} />
         <Route path="/allocation" element={<Allocation />} />
 
         
-        {/* <Route path="/supply-borrow/:id" element={<Transact />} />
-        <Route path="/rewards" element={<Rewards />} /> */}
         
         <Route path="/plugins" element={<Plugins />} />create
 

@@ -1,193 +1,186 @@
 import React, { useEffect, useState } from "react";
-
-type TokenType = {
-    token: string;
-    icon: string;
-    tokenPrice: number;
-};
+import { TokenData } from "../../constants/types/tokenData";
+import { getEthBalance, getTokenBalance } from "../../constants/utils/getBalances";
 
 type AssetSelectorProps = {
-    onTokenSelect: (token: string, price: number) => void;
-    onAssetValueChange: (value: string) => void;
-    assetValue: string;
-    userAddress: string;
-    actionType: "supply" | "withdraw" | "borrow";
+  onTokenSelect: (token: TokenData) => void;
+  onAssetValueChange: (value: string) => void;
+  assetValue: string;
+  userAddress: string | undefined;
+  actionType: "supply" | "withdraw" | "borrow";
+  tokenData: TokenData[];
+  selectedToken: TokenData | null;
+  availableBal : number | null
 };
 
-// 🧪 Dummy Token Data
-const dummyTokenData: TokenType[] = [
-    {
-        token: "ETH",
-        icon: "/Token-Logos/eth-base.svg",
-        tokenPrice: 2500,
-    },
-    {
-        token: "USDC",
-        icon: "/Token-Logos/usdc-base.svg",
-        tokenPrice: 1,
-    },
-    {
-        token: "USDT",
-        icon: "/Token-Logos/usdt-base.svg",
-        tokenPrice: 1,
-    },
-    {
-        token: "WETH",
-        icon: "/Token-Logos/weth-base.svg",
-        tokenPrice: 2500,
-    },
-];
-
-// 🧪 Dummy Hooks and Balance Fetchers
-const useGetValueAndHealth = () => ({
-    etherPrice: 2500,
-    linkPrice: 1,
-    AVA: "10.5",  // ETH available balance
-    AVA2: "2000", // USDC available balance
-});
-
-const getEthBalance = async () => "10.543";
-const getUsdcBalance = async () => "1500.00";
-
 const AssetSelector: React.FC<AssetSelectorProps> = ({
-                                                         onTokenSelect,
-                                                         onAssetValueChange,
-                                                         assetValue,
-                                                         userAddress,
-                                                         actionType,
-                                                     }) => {
-    const { etherPrice, linkPrice, AVA, AVA2 } = useGetValueAndHealth();
-    const [selectedToken, setSelectedToken] = useState(dummyTokenData[0]);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [walletBalance, setWalletBalance] = useState("0");
-    const [availableBal, setAvailableBalance] = useState("0");
+  onTokenSelect,
+  onAssetValueChange,
+  assetValue,
+  userAddress,
+  actionType,
+  tokenData,
+  selectedToken,
+  availableBal,
+}) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [walletBalance, setWalletBalance] = useState("0");
+  const [inputValue, setInputValue] = useState(assetValue || "");
 
-    // Update token prices
-    useEffect(() => {
-        dummyTokenData.forEach((token) => {
-            if (token.token === "ETH") token.tokenPrice = etherPrice;
-            else if (token.token === "USDC") token.tokenPrice = linkPrice;
-        });
+  // Sync local state when parent value changes
+  useEffect(() => {
+    setInputValue(assetValue || "");
+  }, [assetValue]);
 
-        const updated = dummyTokenData.find((t) => t.token === selectedToken.token);
-        if (updated) setSelectedToken({ ...updated });
-    }, [etherPrice, linkPrice]);
-
-    // Fetch balances
-    useEffect(() => {
-        const fetchBalance = async () => {
-            if (!userAddress) return;
-            if (selectedToken.token === "ETH") {
-                setAvailableBalance(AVA);
-                setWalletBalance((await getEthBalance()) || "0");
-            } else if (selectedToken.token === "USDC") {
-                setAvailableBalance(AVA2);
-                setWalletBalance((await getUsdcBalance()) || "0");
-            }
-        };
-        fetchBalance();
-    }, [selectedToken, userAddress]);
-
-    // Handlers
-    const handleTokenSelect = (token: string) => {
-        const selected = dummyTokenData.find((t) => t.token === token);
-        if (selected) {
-            setSelectedToken(selected);
-            onTokenSelect(selected.token, selected.tokenPrice);
+  // Fetch balances when token or address changes
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!userAddress || !selectedToken) return;
+      
+      try {
+        let balance;
+        if (selectedToken.symbol === "ETH") {
+          balance = await getEthBalance(userAddress);
+        } else {
+          balance = await getTokenBalance(
+            userAddress,
+            selectedToken.address,
+            selectedToken.decimals
+          );
         }
-        setIsDropdownOpen(false);
+        setWalletBalance(balance || "0");
+
+      } catch (error) {
+        console.error("Error fetching balance:", error);
+      }
     };
 
-    const [inputValue, setInputValue] = useState(assetValue || "");
+    fetchBalance();
+  }, [selectedToken, userAddress]);
 
-// Sync local state when parent value changes
-    useEffect(() => {
-        setInputValue(assetValue || "");
-    }, [assetValue]);
+  const handleTokenSelect = (token: TokenData) => {
+    onTokenSelect(token);
+    setIsDropdownOpen(false);
+  };
 
-    const handleAssetValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        const regex = /^\d*\.?\d{0,5}$/;
-        if (regex.test(value)) {
-            setInputValue(value);
-            onAssetValueChange(value);
-        }
-    };
+  const handleAssetValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const regex = /^\d*\.?\d{0,5}$/; // Allows numbers with up to 5 decimal places
+    if (regex.test(value)) {
+      setInputValue(value);
+      onAssetValueChange(value);
+    }
+  };
 
-    const handleMaxClick = () => {
-        const maxVal =
-            actionType === "withdraw" || actionType === "borrow"
-                ? (Number(availableBal) * 0.79).toFixed(5)
-                : walletBalance;
-        setInputValue(maxVal); // immediate update
-        onAssetValueChange(maxVal); // update parent
-    };
+  const handleMaxClick = () => {
+    if (!selectedToken) return;
+    
+    const maxVal =
+      actionType === "withdraw" || actionType === "borrow"
+        ? (Number(availableBal) * 0.79).toFixed(5) // 79% of available for safety
+        : walletBalance;
+        
+    setInputValue(maxVal);
+    onAssetValueChange(maxVal);
+  };
 
+  if (!selectedToken) return null;
 
-    const fiatEquivalent = (parseFloat(inputValue || "0") * selectedToken.tokenPrice).toFixed(2);
+  const fiatEquivalent = (
+    parseFloat(inputValue || "0") * selectedToken.price
+  ).toFixed(2);
 
-    return (
-        <div className="bg-[#191818] rounded-lg p-4 w-full max-w-md shadow">
-            <div className="flex justify-between items-center mb-3">
-                {/* Token Dropdown */}
+  return (
+    <div className="bg-[#191818] rounded-lg p-4 w-full max-w-md shadow">
+      <div className="flex justify-between items-center mb-3">
+        {/* Token Dropdown */}
+        <div className="relative">
+          <div
+            className="bg-[#050505] text-white rounded-md p-2 flex items-center gap-2 cursor-pointer min-w-[100px]"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          >
+            <img
+              src={`/Token-Logos/${selectedToken.symbol.toLowerCase()}-base.svg`}
+              alt={selectedToken.symbol}
+              width={18}
+              height={18}
+              className="flex-shrink-0"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/Token-Logos/default-token.svg';
+              }}
+            />
+            <span className="text-xs truncate">{selectedToken.symbol}</span>
+            <span className="text-xs">▼</span>
+          </div>
+          
+          {isDropdownOpen && (
+            <div className="absolute left-0 top-full mt-1 bg-[#050505] w-full rounded z-10 max-h-60 overflow-y-auto">
+              {tokenData.map((token) => (
                 <div
-                    className="relative bg-[#050505] text-white rounded-md p-2 flex items-center gap-2 cursor-pointer"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  key={token.address}
+                  onClick={() => handleTokenSelect(token)}
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-gray-800 cursor-pointer"
                 >
-                    <img src={selectedToken.icon} alt={selectedToken.token} width={18} height={18} />
-                    <span className="text-xs">{selectedToken.token}</span>
-                    <span className="text-xs">▼</span>
-                    {isDropdownOpen && (
-                        <div className="absolute left-0 top-full mt-2 bg-[#050505] w-[100px] rounded z-10">
-                            {dummyTokenData.map((token) => (
-                                <div
-                                    key={token.token}
-                                    onClick={() => handleTokenSelect(token.token)}
-                                    className="flex items-center gap-2 px-3 py-2 hover:bg-gray-800 cursor-pointer"
-                                >
-                                    <img src={token.icon} alt={token.token} width={14} height={14} />
-                                    <span className="text-xs">{token.token}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                  <img
+                    src={`/Token-Logos/${token.symbol.toLowerCase()}-base.svg`}
+                    alt={token.symbol}
+                    width={14}
+                    height={14}
+                    className="flex-shrink-0"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/Token-Logos/default-token.svg';
+                    }}
+                  />
+                  <span className="text-xs truncate">{token.symbol}</span>
                 </div>
-
-                {/* Amount Input + Max */}
-                <div className="flex items-center">
-                    <input
-                        type="text"
-                        value={inputValue}
-                        onChange={handleAssetValueChange}
-                        placeholder="Enter amount"
-                        className="text-right w-28 border-b-2 border-gray-300 focus:outline-none focus:border-white"
-                    />
-
-                    <button
-                        onClick={handleMaxClick}
-                        className="ml-2 bg-[#050505] 0hover:bg-[#000000] text-white px-2 py-1 rounded text-sm"
-                    >
-                        Max
-                    </button>
-                </div>
+              ))}
             </div>
-
-            {/* Wallet Info */}
-            <p className="text-xs text-gray-500 mb-2 text-left">
-                {actionType === "withdraw" || actionType === "borrow" ? "Available Balance: " : "Wallet Balance: "}
-                {actionType === "withdraw" || actionType === "borrow"
-                    ? (Number(availableBal) * 0.79).toFixed(2)
-                    : walletBalance}{" "}
-                {selectedToken.token}
-            </p>
-
-            {/* Fiat value display */}
-            <div className="text-xs text-white flex justify-between">
-                <p>1 {selectedToken.token} = ${selectedToken.tokenPrice}</p>
-                <p className="font-bold">≈ ${fiatEquivalent}</p>
-            </div>
+          )}
         </div>
-    );
+
+        {/* Amount Input + Max */}
+        <div className="flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={handleAssetValueChange}
+            placeholder="0.00"
+            className="text-right w-28 bg-transparent text-white border-b-2 border-gray-300 focus:outline-none focus:border-white"
+          />
+          <button
+            onClick={handleMaxClick}
+            className="ml-2 bg-[#050505] hover:bg-[#000000] text-white px-2 py-1 rounded text-sm"
+            disabled={!userAddress}
+          >
+            Max
+          </button>
+        </div>
+      </div>
+
+      {/* Balance Info */}
+      <p className="text-xs text-gray-500 mb-2 text-left">
+        {actionType === "withdraw" || actionType === "borrow"
+          ? "Available: "
+          : "Wallet: "}
+        {actionType === "withdraw" || actionType === "borrow"
+          ? Number(availableBal).toLocaleString(undefined, {
+              maximumFractionDigits: 5
+            })
+          : Number(walletBalance).toLocaleString(undefined, {
+              maximumFractionDigits: 5
+            })}{" "}
+        {selectedToken.symbol}
+      </p>
+
+      {/* Fiat value display */}
+      <div className="text-xs text-white flex justify-between">
+        <p>
+          1 {selectedToken.symbol} = ${selectedToken.price.toFixed(2)}
+        </p>
+        <p className="font-bold">≈ ${fiatEquivalent}</p>
+      </div>
+    </div>
+  );
 };
 
 export default AssetSelector;

@@ -73,7 +73,9 @@ const useServiceRequest = (
           id: toastId,
         });
 
-        queryClient.invalidateQueries({ queryKey: ["allBorrowRequests"] });
+        queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
+        queryClient.invalidateQueries({ queryKey: ["market"] });
+        queryClient.invalidateQueries({ queryKey: ["position"] });
 
       }
     } catch (error: unknown) {
