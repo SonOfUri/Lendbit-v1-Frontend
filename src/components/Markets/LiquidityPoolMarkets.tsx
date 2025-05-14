@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { formatMoney } from "../../constants/utils/formatMoney";
 import LiquidityMarketCard from "../plugins/LiquidityMarketCard";
 
@@ -23,12 +24,15 @@ const tokenNames: { [key: string]: string } = {
 
 
 const LiquidityPoolMarkets: React.FC<LiquidityPoolProps> = ({ liquidityPools }) => {
+    const navigate = useNavigate();
+
     const handleSupply = (asset: string) => {
         console.log(`Supply clicked for ${asset}`);
     };
 
     const handleBorrow = (asset: string) => {
         console.log(`Borrow clicked for ${asset}`);
+        navigate("/supply-borrow")
     };
 
     return (
