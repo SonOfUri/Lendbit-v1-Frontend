@@ -2,6 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { formatMoney } from "../../constants/utils/formatMoney";
 import LiquidityMarketCard from "../plugins/LiquidityMarketCard";
 
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import Slider from 'react-slick';
+
 interface LiquidityPoolProps {
     liquidityPools: {
         asset: string;
@@ -22,6 +26,40 @@ const tokenNames: { [key: string]: string } = {
     WETH: "Wrapped ETH",
 };
 
+    const sliderSettings = {
+        dots: true, // Enable navigation dots
+        infinite: true, // Loop through slides infinitely
+        speed: 500, // Transition speed
+        slidesToShow: 4, // Number of slides visible at one time
+        slidesToScroll: 1, // Number of slides to scroll on navigation
+        autoplay: true, // Enable autoplay
+        autoplaySpeed: 3000, // 3 seconds between transitions
+        pauseOnHover: true, // Pause autoplay when hovering over a slide
+        responsive: [
+            {
+                breakpoint: 1024, // Adjust for tablets
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                },
+            },
+            {
+                breakpoint: 768, // Adjust for small tablets or larger phones
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                },
+            },
+            {
+                breakpoint: 480, // Adjust for mobile phones
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                },
+            },
+        ],
+    };
+
 
 const LiquidityPoolMarkets: React.FC<LiquidityPoolProps> = ({ liquidityPools }) => {
     const navigate = useNavigate();
@@ -36,26 +74,27 @@ const LiquidityPoolMarkets: React.FC<LiquidityPoolProps> = ({ liquidityPools }) 
     };
 
     return (
-       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Slider {...sliderSettings}>
             {liquidityPools.map((pool, idx) => {
                 const fullName = tokenNames[pool.asset] || pool.asset;
                 return (
-                    <LiquidityMarketCard
-                        key={idx}
-                        icon={`/Token-Logos/${pool.asset.toLowerCase()}-base.svg`} 
-                        tokenName={fullName}
-                        tokenSymbol={pool.asset}
-                        riskLevel={pool.riskLevel.toLowerCase() as "low" | "mid" | "medium" | "high"}
-                        totalSupplied={`$${formatMoney(pool.totalSupplied.toString())}`}
-                        supplyApy={`${pool.supplyApy}%`}
-                        totalBorrowed={`$${formatMoney(pool.totalBorrowed.toString())}`}
-                        borrowApr={`${pool.borrowApr}%`}
-                        onSupplyClick={() => handleSupply(pool.asset)}
-                        onBorrowClick={() => handleBorrow(pool.asset)}
-                    />
+                    <div key={idx} className="px-2"> {/* Add padding between slides */}
+                        <LiquidityMarketCard
+                            icon={`/Token-Logos/${pool.asset.toLowerCase()}-base.svg`}
+                            tokenName={fullName}
+                            tokenSymbol={pool.asset}
+                            riskLevel={pool.riskLevel.toLowerCase() as "low" | "mid" | "medium" | "high"}
+                            totalSupplied={`$${formatMoney(pool.totalSupplied.toString())}`}
+                            supplyApy={`${pool.supplyApy}%`}
+                            totalBorrowed={`$${formatMoney(pool.totalBorrowed.toString())}`}
+                            borrowApr={`${pool.borrowApr}%`}
+                            onSupplyClick={() => handleSupply(pool.asset)}
+                            onBorrowClick={() => handleBorrow(pool.asset)}
+                        />
+                    </div>
                 );
             })}
-        </div>
+        </Slider>
     );
 };
 

@@ -85,7 +85,7 @@ const DashboardBorrowsTable = ({ dashboardData }: DashboardCardsProps) => {
 			<h2 className="text-xl font-bold mb-2 text-left px-2">Borrows</h2>
 
 			<div className="bg-[#050505] rounded-md overflow-hidden shadow-1 noise">
-				<div className="grid grid-cols-6 gap-4 py-3 px-4 font-semibold text-sm text-left">
+				<div className="grid grid-cols-6 gap-4 py-3 px-4 font-semibold text-sm text-left noise">
 					<span>Assets</span>
 					<span>Borrow</span>
 					<span>APR</span>
@@ -94,7 +94,7 @@ const DashboardBorrowsTable = ({ dashboardData }: DashboardCardsProps) => {
 					<span>Action</span>
 				</div>
 
-				<div className="overflow-y-auto max-h-[310px]">
+				<div className="overflow-y-auto max-h-[310px] h-[310px] bg-[#050505]">
 					{rows?.map(
 						({ icon, symbol, amount, usd, apr, collateral, dueIn }, i) => (
 							<div

@@ -114,7 +114,7 @@ const Navbar = () => {
 					{isConnected && isSupportedChain(chainId) && (
 						<div className="hidden md:flex items-center gap-2 bg-[#1a1a1a] px-3 py-1 rounded-md">
 							<img
-								src="/Token-Logos/eth-base.svg"
+								src="/Token-Logos/base-base.svg"
 								alt="Base"
 								className="w-10 h-10"
 							/>

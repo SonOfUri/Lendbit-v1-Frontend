@@ -47,7 +47,7 @@ const TransactionHistory: React.FC = () => {
                 </button>
             </div>
 
-            <div className="divide-y divide-gray-800 overflow-y-auto max-h-[185px]">
+            <div className="divide-y divide-gray-800 overflow-y-auto max-h-[185px] noise">
                 {transactions.map((tx, idx) => (
                     <TransactionRow key={idx} {...tx} />
                 ))}

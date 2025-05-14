@@ -56,13 +56,13 @@ const DashboardPortfolioTable = ({ portfolio, maxWithdrawal }: DashboardPortfoli
             </div>
 
             <div className="noise shadow-1 rounded-md">
-                <div className="text-sm text-gray-300 flex justify-between p-4 rounded-t-md bg-[#050505] noise shadow-1 ">
+                <div className="text-sm text-gray-300 flex justify-between p-4 rounded-t-md bg-[#050505] noise ">
                     <div>Total Balance: <span className="font-semibold text-white">${formatMoney2(portfolio.totalValue)}</span></div>
                     <div>Max Withdrawal: <span className="font-semibold text-white">${formatMoney2(maxWithdrawal.total)}</span></div>
                 </div>
 
                 <div className="border-t border-gray-700 p-4 bg-[#050505] rounded-b-md overflow-x-auto overflow-y-auto max-h-[300px]">
-                    <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1.5fr] gap-4 py-2 font-semibold text-sm text-left">
+                    <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1.5fr] py-2 font-semibold text-sm text-left">
                         <span>Assets</span>
                         <span>Deposit</span>
                         <span>APY</span>

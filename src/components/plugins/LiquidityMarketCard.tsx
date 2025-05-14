@@ -53,10 +53,10 @@ const LiquidityPoolCard: React.FC<Props> = ({
 						<img
 							src={getRiskIcon()}
 							alt={`${riskLevel} risk`}
-							width={40}
-							height={40}
+							width={20}
+							height={20}
 						/>
-						<span className="text-xs text-gray-300 mt-1 uppercase">
+						<span className="text-[7.5px] text-gray-300 mt-1 uppercase">
 							{riskLevel} Risk
 						</span>
 					</div>

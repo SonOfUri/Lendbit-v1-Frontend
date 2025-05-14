@@ -102,7 +102,7 @@ const P2PMarket: React.FC<P2PMarketProps> = ({ p2pMarkets }) => {
       </div>
 
       {/* Rows */}
-      <div className="bg-[#050505] rounded-b-md overflow-hidden noise shadow-1">
+      <div className="bg-[#050505] rounded-b-md overflow-hidden noise shadow-1 overflow-y-scroll h-max-[500px]">
         {filteredOrders.map((item, index) => (
           <LendBorrowRow
             key={index}

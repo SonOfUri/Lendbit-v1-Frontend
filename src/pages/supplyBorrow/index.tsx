@@ -142,7 +142,7 @@ const SupplyBorrow = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Left Panel */}
-                    <div className="bg-[#050505] p-4 rounded-xl noise shadow-1">
+                    <div className="bg-[#050505] p-4 rounded-xl noise shadow-1 h-fit">
                         <p className="text-gray-500 mb-2 text-left">
                             {mode === "supply" ? "I will supply" : "I will borrow"}
                         </p>
