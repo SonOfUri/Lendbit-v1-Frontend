@@ -47,6 +47,8 @@ const useCreateBorrowOrder = (
         try {
             toastId = toast.loading(`Processing order creation...`);
 
+            // console.log(_weiAmount, (_interest * 100));
+
             const transaction = await contract.createLendingRequest(_weiAmount, (_interest * 100), _returnDate, tokenTypeAddress);
 
             const receipt = await transaction.wait();
@@ -59,7 +61,7 @@ const useCreateBorrowOrder = (
                 queryClient.invalidateQueries({ queryKey: ["market"] });
                 queryClient.invalidateQueries({ queryKey: ["position"] });
                 queryClient.invalidateQueries({ queryKey: ["tokens"] });
-                navigate("/")
+                navigate("/markets")
             }
         } catch (error: unknown) {
             try {

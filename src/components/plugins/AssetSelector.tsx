@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TokenData } from "../../constants/types/tokenData";
 import { getEthBalance, getTokenBalance } from "../../constants/utils/getBalances";
+import { formatMoney2 } from "../../constants/utils/formatMoney";
 
 type AssetSelectorProps = {
   onTokenSelect: (token: TokenData) => void;
@@ -77,7 +78,7 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
     
     const maxVal =
       actionType === "withdraw" || actionType === "borrow"
-        ? (Number(availableBal) * 0.79).toFixed(5) // 79% of available for safety
+        ? (Number(availableBal) * 0.99999).toFixed(5)
         : walletBalance;
         
     setInputValue(maxVal);
@@ -88,7 +89,7 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
 
   const fiatEquivalent = (
     parseFloat(inputValue || "0") * selectedToken.price
-  ).toFixed(2);
+  );
 
   return (
     <div className="bg-[#191818] rounded-lg p-4 w-full max-w-md shadow">
@@ -105,9 +106,9 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
               width={18}
               height={18}
               className="flex-shrink-0"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/Token-Logos/default-token.svg';
-              }}
+            //   onError={(e) => {
+            //     (e.target as HTMLImageElement).src = '/Token-Logos/default-token.svg';
+            //   }}
             />
             <span className="text-xs truncate">{selectedToken.symbol}</span>
             <span className="text-xs">▼</span>
@@ -127,9 +128,6 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
                     width={14}
                     height={14}
                     className="flex-shrink-0"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/Token-Logos/default-token.svg';
-                    }}
                   />
                   <span className="text-xs truncate">{token.symbol}</span>
                 </div>
@@ -163,21 +161,17 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
           ? "Available: "
           : "Wallet: "}
         {actionType === "withdraw" || actionType === "borrow"
-          ? Number(availableBal).toLocaleString(undefined, {
-              maximumFractionDigits: 5
-            })
-          : Number(walletBalance).toLocaleString(undefined, {
-              maximumFractionDigits: 5
-            })}{" "}
-        {selectedToken.symbol}
+          ? (`${formatMoney2(availableBal?.toString())}`)
+          : (`${formatMoney2(walletBalance)} ${selectedToken.symbol}`)
+        }
       </p>
 
       {/* Fiat value display */}
       <div className="text-xs text-white flex justify-between">
         <p>
-          1 {selectedToken.symbol} = ${selectedToken.price.toFixed(2)}
+          1 {selectedToken.symbol} = ${formatMoney2(selectedToken.price)}
         </p>
-        <p className="font-bold">≈ ${fiatEquivalent}</p>
+        <p className="font-bold">≈ ${formatMoney2(fiatEquivalent)}</p>
       </div>
     </div>
   );

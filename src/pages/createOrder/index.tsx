@@ -11,6 +11,7 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import LoadingState from "../../components/shared/LoadingState";
 import ConnectPrompt from "../../components/shared/ConnectPrompt";
 import { TokenData } from "../../constants/types/tokenData";
+import { toast } from "sonner";
 
 const CreateOrder = () => {
 
@@ -26,11 +27,14 @@ const CreateOrder = () => {
 	const [showLendTooltip, setShowLendTooltip] = useState(false);
 	const [showBorrowTooltip, setShowBorrowTooltip] = useState(false);
 	const [selectedToken, setSelectedToken] = useState<TokenData | null>(null);
-  	const [assetValue, setAssetValue] = useState("");
+	const [assetValue, setAssetValue] = useState("");
+	const [rate, setRate] = useState(0); // Default to 5.00%
+  	const [orderAmount, setOrderAmount] = useState(0);
 	
     const [availableBal, setAvailableBal] = useState(availableBorrow || 0);
     
-    const [dateValue, setDateValue] = useState<string>("");
+	const [dateValue, setDateValue] = useState<string>("");
+	const [whitelist, setWhitelist] = useState<string[]>([]);
     
     useEffect(() => {
 		setAvailableBal(availableBorrow || 0);
@@ -42,6 +46,15 @@ const CreateOrder = () => {
 		}
 	}, [selectedToken, tokenData]);
 
+	useEffect(() => {
+		if (assetValue && selectedToken) {
+			const amount = parseFloat(assetValue) * selectedToken.price;
+			setOrderAmount(amount);
+		} else {
+			setOrderAmount(0);
+		}
+	}, [assetValue, selectedToken]);
+
     const handleTokenSelect = (token: TokenData) => {
 		setSelectedToken(token);
 	};
@@ -51,37 +64,67 @@ const CreateOrder = () => {
 	};
 
 
+	const unixReturnDate = Math.floor(new Date(dateValue).getTime() / 1000);
+
+
     const handleNavigation = () => {
-		// const missingFields = [];
+		const missingFields = [];
 		
+		if (!assetValue) missingFields.push("Amount");
+		if (!rate) missingFields.push("Interest");
+		if (!dateValue) missingFields.push("Return Date");
+		if (!selectedToken?.address) missingFields.push("Token Address");
+		if (!selectedToken?.decimals) missingFields.push("Token Decimal");
+		if (!selectedToken?.name) missingFields.push("Token Name");
 
-		// if (!assetValue) missingFields.push("Amount");
-		// if (!percentage) missingFields.push("Interest");
-		// if (!dateValue) missingFields.push("Return Date");
-		// if (!selectedToken?.address) missingFields.push("Token Address");
-		// if (!selectedToken?.decimal) missingFields.push("Token Decimal");
-		// if (!selectedToken?.name) missingFields.push("Token Name");
-
-		// if (missingFields.length > 0) {
-		// 	toast.error(`Missing: ${missingFields.join(", ")}`);
-		// 	return;
-		// }
-
-
-		navigate("/allocation", {
+		if (missingFields.length > 0) {
+			toast.error(`Missing: ${missingFields.join(", ")}`);
+			return;
+		}
+		if (selectedToken) {
+			navigate("/allocation", {
 			state: {
-			// _amount: assetValue,
-			// _interest: Number(percentage) || 0,
-			// _returnDate: unixReturnDate,
-			// tokenTypeAddress: selectedToken.address,
-			// tokenDecimal: selectedToken.decimal,
-			// tokenName: selectedToken.name,
-			type: id,
+				_amount: assetValue,
+				_interest: (rate / 10000) || 0,
+				_returnDate: unixReturnDate,
+				tokenTypeAddress: selectedToken.address,
+				tokenDecimal: selectedToken.decimals, 
+				tokenName: selectedToken.name,
+				tokenSymbol: selectedToken.symbol,
+				whiteList: whitelist || [],
+				type: id,
 			},
-		});
+			});
+		} else {
+			toast.error("No token selected");
+		}
 	};
 
-	// const lendingRequestOrder = useCreateBorrowOrder(String(assetValue), Number(percentage), unixReturnDate, selectedToken.address, selectedToken.decimal, selectedToken.name);
+
+	const createBorrowOrder = useCreateBorrowOrder(
+		assetValue || "0", 
+		rate / 10000,
+		dateValue ? Math.floor(new Date(dateValue).getTime() / 1000) : 0,
+		selectedToken?.address || "", 
+		selectedToken?.decimals || 18, 
+		selectedToken?.name || ""
+	);
+
+	const handleCreateBorrowOrder = () => {
+		if (!selectedToken) {
+		toast.error("No token selected");
+		return;
+		}
+		if (!assetValue) {
+		toast.error("Please enter an amount");
+		return;
+		}
+		if (!dateValue) {
+		toast.error("Please select a return date");
+		return;
+		}
+		createBorrowOrder();
+	};
 
 
 	if (dashboardDataLoading || tokenDataLoading) {
@@ -162,19 +205,19 @@ const CreateOrder = () => {
 					</div>
 
 					<div className="px-4 sm:px-8 my-4">
-						<div className="flex flex-col items-start w-full overflow-hidden">
+						<div className="flex flex-col items-start w-full">
 							<p className="font-semibold mb-1 text-white">Select Asset</p>
 							<div className="w-full">
 								{selectedToken && (
 									<AssetSelector
-									onTokenSelect={handleTokenSelect}
-									onAssetValueChange={handleAssetValueChange}
-									assetValue={assetValue}
-									userAddress={address}
-									actionType={id === "lend" ? "supply" : "borrow"}
-									tokenData={tokenData}
-									selectedToken={selectedToken}
-									availableBal = {availableBal}
+										onTokenSelect={handleTokenSelect}
+										onAssetValueChange={handleAssetValueChange}
+										assetValue={assetValue}
+										userAddress={address}
+										actionType={id === "lend" ? "supply" : "borrow"}
+										tokenData={tokenData}
+										selectedToken={selectedToken}
+										availableBal = {availableBal}
 									/>
 								)}
 							</div>
@@ -184,17 +227,17 @@ const CreateOrder = () => {
 					<div className="px-4 sm:px-8">
                         <div className="flex flex-col items-start w-full overflow-hidden mx-auto">
                             <div className="w-11/12 mx-auto">
-                                <p className="font-semibold text-white text-start mb-1">Configure Cost</p>
-                                {id === "lend" ? (
-                                    <div className="w-full">
-                                        <LoanControl amount={17200} type="APY" tokenSymbol="ETH" />
-                                    </div>
-                                ) : (
-                                    <div className="w-full">
-                                        <LoanControl amount={17200} type="APR" tokenSymbol="USDC" />
-                                    </div>
-                                )}  
-                            </div>
+							<p className="font-semibold text-white text-start mb-1">Configure Cost</p>
+							{selectedToken && (
+								<LoanControl 
+									amount={orderAmount} 
+									type={id === "lend" ? "APY" : "APR"} 
+									tokenSymbol={selectedToken.symbol}
+									rate={rate}
+									onRateChange={setRate}
+								/>
+							)}
+							</div>
 						</div>
                     </div>
                     
@@ -208,7 +251,10 @@ const CreateOrder = () => {
                                         setDateValue={setDateValue}
                                         text="Due Date"
                                     />
-                                    <AddRecipients />
+									<AddRecipients
+										addresses={whitelist}
+        								setAddresses={setWhitelist}
+									/>
                                 </div>
                                 )
                             }
@@ -228,12 +274,13 @@ const CreateOrder = () => {
                     
                     <div className="px-6 sm:px-10">
                         {id === "borrow" &&
-							<div
+							<button
 								className={`w-full rounded-md px-6 py-2 text-center cursor-pointer bg-[#FF4D00CC] text-black font-semibold tracking-widest`}
-								onClick={()=> {}}
+								onClick={handleCreateBorrowOrder}
+								disabled={!selectedToken || !assetValue || !dateValue}
 							>
 								Create Order
-							</div>
+							</button>
 						}
 
 						{id === "lend" &&
