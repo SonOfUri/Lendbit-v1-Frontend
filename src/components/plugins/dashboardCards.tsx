@@ -14,8 +14,9 @@ const DashboardCards = () => {
 					"/Token-Logos/usdc-base.svg",
 					"/Token-Logos/weth-base.svg",
 					"/Token-Logos/usdt-base.svg",
-				]}
-			/>
+				]} onButtonClick={function (): void {
+				throw new Error("Function not implemented.");
+			}}			/>
 
 			<DashboardCard
 				title="Total Supply"
@@ -23,8 +24,9 @@ const DashboardCards = () => {
 				buttonText="Supply"
 				subLabel="Net APY"
 				subValue="+0.00"
-				tooltip="Your weighted average APY across assets"
-			/>
+				tooltip="Your weighted average APY across assets" onButtonClick={function (): void {
+				throw new Error("Function not implemented.");
+			}}			/>
 
 			<DashboardCard
 				title="Available to borrow"
@@ -33,8 +35,9 @@ const DashboardCards = () => {
 				subLabel="Health Factor"
 				subValue="100%"
 				tooltip="Your current borrowing risk level"
-				showHealthBar
-			/>
+				showHealthBar onButtonClick={function (): void {
+				throw new Error("Function not implemented.");
+			}}			/>
 		</div>
 	);
 };
