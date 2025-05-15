@@ -60,7 +60,7 @@ const Positions = () => {
     )
 	}
 
-	console.log(positionData);
+	// console.log(positionData);
 	
 
 	return (
