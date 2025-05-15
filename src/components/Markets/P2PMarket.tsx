@@ -4,6 +4,7 @@ import LendBorrowRow from "../plugins/LendBorrowRow";
 import FilterModal from "../plugins/FilterModal";
 import { formatMoney } from "../../constants/utils/formatMoney";
 import { TokenItem } from "../../constants/types";
+import { tokenMockedData } from "../../constants/utils/tokenMockedData";
 
 interface LendBorrowOrder {
   asset: string;
@@ -17,30 +18,38 @@ interface P2PMarkets {
   lendOrders: LendBorrowOrder[];
   borrowOrders: LendBorrowOrder[];
 }
+
 interface P2PMarketProps {
   p2pMarkets: P2PMarkets;
 }
 
 
 
-const mockedTokenList: TokenItem[] = [
-  { symbol: "All Tokens", icon: "" },
-  { symbol: "USDC", icon: "/Token-Logos/usdc-base.svg" },
-  { symbol: "USDT", icon: "/Token-Logos/usdt-base.svg" },
-  { symbol: "ETH", icon: "/Token-Logos/eth-base.svg" },
-  { symbol: "WETH", icon: "/Token-Logos/weth-base.svg" },
-  { symbol: "WBTC", icon: "/Token-Logos/wbtc-base.svg" },
-];
 
 
 const P2PMarket: React.FC<P2PMarketProps> = ({ p2pMarkets }) => {
+
+  // console.log(p2pMarkets);
+  
   const [activeTab, setActiveTab] = useState<"lend" | "borrow">("borrow");
   const [selectedToken, setSelectedToken] = useState("All Tokens");
   const [showFilterModal, setShowFilterModal] = useState(false);
 
-  // Combine lend and borrow orders based on the active tab
-  const orders =
-    activeTab === "lend" ? p2pMarkets.lendOrders : p2pMarkets.borrowOrders;
+  const enhanceOrders = (orders: LendBorrowOrder[]) => {
+    return orders.map(order => {
+      const tokenInfo = tokenMockedData.find(t => t.symbol === order.asset);
+      return {
+        ...order,
+        tokenAddress: tokenInfo?.address,
+        tokenDecimals: tokenInfo?.decimals
+      };
+    });
+  };
+
+  const enhancedLendOrders = enhanceOrders(p2pMarkets.lendOrders);
+  const enhancedBorrowOrders = enhanceOrders(p2pMarkets.borrowOrders);
+
+  const orders = activeTab === "lend" ? enhancedLendOrders : enhancedBorrowOrders;
 
   const filteredOrders = selectedToken === "All Tokens" 
     ? orders 
@@ -49,17 +58,32 @@ const P2PMarket: React.FC<P2PMarketProps> = ({ p2pMarkets }) => {
   const availableTokens = [
     ...new Set(orders.map((order) => order.asset))
   ];
-
+  
   const tokenList: TokenItem[] = availableTokens.length > 0
-  ? [
-      { symbol: "All Tokens", icon: "" },
-      ...availableTokens.map(symbol => ({
-        symbol,
-        icon: `/Token-Logos/${symbol.toLowerCase()}-base.svg`,
-      }))
-    ]
-  : mockedTokenList;
-
+    ? [
+        { symbol: "All Tokens", icon: "" },
+        ...availableTokens.map(symbol => {
+          const tokenInfo = tokenMockedData.find(t => t.symbol === symbol);
+          return {
+            symbol,
+            icon: `/Token-Logos/${symbol.toLowerCase()}-base.svg`,
+            address: tokenInfo?.address,
+            decimals: tokenInfo?.decimals,
+            name: tokenInfo?.name,
+            price: tokenInfo?.price
+          };
+        })
+      ]
+    : tokenMockedData.map(token => ({
+        symbol: token.symbol,
+        icon: `/Token-Logos/${token.symbol.toLowerCase()}-base.svg`,
+        address: token.address,
+        decimals: token.decimals,
+        name: token.name,
+        price: token.price
+    }));
+  
+  
   return (
     <div className="w-full text-white">
       {/* Top Bar */}
@@ -94,7 +118,7 @@ const P2PMarket: React.FC<P2PMarketProps> = ({ p2pMarkets }) => {
       <div className="grid grid-cols-7 gap-4 text-sm text-white p-4 text-left bg-[#181919] rounded-t-md noise shadow-1">
         <span>Assets</span>
         <span>Amount</span>
-        <span>APR</span>
+        <span>{activeTab === "lend" ? "APR" : "APY"}</span>
         <span>Pool ID</span>
         <span>Status</span>
         <span>{activeTab === "lend" ? "Duration" : "Expiry"}</span>
@@ -103,20 +127,25 @@ const P2PMarket: React.FC<P2PMarketProps> = ({ p2pMarkets }) => {
 
       {/* Rows */}
       <div className="bg-[#050505] rounded-b-md overflow-hidden noise shadow-1 overflow-y-scroll h-max-[500px]">
-        {filteredOrders.map((item, index) => (
-          <LendBorrowRow
-            key={index}
-            icon={`/Token-Logos/${item.asset.toLowerCase()}-base.svg`} 
-            symbol={item.asset}
-            amount={formatMoney(item.amount.toString())}
-            usd={`$${formatMoney((item.amount * 1000).toString())}`} // Example calculation for USD value, adjust based on actual data
-            apr={`${item.apr}%`}
-            poolId={item.orderId} 
-            statusPercent={0} // Status could be a placeholder or derived from another value
-            expiry={`${item.duration} Day(s)`} // Convert duration to a string format
-            type={activeTab}
-          />
-        ))}
+        {filteredOrders.map((item, index) => {
+          const tokenInfo = tokenMockedData.find(t => t.symbol === item.asset);
+          return (
+            <LendBorrowRow
+              key={index}
+              icon={`/Token-Logos/${item.asset.toLowerCase()}-base.svg`}
+              symbol={item.asset}
+              amount={item.amount.toString()}
+              usd={`$${formatMoney((item.amount * (tokenInfo?.price || 1)).toString())}`}
+              apr={`${item.apr}%`}
+              poolId={item.orderId}
+              statusPercent={70}
+              expiry={`${item.duration} Day(s)`}
+              type={activeTab}
+              tokenAddress={item.tokenAddress}
+              tokenDecimals={item.tokenDecimals}
+            />
+          );
+        })}
       </div>
 
       {/* Modal */}
