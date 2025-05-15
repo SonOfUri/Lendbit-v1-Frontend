@@ -24,6 +24,8 @@ const tokenNames: { [key: string]: string } = {
     WBTC: "Wrapped BTC",
     USDT: "Tether",
     WETH: "Wrapped ETH",
+    LINK: "ChainLink",
+    
 };
 
     const sliderSettings = {
@@ -66,11 +68,22 @@ const LiquidityPoolMarkets: React.FC<LiquidityPoolProps> = ({ liquidityPools }) 
 
     const handleSupply = (asset: string) => {
         console.log(`Supply clicked for ${asset}`);
+        navigate("/supply-borrow", {
+            state: {
+                mode: "supply",
+                tokenType: asset
+            }
+        })
     };
 
     const handleBorrow = (asset: string) => {
         console.log(`Borrow clicked for ${asset}`);
-        navigate("/supply-borrow")
+        navigate("/supply-borrow", {
+            state: {
+                mode: "borrow",
+                tokenType: asset
+            }
+        })
     };
 
     return (

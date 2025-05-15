@@ -70,9 +70,9 @@ const DashboardPortfolioTable = ({ portfolio, maxWithdrawal }: DashboardPortfoli
                         <span>Actions</span>
                     </div>
 
-                    {assets.map(({ asset, amount, value, apy, isCollateral }) => (
+                    {assets.map(({ asset, amount, value, apy, isCollateral }, index) => (
                         <div
-                            key={asset}
+                            key={index}
                             className="grid grid-cols-[1fr_1fr_1fr_1fr_1.5fr] gap-4 py-3 items-center text-left"
                         >
                             <TokenTagSm icon={getIconPath(asset)} symbol={asset} />

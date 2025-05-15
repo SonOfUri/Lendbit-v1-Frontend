@@ -1,28 +1,25 @@
 import React from "react";
 import TokenTagSm from "./TokenTagSm.tsx";
 import CustomBtn1 from "./CustomBtn1.tsx";
+import { formatMoney2 } from "../../constants/utils/formatMoney.ts";
+import { getTokenLogo } from "../../constants/utils/getTokenLogo.ts";
 
-const CollateralsTable: React.FC = () => {
-    const data = [
-        {
-            icon: "/Token-Logos/usdc-base.svg",
-            symbol: "USDC",
-            amount: "9.1K",
-            usdValue: "$9.1k",
-        },
-        {
-            icon: "/Token-Logos/usdt-base.svg",
-            symbol: "USDT",
-            amount: "9.1K",
-            usdValue: "$9.1k",
-        },
-        {
-            icon: "/Token-Logos/weth-base.svg",
-            symbol: "WETH",
-            amount: "12",
-            usdValue: "$21.5k",
-        },
-    ];
+interface CollateralAsset {
+    asset: string;
+    amount: number;
+    value: number;
+    collateralFactor: number;
+}
+
+interface CollateralsTableProps {
+    collateralAssets?: CollateralAsset[];
+}
+
+const CollateralsTable: React.FC<CollateralsTableProps> = ({ collateralAssets = [] }) => {
+    // Filter out assets with zero amount/value
+    const filteredAssets = collateralAssets.filter(asset => asset.amount > 0 || asset.value > 0);
+    
+  
 
     return (
         <div className="w-full text-white bg-[#050505] rounded-md overflow-hidden noise shadow-1">
@@ -35,42 +32,52 @@ const CollateralsTable: React.FC = () => {
                 <div className="col-span-2 flex justify-start gap-8 pr-2">Actions</div>
             </div>
 
-            {/* Table Body */}
-            {data.map(({ icon, symbol, amount, usdValue }) => (
-                <div
-                    key={symbol}
-                    className="grid grid-cols-6 p-4 items-center text-sm text-left"
-                >
-                    {/* Token */}
-                    <TokenTagSm icon={icon} symbol={symbol} />
-
-                    {/* Amount */}
-                    <div className="flex flex-col">
-                        <span className="font-bold">{amount}</span>
-                    </div>
-
-                    {/* Value */}
-                    <div className="flex flex-col">
-                        <span className="font-bold">{usdValue}</span>
-                    </div>
-
-                    {/* Toggle */}
-                    <div className="flex flex-col">
-                        <img
-                            src="/toggle-on.svg"
-                            alt="Toggle"
-                            width={28}
-                            height={28}
-                        />
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="col-span-2 flex justify-start gap-4 pr-2">
-                        <CustomBtn1 label="Deposit" variant="primary" />
-                        <CustomBtn1 label="Withdraw" variant="secondary" />
-                    </div>
+            {/* Table Body - Show message if no collateral */}
+            {filteredAssets.length === 0 ? (
+                <div className="p-4 text-center text-gray-400">
+                    No collateral assets deposited
                 </div>
-            ))}
+            ) : (
+                filteredAssets.map((asset) => (
+                    <div
+                        key={asset.asset}
+                        className="grid grid-cols-6 p-4 items-center text-sm text-left border-b border-gray-800 last:border-b-0"
+                    >
+                        {/* Token */}
+                        <TokenTagSm 
+                            icon={getTokenLogo(asset.asset)} 
+                            symbol={asset.asset} 
+                        />
+
+                        {/* Amount */}
+                        <div className="flex flex-col">
+                            <span className="font-bold">
+                                {formatMoney2(asset.amount)}
+                            </span>
+                        </div>
+
+                        {/* Value */}
+                        <div className="flex flex-col">
+                            <span className="font-bold">
+                                ${formatMoney2(asset.value)}
+                            </span>
+                        </div>
+
+                        {/* Collateral Factor */}
+                        <div className="flex flex-col">
+                            <span className="font-bold">
+                                {asset.collateralFactor * 100}%
+                            </span>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="col-span-2 flex justify-start gap-4 pr-2">
+                            <CustomBtn1 label="Deposit" variant="primary" />
+                            <CustomBtn1 label="Withdraw" variant="secondary" />
+                        </div>
+                    </div>
+                ))
+            )}
         </div>
     );
 };

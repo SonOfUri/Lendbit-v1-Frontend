@@ -2,7 +2,28 @@ import { useState } from "react";
 import LiquidityBorrowsTable from "./LiquidityBorrowsTable.tsx";
 import P2PBorrowOrdersTable from "./P2PBorrowOrdersTable.tsx";
 
-const Borrows = () => {
+interface BorrowAsset {
+    asset: string;
+    amount: number;
+    value: number;
+    apr: number;
+}
+
+interface BorrowOrder {
+    asset: string;
+    amount: number;
+    apr: number;
+    duration: number;
+    dueDate: string;
+    orderId: string;
+}
+
+interface BorrowsProps {
+    borrowFromLP?: BorrowAsset[];
+    borrowOrders?: BorrowOrder[];
+}
+
+const Borrows: React.FC<BorrowsProps> = ({ borrowFromLP = [], borrowOrders = [] }) => {
     const [isLPSelected, setIsLPSelected] = useState(true);
 
     return (
@@ -28,7 +49,11 @@ const Borrows = () => {
                 </div>
             </div>
 
-            {isLPSelected ? <LiquidityBorrowsTable /> : <P2PBorrowOrdersTable />}
+            {isLPSelected ? (
+                <LiquidityBorrowsTable borrowFromLP={borrowFromLP} />
+            ) : (
+                <P2PBorrowOrdersTable borrowOrders={borrowOrders} />
+            )}
         </div>
     );
 };
