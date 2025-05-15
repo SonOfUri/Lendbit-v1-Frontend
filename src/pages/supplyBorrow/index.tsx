@@ -37,7 +37,7 @@ const SupplyBorrow = () => {
         if (tokenData && tokenData.length > 0) {
             const tokenMatch = tokenData.find(
                 (t) =>
-                    t.symbol.toLowerCase() === state?.tokenType.toLowerCase()
+                    t.symbol.toLowerCase() === state?.tokenType?.toLowerCase()
             );
             setSelectedToken(tokenMatch || tokenData[0]);
         }

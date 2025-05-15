@@ -18,6 +18,9 @@ export interface MarketData {
       apr: number;
       duration: number;
       orderId: string;
+      whitelist: [],
+      min_amount: number,
+      max_amount: number
     }[];
     borrowOrders: {
       asset: string;

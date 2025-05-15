@@ -37,11 +37,4 @@ export interface DashboardData {
     status: string;
     maxBorrow: number;
   };
-  transactionHistory: {
-    type: string;
-    asset: string;
-    amount: number;
-    timestamp: string;
-    txHash: string;
-  }[];
 }
