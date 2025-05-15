@@ -34,39 +34,9 @@ const useCheckAllowances = (tokenTypeAddress: string) => {
         queryFn: fetchAllowance,
         enabled: !!(isConnected && tokenTypeAddress),
         staleTime: 10_000, // Cache for 10 seconds
-        refetchInterval: 15_000, // Poll every 15 seconds
     });
 };
 
 export default useCheckAllowances;
 
 
-// const useCheckAllowances = (tokenTypeAddress: string) => {
-//     const [allowanceVal, setAllowanceVal] = useState(0);
-//     const { address,isConnected,chainId } = useWeb3ModalAccount()
-
-//     useEffect(() => {
-//         const provider = readOnlyProvider
-//         const destination = envVars.vProtocolContractAddress
-        
-//         // console.log("DESTINATION", destination);
-
-        
-//         const contract = getERC20Contract(provider, tokenTypeAddress);
-
-//         contract
-//             .allowance(address, destination)
-//             .then((res) => {
-//                 console.log("RESPONSESSSS", res);
-//                 setAllowanceVal(Number(res))
-//             })
-//             .catch((err) => {
-//                 console.error("error allowance status: ", err);
-//                 setAllowanceVal(0);
-//             });
-//     }, [address, chainId, isConnected, tokenTypeAddress]);
-
-//     return allowanceVal;
-// }
-
-// export default useCheckAllowances;

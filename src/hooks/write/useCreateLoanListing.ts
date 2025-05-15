@@ -31,7 +31,7 @@ const useCreateLoanListingOrder = (
     tokenName: string,
     whitelist: string[],
 ) => {
-    const { chainId } = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
     const { data: allowanceVal = 0, isLoading } = useCheckAllowances(tokenTypeAddress);
     const navigate = useNavigate();
@@ -89,8 +89,12 @@ const useCreateLoanListingOrder = (
                 toast.success(`${_amount}${tokenName} loan listing order successfully created!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["allLoanListings"] });
-                navigate("/")
+                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
+                queryClient.invalidateQueries({ queryKey: ["market"] });
+                queryClient.invalidateQueries({ queryKey: ["position"] });
+                queryClient.invalidateQueries({ queryKey: ["tokens"] });
+
+                navigate("/markets")
             }
         } catch (error: unknown) {
             try {
@@ -102,7 +106,7 @@ const useCreateLoanListingOrder = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, _min_amount, _max_amount, allowanceVal, tokenName, _returnDate, _interest, queryClient, navigate, errorDecoder]);
+    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, _min_amount, _max_amount, allowanceVal, tokenName, _returnDate, _interest, whitelist, queryClient, address, navigate, errorDecoder]);
 };
 
 export default useCreateLoanListingOrder;

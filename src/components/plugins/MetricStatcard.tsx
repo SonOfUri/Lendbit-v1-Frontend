@@ -7,7 +7,7 @@ type MetricStatCardProps = {
 
 const MetricStatCard: React.FC<MetricStatCardProps> = ({ label, value }) => {
     return (
-        <div className="bg-black rounded-md p-4 w-full text-center text-white shadow-sm noise shadow-1">
+        <div className="bg-[#050505] rounded-md p-4 w-full text-center text-white shadow-sm noise shadow-1">
             <p className="text-sm font-medium text-gray-300 mb-1">{label}</p>
             <p className="text-2xl font-bold">{value}</p>
         </div>

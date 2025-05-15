@@ -6,15 +6,12 @@ import { useCallback } from "react";
 import { isSupportedChain } from "../../constants/utils/chains";
 import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
-import useCheckAllowances from "../read/useCheckAllowances";
 import {
-    getERC20Contract,
     getLendbitContract,
 } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import erc20 from "../../abi/erc20.json";
-import { ethers, MaxUint256 } from "ethers";
-import { envVars } from "../../constants/config/envVars";
+import { ethers } from "ethers";
 import { ErrorDecoder } from "ethers-decode-error";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -26,7 +23,7 @@ const useWithdrawCollateral = (
     tokenDecimal: number,
     tokenName: string,
 ) => {
-    const { chainId } = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -57,8 +54,13 @@ const useWithdrawCollateral = (
                 toast.success(`${_amount}${tokenName} successfully withdrawn!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["userUtilities"] });
-                queryClient.invalidateQueries({ queryKey: ["userPosition"] });
+                
+                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
+                queryClient.invalidateQueries({ queryKey: ["market"] });
+                queryClient.invalidateQueries({ queryKey: ["position"] });
+                queryClient.invalidateQueries({ queryKey: ["tokens"] });
+
+
                 navigate("/")
             }
         } catch (error: unknown) {
@@ -71,7 +73,7 @@ const useWithdrawCollateral = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, walletProvider, tokenTypeAddress, _amount, tokenDecimal, tokenName, queryClient, navigate, errorDecoder]);
+    }, [chainId, walletProvider, _amount, tokenDecimal, tokenName, tokenTypeAddress, queryClient, address, navigate, errorDecoder]);
 };
 
 export default useWithdrawCollateral;

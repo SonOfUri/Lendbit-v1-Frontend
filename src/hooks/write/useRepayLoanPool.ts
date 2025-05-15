@@ -16,17 +16,21 @@ import { ErrorDecoder } from "ethers-decode-error";
 import { envVars } from "../../constants/config/envVars";
 import useCheckAllowances from "../read/useCheckAllowances";
 import { Eip1193Provider } from "ethers";
+import { useQueryClient } from "@tanstack/react-query";
 
 const useRepayPool = (
     _amount: string,
     tokenTypeAddress: string,
     tokenDecimal: number,
 ) => {
-    const { chainId } = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
     const { data: allowanceVal = 0, isLoading } = useCheckAllowances(tokenTypeAddress);
 
     const errorDecoder = ErrorDecoder.create([lendbit]);
+
+    const queryClient = useQueryClient();
+
 
     return useCallback(async () => {
         if (!isSupportedChain(chainId)) return toast.warning("SWITCH NETWORK");
@@ -70,6 +74,10 @@ const useRepayPool = (
                 toast.success(`loan of ${_amount} successfully repayed!`, {
                     id: toastId,
                 });
+
+                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
+                queryClient.invalidateQueries({ queryKey: ["market"] });
+                queryClient.invalidateQueries({ queryKey: ["position"] });
             }
         } catch (error: unknown) {
             try {
@@ -81,7 +89,7 @@ const useRepayPool = (
                 toast.error("Repayment failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, errorDecoder]);
+    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, queryClient, address, errorDecoder]);
 };
 
 export default useRepayPool;

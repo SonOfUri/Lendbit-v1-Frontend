@@ -1,55 +1,35 @@
 import { useState } from "react";
 import TokenTagSm from "./TokenTagSm.tsx";
 import CustomBtn1 from "./CustomBtn1.tsx";
+import { formatMoney } from "../../constants/utils/formatMoney.ts";
+import { formatDate } from "../../constants/utils/formatDate.ts";
+import { getTokenLogo } from "../../constants/utils/getTokenLogo.ts";
 
-const P2PLendOrdersTable = () => {
+interface P2PBorrowOrdersTableProps {
+    borrowOrders: {
+        asset: string;
+        amount: number;
+        apr: number;
+        duration: number;
+        dueDate: string;
+        orderId: string;
+    }[];
+}
+
+const P2PBorrowOrdersTable: React.FC<P2PBorrowOrdersTableProps> = ({ borrowOrders }) => {
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-    const data = [
-        {
-            icon: "/Token-Logos/usdc-base.svg",
-            symbol: "USDC",
-            amount: "9.1K",
-            usd: "$9.1k",
-            apr: "6.46%",
-            pool: "0xer...asj",
-            status: "open",
-            expiry: "12 Day(s)",
-        },
-        {
-            icon: "/Token-Logos/usdt-base.svg",
-            symbol: "USDT",
-            amount: "9.1K",
-            usd: "$9.1k",
-            apr: "5.31%",
-            pool: "0xas...12s",
-            status: "open",
-            expiry: "23 Day(s)",
-        },
-        {
-            icon: "/Token-Logos/weth-base.svg",
-            symbol: "WETH",
-            amount: "12",
-            usd: "$21.5k",
-            apr: "5.30%",
-            pool: "0xas...12s",
-            status: "open",
-            expiry: "365 Day(s)",
-        },
-        {
-            icon: "/Token-Logos/eth-base.svg",
-            symbol: "ETH",
-            amount: "3",
-            usd: "$5.3k",
-            apr: "4.57%",
-            pool: "0xer...asj",
-            status: "closed",
-            expiry: "1 Day(s)",
-        },
-    ];
+    
+    const handleToggle = (orderId: string) => {
+        setOpenDropdown((prev) => (prev === orderId ? null : orderId));
+    };
 
-    const handleToggle = (symbol: string) => {
-        setOpenDropdown((prev) => (prev === symbol ? null : symbol));
+    // Calculate days remaining until due date
+    const getDaysRemaining = (dueDate: string) => {
+        const due = new Date(dueDate);
+        const now = new Date();
+        const diffTime = due.getTime() - now.getTime();
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     };
 
     return (
@@ -60,58 +40,73 @@ const P2PLendOrdersTable = () => {
                 <span>Assets</span>
                 <span>Amount</span>
                 <span>APR</span>
-                <span>Pool ID</span>
+                <span>Due Date</span>
+                <span>Order ID</span>
                 <span>Status</span>
-                <span>Expiry</span>
                 <span></span>
             </div>
 
-            <div className="bg-black rounded-b-md p-4 noise shadow-1">
-                {data.map(({ icon, symbol, amount, usd, apr, pool, status, expiry }) => (
-                    <div
-                        key={symbol + pool}
-                        className="grid grid-cols-7 gap-4 py-3 text-sm items-center border-b border-gray-800 relative text-left"
-                    >
-                        <TokenTagSm icon={icon} symbol={symbol} />
-
-                        <div className="flex flex-col">
-                            <span className="font-bold">{amount}</span>
-                            <span className="text-xs text-gray-400">{usd}</span>
-                        </div>
-
-                        <div className="font-semibold">{apr}</div>
-                        <span>{pool}</span>
-                        <span>{status}</span>
-                        <span>{expiry}</span>
-
-                        {/* Dropdown Toggle */}
-                        <div className="relative">
-                            <button onClick={() => handleToggle(symbol)}>
-                                <img
-                                    src="/three-dots.svg"
-                                    alt="Menu"
-                                    width={5}
-                                    height={5}
-                                    className="cursor-pointer"
-                                />
-                            </button>
-
-                            {/* Dropdown */}
-                            {openDropdown === symbol && (
-                                <div className="absolute top-7 right-0 bg-[#111] border border-gray-700 rounded-md shadow-md z-10 p-2 w-33 flex gap-1">
-                                    <CustomBtn1 label="Edit" variant="primary" />
-                                    <br/>
-                                    <CustomBtn1 label="Close" variant="secondary" />
-                                </div>
-                            )}
-                        </div>
+            <div className="bg-[#050505] rounded-b-md p-4 noise shadow-1">
+                {borrowOrders.length === 0 ? (
+                    <div className="text-center py-4 text-gray-400">
+                        No active peer-to-peer borrow orders
                     </div>
-                ))}
+                ) : (
+                    borrowOrders.map((order) => {
+                        const daysRemaining = getDaysRemaining(order.dueDate);
+                        const status = daysRemaining > 0 ? "Active" : "Overdue";
+                        
+                        return (
+                            <div
+                                key={order.orderId}
+                                className="grid grid-cols-7 gap-4 py-3 text-sm items-center relative text-left border-b border-gray-800 last:border-b-0"
+                            >
+                                <TokenTagSm 
+                                    icon={getTokenLogo(order.asset)} 
+                                    symbol={order.asset} 
+                                />
+
+                                <div className="flex flex-col">
+                                    <span className="font-bold">
+                                        {formatMoney(order.amount)}
+                                    </span>
+                                </div>
+
+                                <div className="font-semibold">
+                                    {order.apr.toFixed(2)}%
+                                </div>
+
+                                <span>{formatDate(order.dueDate)}</span>
+                                <span className="text-xs">{order.orderId.slice(0, 6)}...{order.orderId.slice(-4)}</span>
+                                <span className={daysRemaining > 0 ? "text-green-400" : "text-red-400"}>
+                                    {status}
+                                </span>
+
+                                <div className="relative">
+                                    <button onClick={() => handleToggle(order.orderId)}>
+                                        <img
+                                            src="/three-dots.svg"
+                                            alt="Menu"
+                                            width={5}
+                                            height={5}
+                                            className="cursor-pointer"
+                                        />
+                                    </button>
+
+                                    {openDropdown === order.orderId && (
+                                        <div className="absolute top-7 right-0 bg-[#111] border border-gray-700 rounded-md shadow-md z-10 p-2 w-33 flex flex-col gap-1">
+                                            <CustomBtn1 label="Repay" variant="primary" />
+                                            <CustomBtn1 label="Extend" variant="secondary" />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })
+                )}
             </div>
-
-
         </div>
     );
 };
 
-export default P2PLendOrdersTable;
+export default P2PBorrowOrdersTable;

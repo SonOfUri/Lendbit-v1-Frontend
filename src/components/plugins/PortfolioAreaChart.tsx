@@ -9,6 +9,24 @@ import {
     Legend,
 } from "recharts";
 
+/*const data = Array.from({ length: 50 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (79 - i)); // 80 days ago to today
+    const formattedDate = date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
+    const baseCollateral = 3000 + i * 40 + Math.floor(Math.random() * 100);
+    const baseSupply = baseCollateral * 0.66 + Math.floor(Math.random() * 50);
+    const baseBorrow = baseCollateral * 0.33 + Math.floor(Math.random() * 50);
+
+    return {
+        name: formattedDate,
+        collateral: Math.round(baseCollateral),
+        supply: Math.round(baseSupply),
+        borrow: Math.round(baseBorrow)
+    };
+});*/
+
+
 const data = [
     { name: "Jan", collateral: 3000, supply: 2000, borrow: 1000 },
     { name: "Feb", collateral: 4000, supply: 2500, borrow: 1400 },
@@ -21,7 +39,7 @@ const data = [
 
 const PortfolioAreaChart = () => {
     return (
-        <div className="w-full h-[400px] bg-black p-4 rounded-md noise shadow-1">
+        <div className="w-full h-[400px] bg-[#050505] p-4 rounded-md noise shadow-1">
             <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                     data={data}
@@ -60,7 +78,8 @@ const PortfolioAreaChart = () => {
                         type="monotone"
                         dataKey="borrow"
                         stroke="#FFA500"
-                        fillOpacity={0}
+                        fillOpacity={0.35}
+                        fill="#FFA500"
                     />
                 </AreaChart>
             </ResponsiveContainer>

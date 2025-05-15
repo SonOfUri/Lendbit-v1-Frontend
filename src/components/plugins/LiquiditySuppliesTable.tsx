@@ -1,85 +1,78 @@
 import TokenTagSm from "./TokenTagSm.tsx";
 import CustomBtn1 from "./CustomBtn1.tsx";
+import { formatMoney } from "../../constants/utils/formatMoney.ts";
+import { getTokenLogo } from "../../constants/utils/getTokenLogo.ts";
 
-const LiquiditySuppliesTable = () => {
-    const data = [
-        {
-            icon: "/Token-Logos/usdc-base.svg",
-            symbol: "USDC",
-            amount: "9.1K",
-            usd: "$9.1k",
-            apy: "6.46%",
-            interest: "$3.50",
-            date: "1/2/2025",
-        },
-        {
-            icon: "/Token-Logos/usdt-base.svg",
-            symbol: "USDT",
-            amount: "9.1K",
-            usd: "$9.1k",
-            apy: "5.31%",
-            interest: "$12.50",
-            date: "1/2/2025",
-        },
-        {
-            icon: "/Token-Logos/weth-base.svg",
-            symbol: "WETH",
-            amount: "12",
-            usd: "$21.5k",
-            apy: "5.30%",
-            interest: "$6.50",
-            date: "1/2/2025",
-        },
-        {
-            icon: "/Token-Logos/eth-base.svg",
-            symbol: "ETH",
-            amount: "3",
-            usd: "$5.3k",
-            apy: "4.57%",
-            interest: "$316.00",
-            date: "1/2/2025",
-        },
-    ];
+interface LiquiditySuppliesTableProps {
+    supplyToLP: {
+        asset: string;
+        amount: number;
+        value: number;
+        apy: number;
+    }[];
+}
+
+const LiquiditySuppliesTable: React.FC<LiquiditySuppliesTableProps> = ({ supplyToLP }) => {
+
+    // Filter out assets with zero amount
+    const filteredSupplies = supplyToLP.filter(asset => asset.amount > 0);
 
     return (
-        <div className="w-full ">
+        <div className="w-full">
             <h2 className="text-xl font-bold text-left py-4">Supplies</h2>
 
-            <div className="grid grid-cols-6 gap-4 p-4 bg-[#191818] rounded-t-md font-semibold text-sm text-left text-white noise shadow-1 ">
+            <div className="grid grid-cols-6 gap-4 p-4 bg-[#191818] rounded-t-md font-semibold text-sm text-left text-white noise shadow-1">
                 <span>Assets</span>
                 <span>Amount</span>
                 <span>APY</span>
-                <span>Accrued Interest</span>
-                <span>Supplied Since</span>
+                <span>Value</span>
+                <span>Estimated APY</span>
                 <span>Actions</span>
             </div>
 
-            <div className="bg-black p-4 rounded-b-md overflow-x-scroll noise shadow-1">
-                {data.map(({ icon, symbol, amount, usd, apy, interest, date }) => (
-                    <div
-                        key={symbol}
-                        className="grid grid-cols-6 gap-4 py-3 text-sm items-center text-left"
-                    >
-                        <TokenTagSm icon={icon} symbol={symbol} />
-
-                        <div className="flex flex-col">
-                            <span className="font-bold">{amount}</span>
-                            <span className="text-xs text-gray-400">{usd}</span>
-                        </div>
-
-                        <div className="font-semibold">{apy}</div>
-                        <div className="text-white">{interest}</div>
-                        <div className="text-white">{date}</div>
-
-                        <div className="flex gap-2 justify-start">
-                            <CustomBtn1 label="Supply" variant="primary" />
-                            <CustomBtn1 label="Close" variant="secondary" />
-                        </div>
+            <div className="bg-[#050505] p-4 rounded-b-md overflow-x-scroll noise shadow-1">
+                {filteredSupplies.length === 0 ? (
+                    <div className="text-center py-4 text-gray-400">
+                        No active supplies in liquidity pools
                     </div>
-                ))}
+                ) : (
+                    filteredSupplies.map((asset) => (
+                        <div
+                            key={asset.asset}
+                            className="grid grid-cols-6 gap-4 py-3 text-sm items-center text-left border-b border-gray-800 last:border-b-0"
+                        >
+                            <TokenTagSm 
+                                icon={getTokenLogo(asset.asset)} 
+                                symbol={asset.asset} 
+                            />
+
+                            <div className="flex flex-col">
+                                <span className="font-bold">
+                                    {formatMoney(asset.amount)}
+                                </span>
+                            </div>
+
+                            <div className="font-semibold">
+                                {(asset.apy * 100).toFixed(2)}%
+                            </div>
+
+                            <div className="text-white">
+                                ${formatMoney(asset.value)}
+                            </div>
+
+                            <div className="text-white">
+                                {/* Calculate daily interest based on APY */}
+                                ${formatMoney((asset.value * asset.apy) / 365)}
+                            </div>
+
+                            <div className="flex gap-2 justify-start">
+                                <CustomBtn1 label="Supply" variant="primary" />
+                                <CustomBtn1 label="Withdraw" variant="secondary" />
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
-
-
         </div>
     );
 };

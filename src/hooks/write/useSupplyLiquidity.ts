@@ -22,7 +22,7 @@ const useSupplyLiquidity = (
     tokenDecimal: number,
     tokenName: string,
 ) => {
-    const { chainId } = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
 
     const errorDecoder = ErrorDecoder.create([lendbit, erc20]);
@@ -71,10 +71,10 @@ const useSupplyLiquidity = (
                 toast.success(`${_amount}${tokenName} successfully supplied, happy earning!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["userUtilities"] });
-                queryClient.invalidateQueries({ queryKey: ["getAPR&APY"] });
-                queryClient.invalidateQueries({ queryKey: ["getTotalSupplyBorrow"] });
-                queryClient.invalidateQueries({ queryKey: ["userPosition"] });
+                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
+                queryClient.invalidateQueries({ queryKey: ["market"] });
+                queryClient.invalidateQueries({ queryKey: ["position"] });
+                queryClient.invalidateQueries({ queryKey: ["tokens"] });
             }
         } catch (error: unknown) {
             try {
@@ -86,7 +86,7 @@ const useSupplyLiquidity = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [_amount, allowanceVal, chainId, errorDecoder, isLoading, queryClient, tokenDecimal, tokenName, tokenTypeAddress, walletProvider]);
+    }, [_amount, address, allowanceVal, chainId, errorDecoder, isLoading, queryClient, tokenDecimal, tokenName, tokenTypeAddress, walletProvider]);
 };
 
 export default useSupplyLiquidity;

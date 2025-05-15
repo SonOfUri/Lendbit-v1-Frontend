@@ -11,7 +11,6 @@ import lendbit from "../../abi/LendBit.json";
 import erc20 from "../../abi/erc20.json";
 import { ethers } from "ethers";
 import { ErrorDecoder } from "ethers-decode-error";
-import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 
@@ -20,11 +19,10 @@ const useCreatePositionPool = (
     // collateralTokens: string[],
     // collateralAmounts: number[],
 ) => {
-    const { chainId } = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
 
     const errorDecoder = ErrorDecoder.create([lendbit, erc20]);
-    const navigate = useNavigate();
     const queryClient = useQueryClient();
 
 
@@ -49,7 +47,7 @@ const useCreatePositionPool = (
         try {
             toastId = toast.loading(`Processing borrowing...`);
 
-            const transaction = await contract.createPosition(tokenTypeAddress, _weiAmount);
+            const transaction = await contract.borrowFromPool(tokenTypeAddress, _weiAmount);
 
             const receipt = await transaction.wait();
 
@@ -57,11 +55,11 @@ const useCreatePositionPool = (
                 toast.success(`${_amount} ${tokenName} borrowed successfully!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["userUtilities"] });
-                queryClient.invalidateQueries({ queryKey: ["getAPR&APY"] });
-                queryClient.invalidateQueries({ queryKey: ["getTotalSupplyBorrow"] });
-                queryClient.invalidateQueries({ queryKey: ["userPosition"] });
-                navigate("/")
+
+                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
+                queryClient.invalidateQueries({ queryKey: ["market"] });
+                queryClient.invalidateQueries({ queryKey: ["position"] });
+                queryClient.invalidateQueries({ queryKey: ["tokens"] });
             }
         } catch (error: unknown) {
             try {
@@ -73,7 +71,7 @@ const useCreatePositionPool = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, walletProvider, queryClient, navigate, errorDecoder]);
+    }, [chainId, walletProvider, queryClient, address, errorDecoder]);
 };
 
 export default useCreatePositionPool;

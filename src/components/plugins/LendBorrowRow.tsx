@@ -56,7 +56,7 @@ const LendBorrowRow: React.FC<Props> = ({
 				<div className="relative flex items-center">
 					<img src={batteryIcon} alt="status" className="w-10 h-10" />
 					{/* Tooltip */}
-					<span className="absolute top-full mt-1 left-0 text-[10px] bg-black text-white px-2 py-1 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+					<span className="absolute top-full mt-1 left-0 text-[10px] bg-[#050505] text-white px-2 py-1 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200">
 						{statusPercent}%
 					</span>
 				</div>

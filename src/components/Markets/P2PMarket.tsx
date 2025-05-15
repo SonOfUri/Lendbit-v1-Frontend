@@ -64,7 +64,7 @@ const P2PMarket: React.FC<P2PMarketProps> = ({ p2pMarkets }) => {
     <div className="w-full text-white">
       {/* Top Bar */}
       <div className="flex justify-between items-center mb-1">
-        <div className="flex gap-2 bg-black rounded p-1">
+        <div className="flex gap-2 bg-[#050505] rounded p-1">
           <button
             onClick={() => setActiveTab("lend")}
             className={`px-4 py-2 rounded ${activeTab === "lend" ? "bg-white text-black font-semibold" : "text-white"}`}
@@ -102,7 +102,7 @@ const P2PMarket: React.FC<P2PMarketProps> = ({ p2pMarkets }) => {
       </div>
 
       {/* Rows */}
-      <div className="bg-black rounded-b-md overflow-hidden noise shadow-1">
+      <div className="bg-[#050505] rounded-b-md overflow-hidden noise shadow-1 overflow-y-scroll h-max-[500px]">
         {filteredOrders.map((item, index) => (
           <LendBorrowRow
             key={index}

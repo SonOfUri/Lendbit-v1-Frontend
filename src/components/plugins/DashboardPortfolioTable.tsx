@@ -58,7 +58,7 @@ const DashboardPortfolioTable = () => {
 			</div>
 
 			<div className="noise shadow-1 rounded-md">
-				<div className="text-sm text-gray-300 flex justify-between p-4 rounded-t-md bg-black noise shadow-1 ">
+				<div className="text-sm text-gray-300 flex justify-between p-4 rounded-t-md bg-[#050505] noise shadow-1 ">
 					<div className="text-sm text-gray-400 mb-2">
 						Total Balance:{" "}
 						<span className="font-semibold text-white">$0.00</span>
@@ -70,7 +70,7 @@ const DashboardPortfolioTable = () => {
 					</div>
 				</div>
 
-				<div className="border-t border-gray-700 p-4 bg-black rounded-b-md overflow-x-auto overflow-y-auto max-h-[300px] relative">
+				<div className="border-t border-gray-700 p-4 bg-[#050505] rounded-b-md overflow-x-auto overflow-y-hidden max-h-[300px] relative">
                     <div className="absolute inset-0 bg-[#87878720] bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
                         <img onClick={walletConnect} src="/connect.svg" alt="Connect Icon" className="w-20 h-20 cursor-pointer" />
                     </div>

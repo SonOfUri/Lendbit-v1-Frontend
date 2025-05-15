@@ -7,7 +7,7 @@ type CustomBtnProps = {
 };
 
 const CustomBtn1: React.FC<CustomBtnProps> = ({ label, onClick, variant = "primary" }) => {
-    const base = "px-3 py-1 rounded text-sm font-medium";
+    const base = "px-3 py-1 rounded text-sm font-medium cursor-pointer";
     const styles =
         variant === "primary"
             ? "bg-white text-black hover:bg-gray-200"

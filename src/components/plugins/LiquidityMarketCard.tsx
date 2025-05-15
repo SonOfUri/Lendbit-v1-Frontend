@@ -41,7 +41,7 @@ const LiquidityPoolCard: React.FC<Props> = ({
 	};
 
 	return (
-		<div className="bg-black text-white rounded-xl p-4 w-full max-w-sm flex flex-col justify-between shadow-md noise shadow-1">
+		<div className="bg-[#050505] text-white rounded-xl p-4 w-full max-w-sm flex flex-col justify-between shadow-md noise shadow-1">
 			<div className="flex justify-between items-start mb-4">
 				<TokenTagLg icon={icon} name={tokenName} symbol={tokenSymbol} />
 			</div>
@@ -53,10 +53,10 @@ const LiquidityPoolCard: React.FC<Props> = ({
 						<img
 							src={getRiskIcon()}
 							alt={`${riskLevel} risk`}
-							width={40}
-							height={40}
+							width={20}
+							height={20}
 						/>
-						<span className="text-xs text-gray-300 mt-1 uppercase">
+						<span className="text-[7.5px] text-gray-300 mt-1 uppercase">
 							{riskLevel} Risk
 						</span>
 					</div>
@@ -96,3 +96,4 @@ const LiquidityPoolCard: React.FC<Props> = ({
 };
 
 export default LiquidityPoolCard;
+
