@@ -4,36 +4,36 @@ import TransactionRow from "./TransactionRow.tsx";
 const TransactionHistory: React.FC = () => {
     const transactions = [
         {
-            icon: "/icons/deposit.svg",
-            label: "Deposited Collateral",
-            subtext: "on 3 Jan 2024",
-            tagIcon: "/Token-Logos/eth-base.svg",
-            amount: "200000",
-            usdAmount: "$199,999",
-        },
-        {
             icon: "/icons/supply.svg",
             label: "Supplied to Genesis Pool",
-            subtext: "on 3 Jan 2024",
+            subtext: "on 13 May 2024",
             tagIcon: "/Token-Logos/weth-base.svg",
-            amount: "200000",
-            usdAmount: "$199,999",
+            amount: "2",
+            usdAmount: "$5,000",
         },
         {
             icon: "/icons/borrow.svg",
             label: "Borrowed from Genesis Pool",
-            subtext: "on 3 Jan 2024",
+            subtext: "on 13 May 2024",
             tagIcon: "/Token-Logos/usdc-base.svg",
-            amount: "200000",
-            usdAmount: "$199,999",
+            amount: "2,000",
+            usdAmount: "$1999",
         },
         {
             icon: "/icons/withdraw.svg",
             label: "Withdraw Funds",
-            subtext: "on 3 Jan 2024",
-            amount: "200000",
+            subtext: "on 13 May 2024",
+            amount: "20,000",
             tagIcon: "/Token-Logos/usdt-base.svg",
-            usdAmount: "$199,999",
+            usdAmount: "$19,999.9",
+        },
+        {
+            icon: "/icons/deposit.svg",
+            label: "Deposited Collateral",
+            subtext: "on 13 May 2024",
+            tagIcon: "/Token-Logos/eth-base.svg",
+            amount: "0.75",
+            usdAmount: "$1,875",
         },
     ];
 
@@ -47,7 +47,7 @@ const TransactionHistory: React.FC = () => {
                 </button>
             </div>
 
-            <div className="divide-y divide-gray-800 overflow-y-auto max-h-[185px] noise">
+            <div className="divide-y divide-gray-800 overflow-y-scroll max-h-[185px] noise">
                 {transactions.map((tx, idx) => (
                     <TransactionRow key={idx} {...tx} />
                 ))}
