@@ -29,20 +29,17 @@ const Borrows: React.FC<BorrowsProps> = ({ borrowFromLP = [], borrowOrders = [] 
     return (
         <div className="text-white w-full">
             <div className="flex justify-end mb-2">
-                <div className="flex gap-1 p-1 bg-[#050505] rounded-full">
+
+                <div className="flex gap-1 p-1 bg-[#050505] rounded">
                     <button
                         onClick={() => setIsLPSelected(true)}
-                        className={`px-4 py-1 rounded-full text-sm ${
-                            isLPSelected ? "bg-white text-black" : "text-gray-300"
-                        }`}
+                        className={`px-4 py-1 rounded text-sm ${isLPSelected  ? "bg-white text-black font-semibold" : "text-white"}`}
                     >
                         Liquidity Pool
                     </button>
                     <button
                         onClick={() => setIsLPSelected(false)}
-                        className={`px-4 py-1 rounded-full text-sm ${
-                            !isLPSelected ? "bg-white text-black" : "text-gray-300"
-                        }`}
+                        className={`px-4 py-2 rounded ${!isLPSelected ? "bg-white text-black font-semibold" : "text-white"}`}
                     >
                         Peer2Peer
                     </button>

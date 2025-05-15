@@ -12,6 +12,7 @@ import ConnectPrompt from "../../components/shared/ConnectPrompt";
 import { TokenData } from "../../constants/types/tokenData";
 import { formatMoney2 } from "../../constants/utils/formatMoney";
 
+
 const percentages = [25, 50, 75, 100];
 
 const SupplyBorrow = () => {
@@ -126,11 +127,11 @@ const SupplyBorrow = () => {
         <div className="min-h-screen flex items-center lg:items-start justify-center p-4 lg:pt-36 lg:px-4">
             <div className="max-w-4xl w-full">
                 {/* Mode Toggle */}
-                <div className="flex gap-4 mb-4">
+                <div className="flex mb-4 bg-[#050505] w-fit p-2 noise rounded">
                     <button
                         onClick={() => setMode("supply")}
                         className={`px-4 py-1 rounded ${
-                            mode === "supply" ? "bg-[#DD4f00] text-white" : "bg-gray-800 text-gray-400"
+                            mode === "supply" ? "bg-[#DD4f00] text-white" : " text-white"
                         }`}
                     >
                         Supply
@@ -138,7 +139,7 @@ const SupplyBorrow = () => {
                     <button
                         onClick={() => setMode("borrow")}
                         className={`px-4 py-1 rounded ${
-                            mode === "borrow" ? "bg-[#DD4f00] text-white" : "bg-gray-800 text-gray-400"
+                            mode === "borrow" ? "bg-[#DD4f00] text-white" : " text-white"
                         }`}
                     >
                         Borrow
@@ -321,7 +322,10 @@ const SupplyBorrow = () => {
                     </div>
                 </div>
             </div>
+
+
         </div>
+
     );
 };
 
