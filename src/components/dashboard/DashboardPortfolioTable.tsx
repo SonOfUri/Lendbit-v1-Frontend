@@ -110,7 +110,7 @@ const DashboardPortfolioTable = ({
 					</div>
 				</div>
 
-				<div className="border-t border-gray-700 p-4 bg-[#050505] rounded-b-md overflow-x-auto overflow-y-auto max-h-[300px]">
+				<div className="border-t border-gray-700 p-4 bg-[#050505] rounded-b-md overflow-x-auto overflow-y-auto max-h-[300px] h-[260px]">
 					<div className="grid grid-cols-[1fr_1fr_1fr_1fr_1.5fr] py-2 font-semibold text-sm text-left">
 						<span>Assets</span>
 						<span>Deposit</span>

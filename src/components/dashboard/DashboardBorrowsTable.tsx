@@ -88,11 +88,11 @@ const DashboardBorrowsTable = ({
 
   const renderEmptyState = () => (
     <div className="flex flex-col items-center justify-center py-8 h-[310px]">
-      <img 
-        src="/empty-borrows.svg" 
-        alt="No borrows" 
-        className="w-20 h-20 mb-4 opacity-70" 
-      />
+      {/*<img */}
+      {/*  src="/empty-borrows.svg" */}
+      {/*  alt="No borrows" */}
+      {/*  className="w-20 h-20 mb-4 opacity-70" */}
+      {/*/>*/}
       <p className="text-gray-400 text-center">
         You have no active borrows
       </p>
