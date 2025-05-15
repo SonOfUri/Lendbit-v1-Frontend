@@ -1,12 +1,11 @@
 import HealthBar from "../../components/plugins/HealthBar.tsx";
 import MeterGauge from "../../components/plugins/MeterGauge.tsx";
 import PercentageTag from "../../components/plugins/PercentageTag.tsx";
-import AssetSelector from "../../components/plugins/AssetSelector.tsx";
+
 import TokenTagSm from "../../components/plugins/TokenTagSm.tsx";
 import TokenTagLg from "../../components/plugins/TokenTagLg.tsx";
 import RangeSlider from "../../components/plugins/RangeSlider.tsx";
-import LoanControl from "../../components/plugins/LoanControl.tsx";
-import AddRecipients from "../../components/plugins/AddRecipients.tsx";
+
 import MetricStatCard from "../../components/plugins/MetricStatcard.tsx";
 import DashboardCard from "../../components/plugins/DashboardCard.tsx";
 import DashboardPortfolioTable from "../../components/plugins/DashboardPortfolioTable.tsx";
@@ -32,13 +31,13 @@ const Plugins = () => {
             <br/>
             <PercentageTag percentage={90} />
             <br/>
-            <AssetSelector
+            {/* <AssetSelector
                 onTokenSelect={(token, price) => console.log(token, price)}
                 onAssetValueChange={(val) => console.log("Value:", val)}
                 assetValue="1.5"
                 userAddress="0x123"
                 actionType="supply"
-            />
+            /> */}
             <br/>
             <TokenTagSm icon="/Token-Logos/weth-base.svg" symbol="WETH" />
             <br/>
@@ -52,11 +51,11 @@ const Plugins = () => {
                 onChange={({ min, max }) => console.log("Range:", min, "-", max)}
             />
             <br/>
-            <LoanControl amount={17200} type="APY" tokenSymbol="ETH" />
+            {/* <LoanControl amount={17200} type="APY" tokenSymbol="ETH" />
             <br/>
             <LoanControl amount={17200} type="APR" tokenSymbol="USDC" />
             <br/>
-            <AddRecipients />
+            <AddRecipients /> */}
             <br/>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-4xl">
                 <MetricStatCard label="Total Value Locked" value="$12,700,000" />

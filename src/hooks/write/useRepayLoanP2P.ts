@@ -24,7 +24,7 @@ const useRepayP2P = (
     tokenTypeAddress: string,
     tokenDecimal: number,
 ) => {
-    const { chainId } = useWeb3ModalAccount();
+    const { chainId,address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
     const { data: allowanceVal = 0, isLoading } = useCheckAllowances(tokenTypeAddress);
 
@@ -72,7 +72,12 @@ const useRepayP2P = (
                 toast.success(`loan ${_requestId} successfully repayed!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["userActiveRequests"] });
+                await Promise.all([
+                    queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
+                    queryClient.invalidateQueries({ queryKey: ["market"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                   
+                ])
 
             }
         } catch (error: unknown) {
@@ -85,7 +90,7 @@ const useRepayP2P = (
                 toast.error("Repayment failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, _requestId, queryClient, errorDecoder]);
+    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, _requestId, queryClient, address, errorDecoder]);
 };
 
 export default useRepayP2P;

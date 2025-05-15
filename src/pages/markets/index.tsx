@@ -8,7 +8,7 @@ import P2PMarket from "../../components/Markets/P2PMarket.tsx";
 const Markets = () => {
 	const { marketData, marketDataLoading, marketDataError } = useMarketData();
 
-	if (marketDataLoading) {
+	if (marketDataLoading && !marketData) {
         return (
         <div className="w-full h-screen flex items-center justify-center">
             <LoadingState />

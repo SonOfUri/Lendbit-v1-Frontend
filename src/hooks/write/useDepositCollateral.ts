@@ -26,7 +26,7 @@ const useDepositCollateral = (
     tokenDecimal: number,
     tokenName: string,
 ) => {
-    const { chainId } = useWeb3ModalAccount();
+    const { chainId,address} = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
     const { data: allowanceVal = 0, isLoading } = useCheckAllowances(tokenTypeAddress);
     const navigate = useNavigate();
@@ -76,8 +76,13 @@ const useDepositCollateral = (
                 toast.success(`${_amount}${tokenName} successfully deposited as collateral!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["userUtilities"] });
-                queryClient.invalidateQueries({ queryKey: ["userPosition"] });
+                await Promise.all([
+                    queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
+                    queryClient.invalidateQueries({ queryKey: ["market"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                    
+                ])
+
                 navigate("/")
             }
         } catch (error: unknown) {
@@ -90,7 +95,7 @@ const useDepositCollateral = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, tokenName, queryClient, navigate, errorDecoder]);
+    }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, tokenName, queryClient, address, navigate, errorDecoder]);
 };
 
 export default useDepositCollateral;

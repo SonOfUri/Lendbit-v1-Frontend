@@ -15,7 +15,7 @@ import { Eip1193Provider } from "ethers";
 const useCloseListingAd = (
     _requestId: number,
 ) => {
-    const { chainId } = useWeb3ModalAccount();
+    const { chainId,address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
 
     const errorDecoder = ErrorDecoder.create([lendbit]);
@@ -46,7 +46,11 @@ const useCloseListingAd = (
                 toast.success(`ads position of ${_requestId} closed!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["allLoanListings"] });
+                await Promise.all([
+                    queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
+                    queryClient.invalidateQueries({ queryKey: ["market"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                ])
             }
         } catch (error: unknown) {
             try {
@@ -58,7 +62,7 @@ const useCloseListingAd = (
                 toast.error("Closing Ad failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, walletProvider, _requestId, queryClient, errorDecoder]);
+    }, [chainId, walletProvider, _requestId, queryClient, address, errorDecoder]);
 };
 
 export default useCloseListingAd;

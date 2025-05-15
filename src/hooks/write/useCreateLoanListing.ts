@@ -89,10 +89,11 @@ const useCreateLoanListingOrder = (
                 toast.success(`${_amount}${tokenName} loan listing order successfully created!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
-                queryClient.invalidateQueries({ queryKey: ["market"] });
-                queryClient.invalidateQueries({ queryKey: ["position"] });
-                queryClient.invalidateQueries({ queryKey: ["tokens"] });
+                await Promise.all([
+                    queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
+                    queryClient.invalidateQueries({ queryKey: ["market"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                ])
 
                 navigate("/markets")
             }

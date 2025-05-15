@@ -51,9 +51,12 @@ const useRequestLoanFromListing = (
                 toast.success(`${_amount} successfully borrowed!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
-                queryClient.invalidateQueries({ queryKey: ["market"] });
-                queryClient.invalidateQueries({ queryKey: ["position"] });
+                await Promise.all([
+                    queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
+                    queryClient.invalidateQueries({ queryKey: ["market"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                   
+                ])
 
                 navigate("/")
             }

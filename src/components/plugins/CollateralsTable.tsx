@@ -3,6 +3,7 @@ import TokenTagSm from "./TokenTagSm.tsx";
 import CustomBtn1 from "./CustomBtn1.tsx";
 import { formatMoney2 } from "../../constants/utils/formatMoney.ts";
 import { getTokenLogo } from "../../constants/utils/getTokenLogo.ts";
+import { useNavigate } from "react-router-dom";
 
 interface CollateralAsset {
     asset: string;
@@ -16,8 +17,29 @@ interface CollateralsTableProps {
 }
 
 const CollateralsTable: React.FC<CollateralsTableProps> = ({ collateralAssets = [] }) => {
+
+    const navigate = useNavigate();
+
     // Filter out assets with zero amount/value
     const filteredAssets = collateralAssets.filter(asset => asset.amount > 0 || asset.value > 0);
+
+    const handleWithdraw = (asset: CollateralAsset) => {
+        navigate("/transact/withdraw", {
+            state: {
+                tokenType: asset.asset,
+                type: "collateral",
+                available: asset.amount,
+            }
+        })
+    };
+
+    const handleDeposit = (asset: string) => {
+        navigate("/transact/deposit", {
+            state: {
+                tokenType: asset
+            }
+        })
+    };
     
   
 
@@ -72,8 +94,14 @@ const CollateralsTable: React.FC<CollateralsTableProps> = ({ collateralAssets = 
 
                         {/* Action Buttons */}
                         <div className="col-span-2 flex justify-start gap-4 pr-2">
-                            <CustomBtn1 label="Deposit" variant="primary" />
-                            <CustomBtn1 label="Withdraw" variant="secondary" />
+                            <CustomBtn1
+                                label="Deposit" variant="primary"
+                                onClick={() => handleDeposit(asset.asset)}
+                            />
+                            <CustomBtn1
+                                label="Withdraw" variant="secondary"
+                                onClick={() => handleWithdraw(asset)}
+                            />
                         </div>
                     </div>
                 ))

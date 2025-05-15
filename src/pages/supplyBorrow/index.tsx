@@ -10,6 +10,7 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import LoadingState from "../../components/shared/LoadingState";
 import ConnectPrompt from "../../components/shared/ConnectPrompt";
 import { TokenData } from "../../constants/types/tokenData";
+import { formatMoney2 } from "../../constants/utils/formatMoney";
 
 const percentages = [25, 50, 75, 100];
 
@@ -92,7 +93,7 @@ const SupplyBorrow = () => {
 
     const createBorrowPosition = useCreatePositionPool();
 
-    if (dashboardDataLoading || tokenDataLoading) {
+    if ((dashboardDataLoading || tokenDataLoading) && (!dashboardData) ) {
         return (
             <div className="w-full h-screen flex items-center justify-center">
                 <LoadingState />
@@ -208,7 +209,7 @@ const SupplyBorrow = () => {
 
                             <div className="flex items-center mb-4 justify-between">
                                 <p className="text-sm ml-2 text-gray-500 text-left">
-                                    Bal: {bal.toLocaleString()}
+                                    Bal: {formatMoney2(bal)}
                                 </p>
                                 <p className="text-sm text-gray-600 mb-4 text-left">~ ${fiatEquivalent}</p>
                             </div>

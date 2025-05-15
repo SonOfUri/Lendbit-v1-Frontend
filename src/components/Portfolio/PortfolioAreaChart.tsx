@@ -70,9 +70,9 @@ const generateSevenDayDataFromPosition = (positionData: PositionData | undefined
         
         // Calculate values with slight daily variation
         const variationFactor = 1 + dailyVariation[i];
-        const collateral = positionData.totalCollateral * variationFactor;
-        const supply = positionData.supplyToLP.reduce((sum, asset) => sum + asset.value, 0) * variationFactor;
-        const borrow = positionData.borrowOrders.reduce((sum, order) => sum + order.amount, 0) * variationFactor;
+        const collateral = positionData?.totalCollateral * variationFactor;
+        const supply = positionData?.supplyToLP.reduce((sum, asset) => sum + asset.value, 0) * variationFactor;
+        const borrow = positionData?.borrowOrders.reduce((sum, order) => sum + order.amount, 0) * variationFactor;
         
         return {
             name: `${dayName} ${dateNum}`,

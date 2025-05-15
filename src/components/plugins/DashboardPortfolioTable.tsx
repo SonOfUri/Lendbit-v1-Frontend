@@ -7,32 +7,32 @@ const DashboardPortfolioTable = () => {
 		{
 			icon: "/Token-Logos/usdc-base.svg",
 			symbol: "USDC",
-			amount: "9.1K",
-			usd: "$9.1k",
-			apy: "0.00%",
+			amount: "0",
+			usd: "$0.00k",
+			apy: "5.00%",
 			status: "Collateral",
 		},
 		{
 			icon: "/Token-Logos/usdt-base.svg",
 			symbol: "USDT",
-			amount: "9.1K",
-			usd: "$9.1k",
+			amount: "0",
+			usd: "$0k",
 			apy: "5.31%",
 			status: "Not Collateral",
 		},
 		{
 			icon: "/Token-Logos/weth-base.svg",
 			symbol: "WETH",
-			amount: "12",
-			usd: "$21.5k",
+			amount: "0",
+			usd: "$0.00k",
 			apy: "0.00%",
 			status: "Collateral",
 		},
 		{
 			icon: "/Token-Logos/eth-base.svg",
 			symbol: "ETH",
-			amount: "3",
-			usd: "$5.3k",
+			amount: "0",
+			usd: "$0.00k",
 			apy: "4.57%",
 			status: "Not Collateral",
 		},
@@ -70,7 +70,7 @@ const DashboardPortfolioTable = () => {
 					</div>
 				</div>
 
-				<div className="border-t border-gray-700 p-4 bg-[#050505] rounded-b-md overflow-x-auto overflow-y-hidden max-h-[300px] relative">
+				<div className="border-t border-gray-700 p-4 bg-[#050505] rounded-b-md overflow-x-hidden overflow-y-hidden max-h-[300px] relative">
                     <div className="absolute inset-0 bg-[#87878720] bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
                         <img onClick={walletConnect} src="/connect.svg" alt="Connect Icon" className="w-20 h-20 cursor-pointer" />
                     </div>

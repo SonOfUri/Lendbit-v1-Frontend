@@ -20,7 +20,7 @@ const useRemoveLiquidity = (
     tokenTypeAddress: string,
     tokenDecimal: number
 ) => {
-    const { chainId } = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -48,10 +48,13 @@ const useRemoveLiquidity = (
                 toast.success(`${_amount} successfully withdrawn!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["userUtilities"] });
-                queryClient.invalidateQueries({ queryKey: ["getAPR&APY"] });
-                queryClient.invalidateQueries({ queryKey: ["getTotalSupplyBorrow"] });
-                queryClient.invalidateQueries({ queryKey: ["userPosition"] });
+                await Promise.all([
+                    queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
+                    queryClient.invalidateQueries({ queryKey: ["market"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                    
+                ])
+
                 navigate("/")
             }
         } catch (error: unknown) {
@@ -64,7 +67,7 @@ const useRemoveLiquidity = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [_amount, chainId, errorDecoder, navigate, queryClient, tokenDecimal, tokenTypeAddress, walletProvider]);
+    }, [_amount, address, chainId, errorDecoder, navigate, queryClient, tokenDecimal, tokenTypeAddress, walletProvider]);
 };
 
 export default useRemoveLiquidity;
