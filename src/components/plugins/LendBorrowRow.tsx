@@ -1,17 +1,23 @@
 import React from "react";
 import TokenTagSm from "./TokenTagSm.tsx";
 import CustomBtn1 from "./CustomBtn1.tsx";
+import useRequestLoanFromListing from "../../hooks/write/useRequestLoanFromListing.ts";
+import useServiceRequest from "../../hooks/write/useServiceRequest.ts";
+import { toast } from "sonner";
+import { formatMoney } from "../../constants/utils/formatMoney.ts";
 
 type Props = {
-	icon: string;
-	symbol: string;
-	amount: string;
-	usd: string;
-	apr: string;
-	poolId: string;
-	statusPercent: number; // 0 - 100
-	expiry: string;
-	type: "lend" | "borrow";
+  icon: string;
+  symbol: string;
+  amount: string;
+  usd: string;
+  apr: string;
+  poolId: string;
+  statusPercent: number;
+  expiry: string;
+  type: "lend" | "borrow";
+  tokenAddress?: string;
+  tokenDecimals?: number;
 };
 
 const getBatterySvg = (percent: number) => {
@@ -22,17 +28,45 @@ const getBatterySvg = (percent: number) => {
 };
 
 const LendBorrowRow: React.FC<Props> = ({
-	icon,
-	symbol,
-	amount,
-	usd,
-	apr,
-	poolId,
-	statusPercent,
-	expiry,
-	type,
+  icon,
+  symbol,
+  amount,
+  usd,
+  apr,
+  poolId,
+  statusPercent,
+  expiry,
+  type,
+  tokenAddress,
+  tokenDecimals
 }) => {
 	const batteryIcon = getBatterySvg(statusPercent);
+
+	const requestLoan = useRequestLoanFromListing()
+
+	const serviceRequest = useServiceRequest()
+
+	const handleAction = () => {
+		if (!tokenAddress || tokenDecimals === undefined) {
+			toast.error("Token information incomplete");
+			return;
+		}
+
+		
+		if (type === "lend") {
+			requestLoan(
+				Number(poolId),
+				amount,
+				tokenDecimals
+			);
+		} else if (type === "borrow") {
+		serviceRequest(
+			amount,
+			Number(poolId),
+			tokenAddress
+		);
+		}
+	};
 
 	return (
 		<div className="grid grid-cols-7 gap-4 p-4 items-center text-left text-white text-sm relative group">
@@ -41,7 +75,7 @@ const LendBorrowRow: React.FC<Props> = ({
 
 			{/* Amount */}
 			<div className="flex flex-col">
-				<span className="font-bold text-sm">{amount}</span>
+				<span className="font-bold text-sm">{formatMoney(amount)}</span>
 				<span className="text-xs text-gray-400">{usd}</span>
 			</div>
 
@@ -69,8 +103,9 @@ const LendBorrowRow: React.FC<Props> = ({
 
 			{/* Action */}
 			<CustomBtn1
-				label={type === "lend" ? "Lend" : "Borrow"}
+				label={type === "lend" ? "Borrow Now" : "Fund Loan"}
 				variant="primary"
+				onClick={handleAction}
 			/>
 		</div>
 	);
