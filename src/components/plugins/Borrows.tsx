@@ -21,13 +21,15 @@ interface BorrowOrder {
 interface BorrowsProps {
     borrowFromLP?: BorrowAsset[];
     borrowOrders?: BorrowOrder[];
+    initialActiveTab?: 'liquidity' | 'p2p';
+    id?: string;
 }
 
-const Borrows: React.FC<BorrowsProps> = ({ borrowFromLP = [], borrowOrders = [] }) => {
-    const [isLPSelected, setIsLPSelected] = useState(true);
+const Borrows: React.FC<BorrowsProps> = ({id, borrowFromLP = [], borrowOrders = [], initialActiveTab = 'liquidity' }) => {
+    const [isLPSelected, setIsLPSelected] = useState(initialActiveTab === 'liquidity');
 
     return (
-        <div className="text-white w-full">
+        <div id={id} className="text-white w-full">
 
             <div className="w-full flex items-center justify-between pt-6 pb-4">
                 <h2 className="text-xl font-bold text-left w-full">{isLPSelected ? "Borrows" : "My Active Borrow(s)"}</h2>

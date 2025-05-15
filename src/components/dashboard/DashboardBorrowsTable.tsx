@@ -4,6 +4,7 @@ import TokenTagSm from "../plugins/TokenTagSm";
 import { formatDueDate } from "../../constants/utils/formatDate";
 import { formatMoney } from "../../constants/utils/formatMoney";
 import useTokenData from "../../hooks/read/useTokenData";
+import { useNavigate } from "react-router-dom";
 
 interface Borrow {
   asset: string;
@@ -24,6 +25,7 @@ interface DashboardBorrowsTableProps {
         asset: string;
         value: number;
         isCollateral: boolean;
+        amount: number;
       }>;
     };
   };
@@ -45,6 +47,7 @@ const DashboardBorrowsTable = ({
   dashboardData, 
   isLoading = false 
 }: DashboardBorrowsTableProps) => {
+  const navigate = useNavigate();
   const [rows, setRows] = useState<RowData[]>([]);
   const { tokenData } = useTokenData();
 
@@ -61,23 +64,27 @@ const DashboardBorrowsTable = ({
       return acc;
     }, {} as Record<string, number>);
 
-    // Create a map of collateral assets
-    const collateralAssets = assets
-      .filter(asset => asset.isCollateral)
+    // Get collateral assets with amount > 0
+    const availableCollateral = assets
+      .filter(asset => asset.isCollateral && asset.amount > 0)
       .map(asset => asset.asset);
 
     const processedRows = borrows.map((borrow) => {
-    //   const tokenInfo = tokenData?.find(t => t.symbol === borrow.asset);
       const usdValue = assetValueMap[borrow.asset] || 0;
       
+      // Use specified collateralTokens or fallback to any collateral with amount > 0
+      const collateralAssets = borrow.collateralTokens?.length 
+        ? borrow.collateralTokens 
+        : availableCollateral;
+
       return {
         icon: `/Token-Logos/${borrow.asset.toLowerCase()}-base.svg`,
         symbol: borrow.asset,
         amount: formatMoney(borrow.amount),
         usdValue: `$${formatMoney(usdValue)}`,
-        apr: `${(borrow.apr * 100).toFixed(2)}%`,
+        apr: `${(borrow.apr).toFixed(2)}%`,
         dueIn: borrow.dueDate ? formatDueDate(borrow.dueDate) : "-",
-        collateralIcons: (borrow.collateralTokens || collateralAssets)
+        collateralIcons: collateralAssets
           .map(asset => `/Token-Logos/${asset.toLowerCase()}-base.svg`),
         source: borrow.source
       };
@@ -88,11 +95,6 @@ const DashboardBorrowsTable = ({
 
   const renderEmptyState = () => (
     <div className="flex flex-col items-center justify-center py-8 h-[310px]">
-      {/*<img */}
-      {/*  src="/empty-borrows.svg" */}
-      {/*  alt="No borrows" */}
-      {/*  className="w-20 h-20 mb-4 opacity-70" */}
-      {/*/>*/}
       <p className="text-gray-400 text-center">
         You have no active borrows
       </p>
@@ -105,6 +107,15 @@ const DashboardBorrowsTable = ({
       <p className="text-gray-400">Loading borrows...</p>
     </div>
   );
+
+  const handleRepayClick = (source: string) => {
+    navigate('/positions', {
+        state: { 
+            activeBorrowTab: source === 'LP' ? 'liquidity' : 'p2p',
+            shouldScrollToBorrows: true 
+        }
+    });
+  };
 
   return (
     <div className="text-white w-full h-full">
@@ -162,7 +173,7 @@ const DashboardBorrowsTable = ({
                   <CustomBtn1 
                     label="Repay" 
                     variant="secondary" 
-                    onClick={() => console.log('Repay', row.symbol)}
+                    onClick={() => handleRepayClick(row.source)}
                   />
                 </div>
               </div>

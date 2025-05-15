@@ -7,6 +7,8 @@ import usePositionData from "../../hooks/read/usePositionData.ts";
 import LoadingState from "../../components/shared/LoadingState.tsx";
 import ConnectPrompt from "../../components/shared/ConnectPrompt.tsx";
 import { formatMoney2 } from "../../constants/utils/formatMoney.ts";
+import { useLocation } from "react-router-dom";
+import { useLayoutEffect } from "react";
 
 const Positions = () => {
 	const {
@@ -15,6 +17,21 @@ const Positions = () => {
 		positionDataError,
 		isWalletConnected,
 	} = usePositionData();
+
+	const location = useLocation();
+	const activeBorrowTab = location.state?.activeBorrowTab || 'liquidity';
+	
+	const shouldScrollToBorrows = location.state?.shouldScrollToBorrows;
+
+    useLayoutEffect(() => {
+        if (shouldScrollToBorrows) {
+            const borrowsSection = document.getElementById('borrows-section');
+            if (borrowsSection) {
+                borrowsSection.scrollIntoView({ behavior: 'smooth' });
+                window.scrollBy(0, -20);
+            }
+        }
+    }, [shouldScrollToBorrows]);
 
 	if (positionDataLoading && !positionData) {
 		return (
@@ -71,8 +88,10 @@ const Positions = () => {
 
 			{/* 📉 Borrows */}
 			<Borrows
+				id="borrows-section"
 				borrowFromLP={positionData?.borrowFromLP}
 				borrowOrders={positionData?.borrowOrders}
+				initialActiveTab={activeBorrowTab}
 			/>
 		</div>
 	);

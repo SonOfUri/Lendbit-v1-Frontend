@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import TokenTagSm from "./TokenTagSm.tsx";
 import CustomBtn1 from "./CustomBtn1.tsx";
 import { formatMoney } from "../../constants/utils/formatMoney.ts";
 import { getTokenLogo } from "../../constants/utils/getTokenLogo.ts";
+import useCloseListingAd from "../../hooks/write/useCloseListingAd.ts";
 
 interface P2PLendOrdersTableProps {
     lendOrders: {
@@ -16,8 +17,25 @@ interface P2PLendOrdersTableProps {
 
 const P2PLendOrdersTable: React.FC<P2PLendOrdersTableProps> = ({ lendOrders }) => {
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-    
+    const loanListClose = useCloseListingAd();
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (openDropdown) {
+                const dropdownElement = dropdownRefs.current[openDropdown];
+                if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+                    setOpenDropdown(null);
+                }
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [openDropdown]);
 
     const handleToggle = (orderId: string) => {
         setOpenDropdown((prev) => (prev === orderId ? null : orderId));
@@ -25,7 +43,7 @@ const P2PLendOrdersTable: React.FC<P2PLendOrdersTableProps> = ({ lendOrders }) =
 
     return (
         <div className="w-full">
-            <div className="grid grid-cols-7 gap-4 font-semibold text-sm text-left text-white bg-[#191818] p-4 rounded-t-md noise shadow-1">
+            <div className="grid grid-cols-7 gap-4 font-semibold text-sm text-left text-white bg-[#191818] p-4 rounded-t-md noise shadow-1 sticky top-0 z-10">
                 <span>Assets</span>
                 <span>Amount</span>
                 <span>APR</span>
@@ -65,8 +83,29 @@ const P2PLendOrdersTable: React.FC<P2PLendOrdersTableProps> = ({ lendOrders }) =
                             <span className="text-xs">{order.orderId.slice(0, 6)}...{order.orderId.slice(-4)}</span>
                             <span className="text-green-400">Active</span>
 
-                            <div className="relative">
-                                <button onClick={() => handleToggle(order.orderId)}>
+                            <div className="hidden xl:block">
+                                <CustomBtn1
+                                    label="Close"
+                                    variant="primary"
+                                    onClick={() => 
+                                        loanListClose(Number(order.orderId))}
+                                />
+                            </div>
+
+                            <div 
+                                className="relative xl:hidden"
+                                ref={(el) => {
+                                    if (el) {
+                                        dropdownRefs.current[order.orderId] = el;
+                                    } else {
+                                        delete dropdownRefs.current[order.orderId];
+                                    }
+                                }}
+                            >
+                                <button 
+                                    onClick={() => handleToggle(order.orderId)}
+                                    className="p-1 hover:bg-gray-800 rounded"
+                                >
                                     <img
                                         src="/three-dots.svg"
                                         alt="Menu"
@@ -77,9 +116,15 @@ const P2PLendOrdersTable: React.FC<P2PLendOrdersTableProps> = ({ lendOrders }) =
                                 </button>
 
                                 {openDropdown === order.orderId && (
-                                    <div className="absolute -top-6 right-0 bg-[#111] border border-gray-700 rounded-md shadow-md z-10 p-2 w-33 flex flex-col gap-1">
-                                        <CustomBtn1 label="Close" variant="primary" />
-                                        {/* <CustomBtn1 label="Cancel" variant="secondary" /> */}
+                                    <div className="absolute right-0 -top-6 z-50 bg-[#111] border border-gray-700 rounded-md shadow-lg p-2 w-32 flex flex-col gap-1">
+                                        <CustomBtn1 
+                                            label="Close" 
+                                            variant="primary"
+                                            onClick={() => {
+                                                loanListClose(Number(order.orderId));
+                                                setOpenDropdown(null);
+                                            }}
+                                        />
                                     </div>
                                 )}
                             </div>
