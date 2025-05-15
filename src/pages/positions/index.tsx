@@ -44,7 +44,7 @@ const Positions = () => {
 	}
 
 	return (
-		<div className="w-full py-2 px-4 space-y-8">
+		<div className="w-full pt-2 px-4 space-y-8 pb-4">
 			{/* 📈 Graph Placeholder */}
 			<PortfolioAreaChart positionData={positionData} />
 

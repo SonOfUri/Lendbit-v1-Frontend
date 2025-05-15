@@ -6,7 +6,7 @@ import { formatMoney } from "../../constants/utils/formatMoney";
 import { TokenItem } from "../../constants/types";
 import { tokenMockedData } from "../../constants/utils/tokenMockedData";
 
-interface LendBorrowOrder {
+interface LendBorrowOrderBase {
   asset: string;
   amount: number;
   apr: number;
@@ -14,9 +14,28 @@ interface LendBorrowOrder {
   orderId: string;
 }
 
+interface LendOrder extends LendBorrowOrderBase {
+  whitelist: string[];
+  min_amount: number;
+  max_amount: number;
+}
+
+// interface BorrowOrder extends LendBorrowOrderBase {
+//   // Borrow orders might have different properties if needed
+// }
+
+type EnhancedOrder = (LendOrder | LendBorrowOrderBase) & {
+  tokenAddress?: string;
+  tokenDecimals?: number;
+};
+
+function isLendOrder(order: EnhancedOrder): order is LendOrder {
+  return 'min_amount' in order && 'max_amount' in order;
+}
+
 interface P2PMarkets {
-  lendOrders: LendBorrowOrder[];
-  borrowOrders: LendBorrowOrder[];
+  lendOrders: LendOrder[];
+  borrowOrders: LendBorrowOrderBase[];
 }
 
 interface P2PMarketProps {
@@ -26,16 +45,15 @@ interface P2PMarketProps {
 
 
 
-
 const P2PMarket: React.FC<P2PMarketProps> = ({ p2pMarkets }) => {
 
-  // console.log(p2pMarkets);
+  console.log(p2pMarkets);
   
   const [activeTab, setActiveTab] = useState<"lend" | "borrow">("borrow");
   const [selectedToken, setSelectedToken] = useState("All Tokens");
   const [showFilterModal, setShowFilterModal] = useState(false);
 
-  const enhanceOrders = (orders: LendBorrowOrder[]) => {
+  const enhanceOrders = <T extends LendBorrowOrderBase>(orders: T[]) => {
     return orders.map(order => {
       const tokenInfo = tokenMockedData.find(t => t.symbol === order.asset);
       return {
@@ -143,6 +161,8 @@ const P2PMarket: React.FC<P2PMarketProps> = ({ p2pMarkets }) => {
               type={activeTab}
               tokenAddress={item.tokenAddress}
               tokenDecimals={item.tokenDecimals}
+              minAmount={isLendOrder(item) ? item.min_amount : undefined}
+              maxAmount={isLendOrder(item) ? item.max_amount : undefined}
             />
           );
         })}

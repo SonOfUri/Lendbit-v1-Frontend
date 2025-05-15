@@ -31,8 +31,6 @@ const LiquidityBorrowsTable: React.FC<LiquidityBorrowsTableProps> = ({ borrowFro
 
     return (
         <div className="w-full">
-            <h2 className="text-xl font-bold text-left py-4">Borrows</h2>
-
             <div className="grid grid-cols-6 gap-4 p-4 bg-[#181919] rounded-t-md font-semibold text-sm text-left text-white noise shadow-1">
                 <span>Assets</span>
                 <span>Amount</span>

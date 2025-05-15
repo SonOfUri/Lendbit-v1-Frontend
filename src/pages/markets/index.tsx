@@ -3,6 +3,7 @@ import useMarketData from "../../hooks/read/useMarketData.ts";
 import LoadingState from "../../components/shared/LoadingState.tsx";
 import LiquidityPoolMarkets from "../../components/Markets/LiquidityPoolMarkets.tsx";
 import P2PMarket from "../../components/Markets/P2PMarket.tsx";
+import { formatMoney2 } from "../../constants/utils/formatMoney.ts";
 // import { default as P2PMarketFromPlugins } from "../../components/plugins/P2PMarket.tsx";
 
 const Markets = () => {
@@ -30,15 +31,15 @@ const Markets = () => {
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 				<MetricStatCard
 					label="Total Value Locked"
-					value={`$${marketData?.tvl.toLocaleString()}`}
+					value={`$${formatMoney2(marketData?.tvl)}`}
 				/>
 				<MetricStatCard
 					label="Total Supplied"
-					value={`$${marketData?.totalSupplied.toLocaleString()}`}
+					value={`$${formatMoney2(marketData?.totalSupplied)}`}
 				/>
 				<MetricStatCard
 					label="Total Borrowed"
-					value={`$${marketData?.totalBorrowed.toLocaleString()}`}
+					value={`$${formatMoney2(marketData?.totalBorrowed)}`}
 				/>
 			</div>
 
