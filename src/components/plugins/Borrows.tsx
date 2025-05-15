@@ -28,6 +28,9 @@ interface BorrowsProps {
 const Borrows: React.FC<BorrowsProps> = ({id, borrowFromLP = [], borrowOrders = [], initialActiveTab = 'liquidity' }) => {
     const [isLPSelected, setIsLPSelected] = useState(initialActiveTab === 'liquidity');
 
+    // console.log(borrowFromLP, borrowOrders);
+    
+
     return (
         <div id={id} className="text-white w-full">
 

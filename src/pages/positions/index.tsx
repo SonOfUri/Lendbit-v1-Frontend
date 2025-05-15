@@ -60,6 +60,9 @@ const Positions = () => {
     )
 	}
 
+	console.log(positionData);
+	
+
 	return (
 		<div className="w-full pt-2 px-4 space-y-8 pb-4">
 			{/* 📈 Graph Placeholder */}

@@ -89,7 +89,7 @@ const LiquidityBorrowsTable: React.FC<LiquidityBorrowsTableProps> = ({ borrowFro
                             </div>
 
                             <div className="font-semibold">
-                                {(borrow.apr * 100).toFixed(2)}%
+                                {(borrow.apr).toFixed(2)}%
                             </div>
 
                             <div className="text-white">

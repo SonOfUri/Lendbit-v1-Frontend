@@ -52,46 +52,44 @@ const DashboardBorrowsTable = ({
   const { tokenData } = useTokenData();
 
   useEffect(() => {
-    if (!dashboardData || isLoading) return;
+    if (!dashboardData || isLoading || !tokenData) return;
 
     const { lending, portfolio } = dashboardData;
     const borrows = lending?.borrows || [];
     const assets = portfolio?.assets || [];
 
-    // Create a map of asset values for quick lookup
-    const assetValueMap = assets.reduce((acc, asset) => {
-      acc[asset.asset] = asset.value;
-      return acc;
+    const tokenPriceBySymbol = tokenData.reduce((acc, token) => {
+        acc[token.symbol.toUpperCase()] = token.price;
+        return acc;
     }, {} as Record<string, number>);
 
-    // Get collateral assets with amount > 0
     const availableCollateral = assets
-      .filter(asset => asset.isCollateral && asset.amount > 0)
-      .map(asset => asset.asset);
+        .filter(asset => asset.isCollateral && asset.amount > 0)
+        .map(asset => asset.asset);
 
     const processedRows = borrows.map((borrow) => {
-      const usdValue = assetValueMap[borrow.asset] || 0;
-      
-      // Use specified collateralTokens or fallback to any collateral with amount > 0
-      const collateralAssets = borrow.collateralTokens?.length 
-        ? borrow.collateralTokens 
-        : availableCollateral;
+        const tokenPrice = tokenPriceBySymbol[borrow.asset.toUpperCase()] || 0;
+        const usdValue = borrow.amount * tokenPrice;
+        
+        const collateralAssets = borrow.collateralTokens?.length 
+            ? borrow.collateralTokens 
+            : availableCollateral;
 
-      return {
-        icon: `/Token-Logos/${borrow.asset.toLowerCase()}-base.svg`,
-        symbol: borrow.asset,
-        amount: formatMoney(borrow.amount),
-        usdValue: `$${formatMoney(usdValue)}`,
-        apr: `${(borrow.apr).toFixed(2)}%`,
-        dueIn: borrow.dueDate ? formatDueDate(borrow.dueDate) : "-",
-        collateralIcons: collateralAssets
-          .map(asset => `/Token-Logos/${asset.toLowerCase()}-base.svg`),
-        source: borrow.source
-      };
+        return {
+            icon: `/Token-Logos/${borrow.asset.toLowerCase()}-base.svg`,
+            symbol: borrow.asset,
+            amount: formatMoney(borrow.amount),
+            usdValue: `$${formatMoney(usdValue)}`,
+            apr: `${(borrow.apr).toFixed(2)}%`,
+            dueIn: borrow.dueDate ? formatDueDate(borrow.dueDate) : "-",
+            collateralIcons: collateralAssets
+                .map(asset => `/Token-Logos/${asset.toLowerCase()}-base.svg`),
+            source: borrow.source
+        };
     });
 
     setRows(processedRows);
-  }, [dashboardData, tokenData, isLoading]);
+}, [dashboardData, tokenData, isLoading]);
 
   const renderEmptyState = () => (
     <div className="flex flex-col items-center justify-center py-8 h-[310px]">
