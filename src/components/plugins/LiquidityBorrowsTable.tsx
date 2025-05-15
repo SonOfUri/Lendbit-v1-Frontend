@@ -2,6 +2,7 @@ import TokenTagSm from "./TokenTagSm.tsx";
 import CustomBtn1 from "./CustomBtn1.tsx";
 import { formatMoney } from "../../constants/utils/formatMoney.ts";
 import { getTokenLogo } from "../../constants/utils/getTokenLogo.ts";
+import { useNavigate } from "react-router-dom";
 
 
 interface LiquidityBorrowsTableProps {
@@ -14,7 +15,16 @@ interface LiquidityBorrowsTableProps {
 }
 
 const LiquidityBorrowsTable: React.FC<LiquidityBorrowsTableProps> = ({ borrowFromLP }) => {
-    
+    const navigate = useNavigate();
+
+    const handleBorrow = (asset: string) => {
+        navigate("/supply-borrow", {
+            state: {
+                mode: "borrow",
+                tokenType: asset
+            }
+        })
+    };
 
     // Filter out assets with zero amount
     const filteredBorrows = borrowFromLP.filter(asset => asset.amount > 0);
@@ -38,9 +48,9 @@ const LiquidityBorrowsTable: React.FC<LiquidityBorrowsTableProps> = ({ borrowFro
                         No active borrows from liquidity pools
                     </div>
                 ) : (
-                    filteredBorrows.map((borrow) => (
+                    filteredBorrows.map((borrow, index) => (
                         <div
-                            key={borrow.asset}
+                            key={index}
                             className="grid grid-cols-6 gap-4 py-3 text-sm items-center text-left border-b border-gray-800 last:border-b-0"
                         >
                             <TokenTagSm 
@@ -68,7 +78,11 @@ const LiquidityBorrowsTable: React.FC<LiquidityBorrowsTableProps> = ({ borrowFro
                             </div>
 
                             <div className="flex gap-2 justify-start">
-                                <CustomBtn1 label="Borrow" variant="primary" />
+                                <CustomBtn1
+                                    label="Borrow"
+                                    variant="primary"
+                                    onClick={() => handleBorrow(borrow.asset)}
+                                />
                                 <CustomBtn1 label="Repay" variant="secondary" />
                             </div>
                         </div>

@@ -67,7 +67,7 @@ const LiquidityPoolMarkets: React.FC<LiquidityPoolProps> = ({ liquidityPools }) 
     const navigate = useNavigate();
 
     const handleSupply = (asset: string) => {
-        console.log(`Supply clicked for ${asset}`);
+        // console.log(`Supply clicked for ${asset}`);
         navigate("/supply-borrow", {
             state: {
                 mode: "supply",
@@ -77,7 +77,7 @@ const LiquidityPoolMarkets: React.FC<LiquidityPoolProps> = ({ liquidityPools }) 
     };
 
     const handleBorrow = (asset: string) => {
-        console.log(`Borrow clicked for ${asset}`);
+        // console.log(`Borrow clicked for ${asset}`);
         navigate("/supply-borrow", {
             state: {
                 mode: "borrow",

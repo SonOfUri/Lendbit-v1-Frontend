@@ -6,64 +6,75 @@ import { useCallback } from "react";
 import { isSupportedChain } from "../../constants/utils/chains";
 import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
-import { getLendbitContract, } from "../../api/contractsInstance";
+import {
+    getLendbitContract,
+} from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
+import erc20 from "../../abi/erc20.json";
+import { ethers } from "ethers";
 import { ErrorDecoder } from "ethers-decode-error";
+import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 
-const useCloseRequest = (
-    _requestId: number,
+const useWithdrawPool = (
+    tokenTypeAddress: string,
+    _amount: string,
+    tokenDecimal: number,
+    tokenName: string,
 ) => {
-    const { chainId, address} = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
-
-    const errorDecoder = ErrorDecoder.create([lendbit]);
-
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
 
+    const errorDecoder = ErrorDecoder.create([lendbit, erc20]);
 
     return useCallback(async () => {
         if (!isSupportedChain(chainId)) return toast.warning("SWITCH NETWORK");
+
 
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
         const signer = await readWriteProvider.getSigner();
         const contract = getLendbitContract(signer, lendbit);
 
-
+        const _weiAmount = ethers.parseUnits(_amount, tokenDecimal);
         let toastId: string | number | undefined;
 
         try {
-            toastId = toast.loading(`closing ads position...`);
+            toastId = toast.loading(`Processing withdrawal of supplies transaction...`);
 
+            toast.loading(`Processing withdrawal of ${_amount}${tokenName} supplied...`, { id: toastId })
 
-            const transaction = await contract.closeRequest(
-                _requestId,
-            );
+            // **Proceed with withdraw**
+            const transaction = await contract.withdraw(tokenTypeAddress, _weiAmount);
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`request of id #${_requestId} closed!`, {
+                toast.success(`${_amount}${tokenName} supplied successfully withdrawn!`, {
                     id: toastId,
                 });
+                
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
                     queryClient.invalidateQueries({ queryKey: ["position"] }),
+                    
                 ])
 
+                navigate("/")
             }
         } catch (error: unknown) {
             try {
                 const decodedError = await errorDecoder.decode(error);
                 console.error("Transaction failed:", decodedError.reason);
-                toast.error(`ads closing failed: ${decodedError.reason}`, { id: toastId });
+                toast.error(`Transaction failed: ${decodedError.reason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
-                toast.error("Closing request failed: Unknown error", { id: toastId });
+                toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, walletProvider, _requestId, queryClient, address, errorDecoder]);
+    }, [chainId, walletProvider, _amount, tokenDecimal, tokenName, tokenTypeAddress, queryClient, address, navigate, errorDecoder]);
 };
 
-export default useCloseRequest;
+export default useWithdrawPool;

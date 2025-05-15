@@ -57,10 +57,13 @@ const useCreateBorrowOrder = (
                 toast.success(`${_amount} ${tokenName} lending request successfully created!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
-                queryClient.invalidateQueries({ queryKey: ["market"] });
-                queryClient.invalidateQueries({ queryKey: ["position"] });
-                queryClient.invalidateQueries({ queryKey: ["tokens"] });
+
+                await Promise.all([
+                    queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
+                    queryClient.invalidateQueries({ queryKey: ["market"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                ])
+
                 navigate("/markets")
             }
         } catch (error: unknown) {

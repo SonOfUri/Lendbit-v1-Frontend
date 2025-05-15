@@ -55,11 +55,12 @@ const useWithdrawCollateral = (
                     id: toastId,
                 });
                 
-                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
-                queryClient.invalidateQueries({ queryKey: ["market"] });
-                queryClient.invalidateQueries({ queryKey: ["position"] });
-                queryClient.invalidateQueries({ queryKey: ["tokens"] });
-
+                await Promise.all([
+                    queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
+                    queryClient.invalidateQueries({ queryKey: ["market"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                    
+                ])
 
                 navigate("/")
             }

@@ -8,7 +8,7 @@ type AssetSelectorProps = {
   onAssetValueChange: (value: string) => void;
   assetValue: string;
   userAddress: string | undefined;
-  actionType: "supply" | "withdraw" | "borrow";
+  actionType: "supply" | "withdraw" | "borrow" | "deposit";
   tokenData: TokenData[];
   selectedToken: TokenData | null;
   availableBal : number | null

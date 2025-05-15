@@ -1,27 +1,30 @@
 import { useQuery } from '@tanstack/react-query';
 import { useWeb3ModalAccount } from '@web3modal/ethers/react';
-import { getFetch } from '../../api/fetch';
+import { getFetch2 } from '../../api/fetch';
 import { PositionData } from '../../constants/types/positionData';
+import { usePositionStore } from '../../stores/usePositionStore';
 
 const usePositionData = () => {
   const { address, isConnected } = useWeb3ModalAccount();
+  const { positionData, setPositionData } = usePositionStore();
+  
+    const { data, isLoading, error } = useQuery<PositionData>({
+      queryKey: ['position'],
+      queryFn: () => getFetch2<PositionData>(`/position/${address}`),
+      enabled: isConnected && !!address && !positionData,
+      staleTime: 1000 * 60 * 5, 
+      meta: {
+        onSuccess: (data: PositionData) => {
+          setPositionData(data);
+        },
+      },
+    });
 
-  const {
-    data: positionData,
-    isLoading: positionDataLoading,
-    error: positionDataError,
-  } = useQuery({
-    queryKey: ['position', address],
-    queryFn: () => getFetch<PositionData>(`/position/${address}`),
-    enabled: isConnected && !!address,
-    select: (res) => res.data,
-    // refetchInterval: 30 * 1000, 
-  });
 
-  return {
-    positionData,
-    positionDataLoading,
-    positionDataError,
+ return {
+    positionData: positionData ?? data,
+    positionDataLoading: isLoading,
+    positionDataError: error,
     isWalletConnected: isConnected && !!address,
   };
 };

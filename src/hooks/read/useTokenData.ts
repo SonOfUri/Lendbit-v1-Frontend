@@ -1,25 +1,27 @@
 import { useQuery } from '@tanstack/react-query';
-import { getFetch } from '../../api/fetch';
 import { TokenData } from '../../constants/types/tokenData';
+import { getFetch2 } from '../../api/fetch';
+import { useTokenStore } from '../../stores/useTokenStore';
 
 const useTokenData = () => {
-  const {
-    data: tokenData,
-    isLoading: tokenDataLoading,
-    error: tokenDataError,
-  } = useQuery({
-    queryKey: ['tokens'],
-    queryFn: () => getFetch<TokenData[]>('/token/all'),
-    select: (res) => res.data,
-    staleTime: 60 * 1000,
-    refetchInterval: 30 * 1000,
-    refetchOnWindowFocus: false,
-  });
+  const { tokenData, setTokenData } = useTokenStore();
+  
+    const { data, isLoading, error } = useQuery<TokenData[]>({
+      queryKey: ['tokens'],
+      queryFn: () => getFetch2<TokenData[]>(`/token/all`),
+      staleTime: 1000 * 60 * 5, 
+      meta: {
+        onSuccess: (data: TokenData[]) => {
+          setTokenData(data);
+        },
+      },
+    });
 
-  return {
-    tokenData,
-    tokenDataLoading,
-    tokenDataError,
+
+ return {
+    tokenData: tokenData ?? data,
+    tokenDataLoading: isLoading,
+    tokenDataError: error,
   };
 };
 

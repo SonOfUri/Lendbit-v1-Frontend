@@ -71,10 +71,12 @@ const useSupplyLiquidity = (
                 toast.success(`${_amount}${tokenName} successfully supplied, happy earning!`, {
                     id: toastId,
                 });
-                queryClient.invalidateQueries({ queryKey: ["dashboard", address] });
-                queryClient.invalidateQueries({ queryKey: ["market"] });
-                queryClient.invalidateQueries({ queryKey: ["position"] });
-                queryClient.invalidateQueries({ queryKey: ["tokens"] });
+                await Promise.all([
+                    queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
+                    queryClient.invalidateQueries({ queryKey: ["market"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                    
+                ])
             }
         } catch (error: unknown) {
             try {

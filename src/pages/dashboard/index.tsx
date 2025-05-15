@@ -15,7 +15,7 @@ const Dashboard = () => {
     const { dashboardData, dashboardDataLoading, dashboardDataError, isWalletConnected } = useDashboardData()
     
 
-    if (dashboardDataLoading) {
+    if (dashboardDataLoading && !dashboardData) {
         return (
         <div className="w-full h-screen flex items-center justify-center">
             <LoadingState />
