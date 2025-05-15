@@ -30,21 +30,24 @@ const Supplies: React.FC<SuppliesProps> = ({ supplyToLP = [], lendOrders = [] })
 
     return (
         <div className="text-white w-full">
-            <div className="flex justify-end mb-2">
-                <div className="flex gap-1 p-1 bg-[#050505] rounded-full">
-                    <div className="flex gap-2 bg-[#050505] rounded p-1">
-                        <button
-                            onClick={() => setIsLPSelected(true)}
-                            className={`px-4 py-2 rounded ${  isLPSelected ? "bg-white text-black font-semibold" : "text-white"}`}
-                        >
-                            Liquidity Pool
-                        </button>
-                        <button
-                            onClick={() => setIsLPSelected(false)}
-                            className={`px-4 py-2 rounded ${!isLPSelected ?  "bg-white text-black font-semibold" : "text-white"}`}
-                        >
-                            Peer2Peer
-                        </button>
+            <div className="w-full flex items-center justify-between pt-6 pb-4">
+                <h2 className="text-xl font-bold text-left w-full">{isLPSelected ? "Supplies" : "My Lend Orders"}</h2>
+                <div className="flex justify-end w-full">
+                    <div className="flex gap-1 p-1 bg-[#050505] rounded-full">
+                        <div className="flex gap-2 bg-[#050505] rounded p-1">
+                            <button
+                                onClick={() => setIsLPSelected(true)}
+                                className={`px-4 py-2 rounded ${  isLPSelected ? "bg-white text-black font-semibold" : "text-white"}`}
+                            >
+                                Liquidity Pool
+                            </button>
+                            <button
+                                onClick={() => setIsLPSelected(false)}
+                                className={`px-4 py-2 rounded ${!isLPSelected ?  "bg-white text-black font-semibold" : "text-white"}`}
+                            >
+                                Peer2Peer
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

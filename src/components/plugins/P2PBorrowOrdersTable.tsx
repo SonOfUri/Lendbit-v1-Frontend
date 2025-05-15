@@ -34,8 +34,6 @@ const P2PBorrowOrdersTable: React.FC<P2PBorrowOrdersTableProps> = ({ borrowOrder
 
     return (
         <div className="w-full">
-            <h2 className="text-xl font-bold text-left py-4">My Borrow Orders</h2>
-
             <div className="grid grid-cols-7 gap-4 p-4 font-semibold text-sm text-left text-white bg-[#181919] rounded-t-md noise shadow-1">
                 <span>Assets</span>
                 <span>Amount</span>
@@ -94,9 +92,13 @@ const P2PBorrowOrdersTable: React.FC<P2PBorrowOrdersTableProps> = ({ borrowOrder
                                     </button>
 
                                     {openDropdown === order.orderId && (
-                                        <div className="absolute top-7 right-0 bg-[#111] border border-gray-700 rounded-md shadow-md z-10 p-2 w-33 flex flex-col gap-1">
-                                            <CustomBtn1 label="Repay" variant="primary" />
-                                            <CustomBtn1 label="Extend" variant="secondary" />
+                                        <div className="absolute -top-6 right-0 bg-[#111] border border-gray-700 rounded-md shadow-md z-10 p-2 w-33 flex flex-col gap-1">
+                                            <CustomBtn1
+                                                label="Repay"
+                                                variant="primary"
+                                                
+                                            />
+                                            {/* <CustomBtn1 label="Extend" variant="secondary" /> */}
                                         </div>
                                     )}
                                 </div>

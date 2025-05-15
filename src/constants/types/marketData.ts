@@ -20,7 +20,7 @@ export interface MarketData {
       orderId: string;
       whitelist: [],
       min_amount: number,
-      max_amount: number
+      max_amount: number,
     }[];
     borrowOrders: {
       asset: string;

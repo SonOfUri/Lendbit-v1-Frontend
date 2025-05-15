@@ -47,8 +47,6 @@ const LiquiditySuppliesTable: React.FC<LiquiditySuppliesTableProps> = ({ supplyT
 
     return (
         <div className="w-full">
-            <h2 className="text-xl font-bold text-left py-4">Supplies</h2>
-
             <div className="grid grid-cols-6 gap-4 p-4 bg-[#191818] rounded-t-md font-semibold text-sm text-left text-white noise shadow-1">
                 <span>Assets</span>
                 <span>Amount</span>

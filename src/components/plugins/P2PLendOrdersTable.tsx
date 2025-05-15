@@ -25,8 +25,6 @@ const P2PLendOrdersTable: React.FC<P2PLendOrdersTableProps> = ({ lendOrders }) =
 
     return (
         <div className="w-full">
-            <h2 className="text-xl font-bold text-left py-4">My Lend Orders</h2>
-
             <div className="grid grid-cols-7 gap-4 font-semibold text-sm text-left text-white bg-[#191818] p-4 rounded-t-md noise shadow-1">
                 <span>Assets</span>
                 <span>Amount</span>
@@ -79,9 +77,9 @@ const P2PLendOrdersTable: React.FC<P2PLendOrdersTableProps> = ({ lendOrders }) =
                                 </button>
 
                                 {openDropdown === order.orderId && (
-                                    <div className="absolute top-7 right-0 bg-[#111] border border-gray-700 rounded-md shadow-md z-10 p-2 w-33 flex flex-col gap-1">
-                                        <CustomBtn1 label="Edit" variant="primary" />
-                                        <CustomBtn1 label="Cancel" variant="secondary" />
+                                    <div className="absolute -top-6 right-0 bg-[#111] border border-gray-700 rounded-md shadow-md z-10 p-2 w-33 flex flex-col gap-1">
+                                        <CustomBtn1 label="Close" variant="primary" />
+                                        {/* <CustomBtn1 label="Cancel" variant="secondary" /> */}
                                     </div>
                                 )}
                             </div>

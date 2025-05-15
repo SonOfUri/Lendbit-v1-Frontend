@@ -28,21 +28,26 @@ const Borrows: React.FC<BorrowsProps> = ({ borrowFromLP = [], borrowOrders = [] 
 
     return (
         <div className="text-white w-full">
-            <div className="flex justify-end mb-2">
 
-                <div className="flex gap-1 p-1 bg-[#050505] rounded">
-                    <button
-                        onClick={() => setIsLPSelected(true)}
-                        className={`px-4 py-1 rounded text-sm ${isLPSelected  ? "bg-white text-black font-semibold" : "text-white"}`}
-                    >
-                        Liquidity Pool
-                    </button>
-                    <button
-                        onClick={() => setIsLPSelected(false)}
-                        className={`px-4 py-2 rounded ${!isLPSelected ? "bg-white text-black font-semibold" : "text-white"}`}
-                    >
-                        Peer2Peer
-                    </button>
+            <div className="w-full flex items-center justify-between pt-6 pb-4">
+                <h2 className="text-xl font-bold text-left w-full">{isLPSelected ? "Borrows" : "My Active Borrow(s)"}</h2>
+
+                <div className="flex justify-end w-full">
+
+                    <div className="flex gap-1 p-1 bg-[#050505] rounded">
+                        <button
+                            onClick={() => setIsLPSelected(true)}
+                            className={`px-4 py-1 rounded text-sm ${isLPSelected  ? "bg-white text-black font-semibold" : "text-white"}`}
+                        >
+                            Liquidity Pool
+                        </button>
+                        <button
+                            onClick={() => setIsLPSelected(false)}
+                            className={`px-4 py-2 rounded ${!isLPSelected ? "bg-white text-black font-semibold" : "text-white"}`}
+                        >
+                            Peer2Peer
+                        </button>
+                    </div>
                 </div>
             </div>
 
