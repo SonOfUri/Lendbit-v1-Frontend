@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useNavigate } from "react-router-dom";
 import {formatMoney2 } from "../../constants/utils/formatMoney";
 import DashboardCard from "../plugins/DashboardCard";
 
@@ -7,9 +8,36 @@ interface DashboardCardsProps {
 }
 
 const DashboardCards = ({ dashboardData }: DashboardCardsProps) => {
+
+	const navigate = useNavigate();
+
 	const { lending, healthFactor } = dashboardData || {};
 	const { totalCollateral = 0, totalSupply = 0, availableBorrow = 0 } = lending || {};
 	const { value: healthValue = 0 } = healthFactor || {};
+
+
+	const handleDeposit = () => {
+        navigate("/transact/deposit")
+	};
+	
+	const handleSupply = (asset: string) => {
+        navigate("/supply-borrow", {
+            state: {
+                mode: "supply",
+                tokenType: asset
+            }
+        })
+    };
+
+    const handleBorrow = (asset: string) => {
+        // console.log(`Borrow clicked for ${asset}`);
+        navigate("/supply-borrow", {
+            state: {
+                mode: "borrow",
+                tokenType: asset
+            }
+        })
+    };
 
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
@@ -26,6 +54,8 @@ const DashboardCards = ({ dashboardData }: DashboardCardsProps) => {
 					"/Token-Logos/weth-base.svg",
 					"/Token-Logos/usdt-base.svg",
 				]}
+
+				onButtonClick={() => handleDeposit()}
 			/>
 
 			<DashboardCard
@@ -35,6 +65,8 @@ const DashboardCards = ({ dashboardData }: DashboardCardsProps) => {
 				subLabel="Net APY"
 				subValue="+0.00" // You can compute weighted APY later
 				tooltip="Your weighted average APY across assets"
+
+				onButtonClick={() => handleSupply("WETH")}
 			/>
 
 			<DashboardCard
@@ -45,6 +77,8 @@ const DashboardCards = ({ dashboardData }: DashboardCardsProps) => {
 				subValue={`${Math.min((healthValue / 1.5) * 100, 100).toFixed(0)}%`}
 				tooltip="Your current borrowing risk level"
 				showHealthBar
+
+				onButtonClick={() => handleBorrow("WETH")}
 			/>
 		</div>
 	);
