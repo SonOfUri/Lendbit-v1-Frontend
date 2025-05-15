@@ -16,7 +16,12 @@ const Markets = () => {
         );
     }
 	if (marketDataError) {
-		return <div>Error fetching market data</div>;
+		return (
+			<div className="w-full h-screen flex items-center justify-center">
+				<LoadingState />
+				<div className="mt-6">Error: Refetching market data...</div>
+			</div>
+		)
 	}
 
 	return (

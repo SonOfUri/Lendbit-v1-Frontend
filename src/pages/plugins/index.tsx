@@ -7,7 +7,6 @@ import TokenTagLg from "../../components/plugins/TokenTagLg.tsx";
 import RangeSlider from "../../components/plugins/RangeSlider.tsx";
 
 import MetricStatCard from "../../components/plugins/MetricStatcard.tsx";
-import DashboardCard from "../../components/plugins/DashboardCard.tsx";
 import DashboardPortfolioTable from "../../components/plugins/DashboardPortfolioTable.tsx";
 import DashboardBorrowsTable from "../../components/plugins/DashboardBorrowsCard.tsx";
 import DashboardBorrowPowerCard from "../../components/plugins/DashboardBorrowPowerCard.tsx";
@@ -64,25 +63,25 @@ const Plugins = () => {
             </div>
             <br/>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <DashboardCard
+                {/* <DashboardCard
                     title="Total Collateral"
                     value="$0.00"
                     buttonText="Deposit"
                     subLabel="Assets"
                     tooltip="Tokens you’ve locked"
                     tokenIcons={["/Token-Logos/eth-base.svg", "/Token-Logos/usdc-base.svg", "/Token-Logos/weth-base.svg", "/Token-Logos/usdt-base.svg"]}
-                />
+                /> */}
 
-                <DashboardCard
+                {/* <DashboardCard
                     title="Total Supply"
                     value="$0.00"
                     buttonText="Supply"
                     subLabel="Net APY"
                     subValue="+0.00"
                     tooltip="Your weighted average APY across assets"
-                />
+                /> */}
 
-                <DashboardCard
+                {/* <DashboardCard
                     title="Available to borrow"
                     value="$0.00"
                     buttonText="Borrow"
@@ -90,7 +89,7 @@ const Plugins = () => {
                     subValue="100%"
                     tooltip="Your current borrowing risk level"
                     showHealthBar
-                />
+                /> */}
 
             </div>
 

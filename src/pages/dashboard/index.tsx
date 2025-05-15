@@ -12,68 +12,96 @@ import DashboardBorrowPowerCard from "../../components/dashboard/DashboardBorrow
 
 
 const Dashboard = () => {
-    const { dashboardData, dashboardDataLoading, dashboardDataError, isWalletConnected } = useDashboardData()
-    
+  const { dashboardData, dashboardDataLoading, dashboardDataError, isWalletConnected } = useDashboardData();
+  
+  // Safe default values
+  const safeDashboardData = {
+    lending: dashboardData?.lending ?? {
+      borrows: [],
+      totalCollateral: 0,
+      totalSupply: 0,
+      availableBorrow: 0
+    },
+    portfolio: dashboardData?.portfolio ?? {
+      totalValue: 0,
+      assets: []
+    },
+    maxWithdrawal: dashboardData?.maxWithdrawal ?? {
+      total: 0,
+      assets: []
+    },
+    healthFactor: dashboardData?.healthFactor ?? {
+      value: 0,
+      status: "SAFE",
+      maxBorrow: 0
+    }
+  };
 
-    if (dashboardDataLoading && !dashboardData) {
-        return (
+  if (dashboardDataLoading && !dashboardData) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <LoadingState />
+      </div>
+    );
+  }
+
+  if (dashboardDataError) {
+    return (
         <div className="w-full h-screen flex items-center justify-center">
             <LoadingState />
+            <div className="mt-6">Error: Refetching dashboard data...</div>
         </div>
-        );
-    }
-	if (dashboardDataError) {
-		return <div>Error fetching dashboard data</div>;
-	}
+    )
+  }
 
   return (
+    <div className="w-full px-4 py-2 flex flex-col gap-6 text-white">
+      {/* === Top Row Cards === */}
+      <DashboardCards dashboardData={safeDashboardData} />
 
-    <div className="w-full px-4 py-2 flex flex-col gap-6  text-white">
-          {/* === Top Row Cards === */}
-          <DashboardCards dashboardData={dashboardData} />
-
-          {/* === Middle Row Tables === */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-              {
-                isWalletConnected?
-                (<div className="h-full">
-                    <DashboardPortfolioTable
-                        portfolio={dashboardData?.portfolio ?? { totalValue: 0, assets: [] }}
-                        maxWithdrawal={dashboardData?.maxWithdrawal ?? { total: 0, assets: [] }}
-                    />
-                </div>)
-                :
-                (<div className="h-full">
-                    <DashboardPortfolioTableFromPlugins />
-                </div>)
-              }
-                
-              {
-                isWalletConnected?
-                (<div className="h-full">
-                    <DashboardBorrowsTable dashboardData={dashboardData}/>
-                </div>)
-                :
-                (<DashboardBorrowsTableFromPlugins />)
-              }
-              
+      {/* === Middle Row Tables === */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+        {isWalletConnected ? (
+          <div className="h-full">
+            <DashboardPortfolioTable
+              portfolio={safeDashboardData.portfolio}
+              maxWithdrawal={safeDashboardData.maxWithdrawal}
+            />
           </div>
+        ) : (
+          <div className="h-full">
+            <DashboardPortfolioTableFromPlugins />
+          </div>
+        )}
+        
+        {isWalletConnected ? (
+          <div className="h-full">
+            <DashboardBorrowsTable 
+              dashboardData={{
+                lending: safeDashboardData.lending,
+                portfolio: safeDashboardData.portfolio
+              }} 
+            />
+          </div>
+        ) : (
+          <DashboardBorrowsTableFromPlugins />
+        )}
+      </div>
 
-          {/* === Bottom Row Insights === */}
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
-            <div className="lg:col-span-4">
-                <DashboardBorrowPowerCard
-                    available={dashboardData?.lending?.availableBorrow ?? 0}
-                    totalCollateral={dashboardData?.lending?.totalCollateral ?? 0}
-                />
-            </div>
-            <div className="lg:col-span-6">
-                <TransactionHistory />
-            </div>
+      {/* === Bottom Row Insights === */}
+      <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
+        <div className="lg:col-span-4">
+          <DashboardBorrowPowerCard
+            available={safeDashboardData.lending.availableBorrow}
+            totalCollateral={safeDashboardData.lending.totalCollateral}
+          />
         </div>
-
+        <div className="lg:col-span-6">
+          <TransactionHistory />
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
 export default Dashboard

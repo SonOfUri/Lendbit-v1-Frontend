@@ -35,7 +35,12 @@ const Positions = () => {
 	}
 
 	if (positionDataError) {
-		return <div>Error fetching portfolio data</div>;
+		return (
+			<div className="w-full h-screen flex items-center justify-center">
+				<LoadingState />
+				<div className="mt-6">Error: Refetching portfolio data...</div>
+			</div>
+    )
 	}
 
 	return (

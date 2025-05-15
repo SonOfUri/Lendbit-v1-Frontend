@@ -126,9 +126,9 @@ const Transact = () => {
 	if (!tokenData || tokenData.length === 0) {
 		return (
 			<div className="w-full h-screen flex items-center justify-center">
-				<p className="text-white">No tokens available</p>
-			</div>
-		);
+				<LoadingState />
+				<div className="mt-6">Error: Refetching available tokens...</div>
+			</div>)
 	}
 
 	return (
