@@ -90,8 +90,8 @@ const Navbar = () => {
 	}, []);
 
 	return (
-		<div className="relative custom-corner-header">
-			<nav className="w-full bg-[#050505] px-4 py-3 flex items-center justify-between text-white">
+		<div className="relative custom-corner-header noise">
+			<nav className="w-full bg-[#050505] px-4 py-3 flex items-center justify-between text-white noise">
 				{/* Logo and Mobile Menu Button */}
 				<a href="https://www.lendbit.finance/">
 				<div className="flex items-center gap-6">
@@ -149,7 +149,7 @@ const Navbar = () => {
 				<div className="hidden lg:flex gap-6 text-sm u-class-nav">
 					{navLinks.map(({ to, label }) => (
 						<NavLink
-							style={{ color: "white" }}
+							// style={{ color: "white" }}
 							key={to}
 							to={to}
 							className={({ isActive }) =>
@@ -174,7 +174,7 @@ const Navbar = () => {
 								alt="Base"
 								className="w-10 h-10"
 							/>
-							<span className="text-white text-lg">Base</span>
+							{/*<span className="text-white text-lg">Base</span>*/}
 						</div>
 					)}
 
