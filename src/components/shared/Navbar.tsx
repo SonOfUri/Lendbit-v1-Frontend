@@ -90,12 +90,13 @@ const Navbar = () => {
 	}, []);
 
 	return (
-		<div className="relative custom-corner-header">
-			<nav className="w-full bg-[#050505] px-4 py-3 flex items-center justify-between text-white noise">
+		<div className="relative custom-corner-header noise">
+			<nav className="w-full bg-[#050505] px-4 py-3 flex items-center justify-between text-white moise">
 				{/* Logo and Mobile Menu Button */}
-				<a href="https://www.lendbit.finance/">
+
 				<div className="flex items-center gap-6">
 					<div className="flex items-center gap-2">
+						<a href="https://www.lendbit.finance/">
 						<img
 							src="/logo-icon.svg"
 							alt="Lendbit Icon"
@@ -106,6 +107,8 @@ const Navbar = () => {
 							alt="Lendbit Text"
 							className="hidden md:block w-[90px]"
 						/>
+					</a>
+
 					</div>
 
 					<button
@@ -144,7 +147,6 @@ const Navbar = () => {
 						)}
 					</button>
 				</div>
-			</a>
 				{/* Desktop Nav Links */}
 				<div className="hidden lg:flex gap-6 text-sm u-class-nav">
 					{navLinks.map(({ to, label }) => (
