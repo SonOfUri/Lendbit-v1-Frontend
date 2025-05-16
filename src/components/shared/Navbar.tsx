@@ -95,8 +95,9 @@ const Navbar = () => {
 				{/* Logo and Mobile Menu Button */}
 
 				<div className="flex items-center gap-6">
+					<a href="https://www.lendbit.finance/">
 					<div className="flex items-center gap-2">
-						<a href="https://www.lendbit.finance/">
+
 						<img
 							src="/logo-icon.svg"
 							alt="Lendbit Icon"
@@ -107,10 +108,10 @@ const Navbar = () => {
 							alt="Lendbit Text"
 							className="hidden md:block w-[90px]"
 						/>
-					</a>
+
 
 					</div>
-
+					</a>
 					<button
 						className="lg:hidden text-white cursor-pointer"
 						onClick={toggleMobileMenu}
