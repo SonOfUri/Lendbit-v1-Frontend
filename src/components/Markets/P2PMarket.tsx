@@ -47,7 +47,7 @@ interface P2PMarketProps {
 
 const P2PMarket: React.FC<P2PMarketProps> = ({ p2pMarkets }) => {
 
-  console.log(p2pMarkets);
+  // console.log(p2pMarkets);
   
   const [activeTab, setActiveTab] = useState<"lend" | "borrow">("borrow");
   const [selectedToken, setSelectedToken] = useState("All Tokens");

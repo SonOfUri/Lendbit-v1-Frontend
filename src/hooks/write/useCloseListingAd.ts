@@ -13,7 +13,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 
 const useCloseListingAd = (
-    _requestId: number,
+   
 ) => {
     const { chainId,address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
@@ -23,7 +23,7 @@ const useCloseListingAd = (
     const queryClient = useQueryClient();
 
 
-    return useCallback(async () => {
+    return useCallback(async ( _requestId: number,) => {
         if (!isSupportedChain(chainId)) return toast.warning("SWITCH NETWORK");
 
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
@@ -62,7 +62,7 @@ const useCloseListingAd = (
                 toast.error("Closing Ad failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, walletProvider, _requestId, queryClient, address, errorDecoder]);
+    }, [chainId, walletProvider, queryClient, address, errorDecoder]);
 };
 
 export default useCloseListingAd;

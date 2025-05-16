@@ -21,7 +21,7 @@ createRoot(document.getElementById("root")!).render(
             <Navbar />
             <App />
           </div>
-          <Toaster richColors position="bottom-right" />
+          <Toaster richColors closeButton swipeDirections={["right", "left", "bottom", "top"]} position="top-center" />
         </main>
         </section>
 		</Router>
