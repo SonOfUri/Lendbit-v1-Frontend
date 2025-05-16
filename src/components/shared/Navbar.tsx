@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { isSupportedChain } from "../../constants/utils/chains";
@@ -40,15 +41,20 @@ const Navbar = () => {
 		} else {
 			setIsWalletDropdownOpen((prev) => !prev);
 		}
+
+		setIsMobileMenuOpen(false);
+
 	};
 
 	const handleSignout = () => {
 		setIsWalletDropdownOpen(false);
+		setIsMobileMenuOpen(false)
 		open();
 	};
 
 	const toggleMobileMenu = () => {
-		setIsMobileMenuOpen(!isMobileMenuOpen);
+		setIsMobileMenuOpen(prev => !prev);
+		setIsWalletDropdownOpen(false);
 	};
 
 	useEffect(() => {
@@ -65,57 +71,33 @@ const Navbar = () => {
 		fetchBalance();
 	}, [isConnected, address]);
 
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			// Check if clicked element is a NavLink
-			const isNavLink = (event.target as HTMLElement).closest("a[href]");
-
-			if (isNavLink) {
-				return;
-			}
-
-			if (
-				(walletDropdownRef.current &&
-					!walletDropdownRef.current.contains(event.target as Node)) ||
-				(mobileMenuRef.current &&
-					!mobileMenuRef.current.contains(event.target as Node))
-			) {
-				setIsWalletDropdownOpen(false);
-				setIsMobileMenuOpen(false);
-			}
-		};
-
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => document.removeEventListener("mousedown", handleClickOutside);
-	}, []);
 
 	return (
-		<div className="relative custom-corner-header noise">
-			<nav className="w-full bg-[#050505] px-4 py-3 flex items-center justify-between text-white moise">
+		<div className="relative custom-corner-header">
+			<nav className="w-full bg-[#050505] px-4 py-5 flex items-center justify-between text-white">
 				{/* Logo and Mobile Menu Button */}
-
 				<div className="flex items-center gap-6">
-					<a href="https://www.lendbit.finance/">
-					<div className="flex items-center gap-2">
-
-						<img
-							src="/logo-icon.svg"
-							alt="Lendbit Icon"
-							className="w-10 h-10"
-						/>
-						<img
-							src="/logo-text.svg"
-							alt="Lendbit Text"
-							className="hidden md:block w-[90px]"
-						/>
-
-
-					</div>
+					<a href="https://www.lendbit.finance/" target="_blank" rel="noopener noreferrer">
+						<div className="flex items-center gap-2">
+							<img
+								src="/logo-icon.svg"
+								alt="Lendbit Icon"
+								className="w-10 h-10"
+							/>
+							<img
+								src="/logo-text.svg"
+								alt="Lendbit Text"
+								className="hidden md:block w-[90px]"
+							/>
+						</div>
 					</a>
+					
+
 					<button
 						className="lg:hidden text-white cursor-pointer"
 						onClick={toggleMobileMenu}
-						aria-label="Toggle menu"
+						aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+						aria-expanded={isMobileMenuOpen}
 					>
 						{isMobileMenuOpen ? (
 							<svg
@@ -148,11 +130,11 @@ const Navbar = () => {
 						)}
 					</button>
 				</div>
+
 				{/* Desktop Nav Links */}
 				<div className="hidden lg:flex gap-6 text-sm u-class-nav">
 					{navLinks.map(({ to, label }) => (
 						<NavLink
-							// style={{ color: "white" }}
 							key={to}
 							to={to}
 							className={({ isActive }) =>
@@ -175,9 +157,9 @@ const Navbar = () => {
 							<img
 								src="/Token-Logos/base-base.svg"
 								alt="Base"
-								className="w-10 h-10"
+								className="w-8 h-8"
 							/>
-							{/*<span className="text-white text-lg">Base</span>*/}
+							<span className="text-lg text-orange-500">:</span>
 						</div>
 					)}
 
@@ -185,23 +167,27 @@ const Navbar = () => {
 					<main className="relative cursor-pointer" ref={walletDropdownRef}>
 						<button
 							onClick={walletConnect}
-							className="bg-[#1a1a1a] text-orange-500 px-4 py-1 rounded-md text-lg flex items-center gap-1 cursor-pointer"
+							className="bg-[#1a1a1a] text-orange-500 px-4 py-1 rounded-md text-sm flex items-center gap-1 cursor-pointer"
 						>
 							{!isConnected ? (
 								<p>Connect</p>
 							) : !isSupportedChain(chainId) ? (
 								<p className="leading-tight">Switch Network</p>
 							) : (
-								<p className="flex items-center gap-0.5">
-									<img
-										src="/Token-Logos/base-base.svg"
-										alt="Base"
-										className="w-6 h-6 md:hidden"
-									/>
+								<p className="flex items-center gap-1">
+									<span className="md:hidden flex items-center gap-1">
+										<img
+											src="/Token-Logos/base-base.svg"
+											alt="Base"
+											className="w-6 h-6 md:hidden"
+										/>
+									{":"}{" "}
+									</span>
+									
 									{address ? formatAddress(address) : "Address"}
 								</p>
 							)}
-							<img src="/connect.svg" alt="arrow" className="w-10 h-10" />
+							<img src="/connect.svg" alt="arrow" className="w-8 h-8" />
 						</button>
 
 						{isWalletDropdownOpen && (
