@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TokenTagSm from "./TokenTagSm.tsx";
 import CustomBtn1 from "./CustomBtn1.tsx";
 import { formatMoney } from "../../constants/utils/formatMoney.ts";
 import { formatDate } from "../../constants/utils/formatDate.ts";
 import { getTokenLogo } from "../../constants/utils/getTokenLogo.ts";
+import useRepayP2P from "../../hooks/write/useRepayLoanP2P.ts";
+import { tokenMockedData } from "../../constants/utils/tokenMockedData.ts";
 
 interface P2PBorrowOrdersTableProps {
     borrowOrders: {
@@ -18,11 +20,56 @@ interface P2PBorrowOrdersTableProps {
 
 const P2PBorrowOrdersTable: React.FC<P2PBorrowOrdersTableProps> = ({ borrowOrders }) => {
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
+    const [selectedRepay, setSelectedRepay] = useState<{
+        asset: string;
+        amount: string;
+        address: string;
+        decimals: number;
+        requestId: number;
+    } | null>(null);
     
+    const repayP2P = useRepayP2P(
+        selectedRepay?.amount || "0",
+        selectedRepay?.requestId || 0,
+        selectedRepay?.address || "",
+        selectedRepay?.decimals || 18
+    );
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (openDropdown) {
+                const dropdownElement = dropdownRefs.current[openDropdown];
+                if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+                    setOpenDropdown(null);
+                }
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [openDropdown]);
+
+    const handleRepay = (asset: string, amount: number, requestId: number) => {
+        const tokenInfo = tokenMockedData.find(t => t.symbol === asset);
+        setSelectedRepay({
+            asset,
+            amount: amount.toString(),
+            address: tokenInfo?.address || "",
+            decimals: tokenInfo?.decimals || 18,
+            requestId:requestId,
+        });
+        // Execute repay after state update
+        setTimeout(() => repayP2P(), 0);
+    };
+
     const handleToggle = (orderId: string) => {
         setOpenDropdown((prev) => (prev === orderId ? null : orderId));
     };
+
 
     // Calculate days remaining until due date
     const getDaysRemaining = (dueDate: string) => {
@@ -80,7 +127,24 @@ const P2PBorrowOrdersTable: React.FC<P2PBorrowOrdersTableProps> = ({ borrowOrder
                                     {status}
                                 </span>
 
-                                <div className="relative">
+                                <div className="hidden xl:block">
+                                    <CustomBtn1
+                                        label="Repay"
+                                        variant="primary"
+                                        onClick={() => 
+                                            handleRepay(order.asset, order.amount, Number(order.orderId))}
+                                    />
+                                </div>
+
+                                <div className="relative xl:hidden"
+                                    ref={(el) => {
+                                    if (el) {
+                                        dropdownRefs.current[order.orderId] = el;
+                                    } else {
+                                        delete dropdownRefs.current[order.orderId];
+                                    }
+                                }}
+                                >
                                     <button onClick={() => handleToggle(order.orderId)}>
                                         <img
                                             src="/three-dots.svg"
@@ -92,11 +156,14 @@ const P2PBorrowOrdersTable: React.FC<P2PBorrowOrdersTableProps> = ({ borrowOrder
                                     </button>
 
                                     {openDropdown === order.orderId && (
-                                        <div className="absolute -top-6 right-0 bg-[#111] border border-gray-700 rounded-md shadow-md z-10 p-2 w-33 flex flex-col gap-1">
+                                        <div className="absolute -top-6 right-0 bg-[#111] border border-gray-700 rounded-md shadow-md z-10 p-2 w-32 flex flex-col gap-1">
                                             <CustomBtn1
                                                 label="Repay"
                                                 variant="primary"
-                                                
+                                                onClick={() => {
+                                                    handleRepay(order.asset, order.amount, Number(order.orderId));
+                                                    setOpenDropdown(null);
+                                            }}
                                             />
                                             {/* <CustomBtn1 label="Extend" variant="secondary" /> */}
                                         </div>

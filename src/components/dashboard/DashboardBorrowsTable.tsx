@@ -4,6 +4,7 @@ import TokenTagSm from "../plugins/TokenTagSm";
 import { formatDueDate } from "../../constants/utils/formatDate";
 import { formatMoney } from "../../constants/utils/formatMoney";
 import useTokenData from "../../hooks/read/useTokenData";
+import { useNavigate } from "react-router-dom";
 
 interface Borrow {
   asset: string;
@@ -24,6 +25,7 @@ interface DashboardBorrowsTableProps {
         asset: string;
         value: number;
         isCollateral: boolean;
+        amount: number;
       }>;
     };
   };
@@ -45,54 +47,52 @@ const DashboardBorrowsTable = ({
   dashboardData, 
   isLoading = false 
 }: DashboardBorrowsTableProps) => {
+  const navigate = useNavigate();
   const [rows, setRows] = useState<RowData[]>([]);
   const { tokenData } = useTokenData();
 
   useEffect(() => {
-    if (!dashboardData || isLoading) return;
+    if (!dashboardData || isLoading || !tokenData) return;
 
     const { lending, portfolio } = dashboardData;
     const borrows = lending?.borrows || [];
     const assets = portfolio?.assets || [];
 
-    // Create a map of asset values for quick lookup
-    const assetValueMap = assets.reduce((acc, asset) => {
-      acc[asset.asset] = asset.value;
-      return acc;
+    const tokenPriceBySymbol = tokenData.reduce((acc, token) => {
+        acc[token.symbol.toUpperCase()] = token.price;
+        return acc;
     }, {} as Record<string, number>);
 
-    // Create a map of collateral assets
-    const collateralAssets = assets
-      .filter(asset => asset.isCollateral)
-      .map(asset => asset.asset);
+    const availableCollateral = assets
+        .filter(asset => asset.isCollateral && asset.amount > 0)
+        .map(asset => asset.asset);
 
     const processedRows = borrows.map((borrow) => {
-    //   const tokenInfo = tokenData?.find(t => t.symbol === borrow.asset);
-      const usdValue = assetValueMap[borrow.asset] || 0;
-      
-      return {
-        icon: `/Token-Logos/${borrow.asset.toLowerCase()}-base.svg`,
-        symbol: borrow.asset,
-        amount: formatMoney(borrow.amount),
-        usdValue: `$${formatMoney(usdValue)}`,
-        apr: `${(borrow.apr * 100).toFixed(2)}%`,
-        dueIn: borrow.dueDate ? formatDueDate(borrow.dueDate) : "-",
-        collateralIcons: (borrow.collateralTokens || collateralAssets)
-          .map(asset => `/Token-Logos/${asset.toLowerCase()}-base.svg`),
-        source: borrow.source
-      };
+        const tokenPrice = tokenPriceBySymbol[borrow.asset.toUpperCase()] || 0;
+        const usdValue = borrow.amount * tokenPrice;
+        
+        const collateralAssets = borrow.collateralTokens?.length 
+            ? borrow.collateralTokens 
+            : availableCollateral;
+
+        return {
+            icon: `/Token-Logos/${borrow.asset.toLowerCase()}-base.svg`,
+            symbol: borrow.asset,
+            amount: formatMoney(borrow.amount),
+            usdValue: `$${formatMoney(usdValue)}`,
+            apr: `${(borrow.apr).toFixed(2)}%`,
+            dueIn: borrow.dueDate ? formatDueDate(borrow.dueDate) : "-",
+            collateralIcons: collateralAssets
+                .map(asset => `/Token-Logos/${asset.toLowerCase()}-base.svg`),
+            source: borrow.source
+        };
     });
 
     setRows(processedRows);
-  }, [dashboardData, tokenData, isLoading]);
+}, [dashboardData, tokenData, isLoading]);
 
   const renderEmptyState = () => (
     <div className="flex flex-col items-center justify-center py-8 h-[310px]">
-      {/*<img */}
-      {/*  src="/empty-borrows.svg" */}
-      {/*  alt="No borrows" */}
-      {/*  className="w-20 h-20 mb-4 opacity-70" */}
-      {/*/>*/}
       <p className="text-gray-400 text-center">
         You have no active borrows
       </p>
@@ -105,6 +105,15 @@ const DashboardBorrowsTable = ({
       <p className="text-gray-400">Loading borrows...</p>
     </div>
   );
+
+  const handleRepayClick = (source: string) => {
+    navigate('/positions', {
+        state: { 
+            activeBorrowTab: source === 'LP' ? 'liquidity' : 'p2p',
+            shouldScrollToBorrows: true 
+        }
+    });
+  };
 
   return (
     <div className="text-white w-full h-full">
@@ -162,7 +171,7 @@ const DashboardBorrowsTable = ({
                   <CustomBtn1 
                     label="Repay" 
                     variant="secondary" 
-                    onClick={() => console.log('Repay', row.symbol)}
+                    onClick={() => handleRepayClick(row.source)}
                   />
                 </div>
               </div>

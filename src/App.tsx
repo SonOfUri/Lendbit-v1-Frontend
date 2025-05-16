@@ -3,7 +3,6 @@ import { Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/dashboard';
 import Markets from './pages/markets';
 import Positions from './pages/positions';
-import Plugins from './pages/plugins';
 import SupplyBorrow from "./pages/supplyBorrow";
 
 import './App.css';
@@ -28,7 +27,7 @@ function App() {
 
         
         
-        <Route path="/plugins" element={<Plugins />} />create
+        {/* <Route path="/plugins" element={<Plugins />} />create */}
 
         <Route
           path="*"

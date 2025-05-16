@@ -79,7 +79,7 @@ const LiquiditySuppliesTable: React.FC<LiquiditySuppliesTableProps> = ({ supplyT
                             </div>
 
                             <div className="font-semibold">
-                                {(asset.apy * 100).toFixed(2)}%
+                                {(asset.apy).toFixed(2)}%
                             </div>
 
                             <div className="text-white">

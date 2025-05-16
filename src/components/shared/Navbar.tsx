@@ -93,7 +93,6 @@ const Navbar = () => {
 						{ to: "/create/lend", label: "Create" },
 					].map(({ to, label }) => (
 						<NavLink
-							style={{ color: "white" }}
 							key={to}
 							to={to}
 							className={({ isActive }) =>
