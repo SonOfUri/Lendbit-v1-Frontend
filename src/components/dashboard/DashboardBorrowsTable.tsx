@@ -131,7 +131,7 @@ const DashboardBorrowsTable = ({
           </div>
         )}
 
-        <div className="overflow-y-auto max-h-[310px] bg-[#050505]">
+        <div className="overflow-y-auto h-[267px] bg-[#050505]">
           {isLoading ? (
             renderLoadingState()
           ) : rows.length === 0 ? (

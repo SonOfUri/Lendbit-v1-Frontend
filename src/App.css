@@ -66,6 +66,25 @@
   pointer-events: none;
 }
 
+.noise-no-overflow{
+    position: relative;
+    /*overflow: hidden;*/
+}
+
+
+.noise-no-overflow:after{
+    content: "";
+    background: url("/noise.png")  repeat;
+    mix-blend-mode: overlay;
+    position: absolute;
+    inset: 0;
+    opacity: .9;
+    z-index: 1;
+    background-size: 128px;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
 .noiseNav:after{
   content: "";
   background: url("/noise.png")  repeat;
@@ -163,3 +182,7 @@
 /**{*/
 /*  border: red 1px solid;*/
 /*}*/
+
+.no-clip-path ::after, .no-clip-path ::before, .no-clip-path{
+    border: none !important;
+}
