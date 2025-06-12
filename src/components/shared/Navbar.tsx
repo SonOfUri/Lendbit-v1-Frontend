@@ -11,6 +11,7 @@ import {
 } from "@web3modal/ethers/react";
 import { getEthBalance } from "../../constants/utils/getBalances";
 import { formatAddress } from "../../constants/utils/formatAddress";
+import ChainSelector from "./ChainSelector.tsx";
 
 const Navbar = () => {
 	const { open } = useWeb3Modal();
@@ -91,7 +92,7 @@ const Navbar = () => {
 							/>
 						</div>
 					</a>
-					
+
 
 					<button
 						className="lg:hidden text-white cursor-pointer"
@@ -152,16 +153,18 @@ const Navbar = () => {
 
 				{/* Right Side */}
 				<div className="flex items-center gap-2">
-					{isConnected && isSupportedChain(chainId) && (
-						<div className="hidden md:flex items-center gap-2 bg-[#1a1a1a] px-3 py-1 rounded-md">
-							<img
-								src="/Token-Logos/base-base.svg"
-								alt="Base"
-								className="w-8 h-8"
-							/>
-							<span className="text-lg text-orange-500">:</span>
-						</div>
-					)}
+					{/*{isConnected && isSupportedChain(chainId) && (*/}
+					{/*	<div className="hidden md:flex items-center gap-2 bg-[#1a1a1a] px-3 py-1 rounded-md">*/}
+					{/*		<img*/}
+					{/*			src="/Token-Logos/base-base.svg"*/}
+					{/*			alt="Base"*/}
+					{/*			className="w-8 h-8"*/}
+					{/*		/>*/}
+					{/*		<span className="text-lg text-orange-500">:</span>*/}
+					{/*	</div>*/}
+					{/*)}*/}
+
+					<ChainSelector />
 
 					{/* Connect Button */}
 					<main className="relative cursor-pointer" ref={walletDropdownRef}>

@@ -9,6 +9,7 @@ import './App.css';
 import CreateOrder from './pages/createOrder';
 import Allocation from './pages/createOrder/allocation';
 import Transact from './pages/transact';
+import TransactionHistory from "./pages/TransactionsPage";
 
 
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/transact/:id" element={<Transact />} />
         <Route path="/create/:id" element={<CreateOrder />} />
         <Route path="/allocation" element={<Allocation />} />
+        <Route path="/transactions" element={<TransactionHistory />} />
 
         
         

@@ -120,7 +120,7 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
                 <div
                   key={token.address}
                   onClick={() => handleTokenSelect(token)}
-                  className="flex items-center gap-2 px-3 py-2 hover:bg-gray-800 cursor-pointer"
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-[#1a1a1a] cursor-pointer"
                 >
                   <img
                     src={`/Token-Logos/${token.symbol.toLowerCase()}-base.svg`}

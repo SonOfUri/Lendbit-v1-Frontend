@@ -133,7 +133,7 @@ const Transact = () => {
 
 	return (
 		<div className="min-h-screen flex items-center lg:items-start justify-center  p-4 lg:pt-36 lg:px-4">
-			<div className="max-w-[593px] w-full bg-[#050505] rounded-xl p-4 noise ">
+			<div className="max-w-[593px] w-full bg-[#050505] rounded-xl p-4 noise-no-overflow">
 				<div className="max-w-[450px] mx-auto">
 					<p className="text-2xl text-white px-2 font-bold flex items-start capitalize">
 						{id}
