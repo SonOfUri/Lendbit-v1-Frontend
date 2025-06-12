@@ -13,6 +13,22 @@ const baseSepolia = {
     rpcUrl: `${envVars.httpRPC}`
 }
 
+const arbitrumSepolia = {
+    chainId: SUPPORTED_CHAIN_ID,
+    name: 'Base Sepolia',
+    currency: 'ETH',
+    explorerUrl: 'https://sepolia.basescan.org/',
+    rpcUrl: `${envVars.httpRPC}`
+}
+
+const avaxSepolia = {
+    chainId: SUPPORTED_CHAIN_ID,
+    name: 'Base Sepolia',
+    currency: 'ETH',
+    explorerUrl: 'https://sepolia.basescan.org/',
+    rpcUrl: `${envVars.httpRPC}`
+}
+
 
 
 const metadata = {
