@@ -4,7 +4,7 @@ import useSupplyLiquidity from "../../hooks/write/useSupplyLiquidity";
 import useCreatePositionPool from "../../hooks/write/useCreatePositionPool";
 import useDashboardData from "../../hooks/read/useDashboardData";
 import useTokenData from "../../hooks/read/useTokenData";
-import { isSupportedChain } from "../../constants/utils/chains";
+import { isSupportedChains } from "../../constants/utils/chains";
 import { getEthBalance, getTokenBalance } from "../../constants/utils/getBalances";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import LoadingState from "../../components/shared/LoadingState";
@@ -51,11 +51,11 @@ const SupplyBorrow = () => {
 
     useEffect(() => {
         const fetchBalance = async () => {
-            if (isWalletConnected && address && isSupportedChain(chainId) && selectedToken) {
+            if (isWalletConnected && address && isSupportedChains(chainId) && selectedToken && chainId !== undefined) {
                 try {
                     let fetchBal;
                     if (selectedToken.name === "Ether") {
-                        fetchBal = await getEthBalance(address);
+                        fetchBal = await getEthBalance(address, chainId);
                     } else {
                         fetchBal = await getTokenBalance(
                             address,

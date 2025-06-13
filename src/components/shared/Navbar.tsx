@@ -1,8 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { isSupportedChain } from "../../constants/utils/chains";
-import { SUPPORTED_CHAIN_ID } from "../../api/connection";
+import { isSupportedChains } from "../../constants/utils/chains";
 import {
 	useSwitchNetwork,
 	useWalletInfo,
@@ -12,6 +11,7 @@ import {
 import { getEthBalance } from "../../constants/utils/getBalances";
 import { formatAddress } from "../../constants/utils/formatAddress";
 import ChainSelector from "./ChainSelector.tsx";
+import { CHAIN_NATIVE_SYMBOLS, SUPPORTED_CHAINS_ID } from "../../constants/config/chains.ts";
 
 const Navbar = () => {
 	const { open } = useWeb3Modal();
@@ -24,6 +24,7 @@ const Navbar = () => {
 	const [balance, setBalance] = useState<string | null>(null);
 	const walletDropdownRef = useRef<HTMLDivElement>(null);
 	const mobileMenuRef = useRef<HTMLDivElement>(null);
+	const [isChainOpen, setIsChainOpen] = useState(false);
 
 	const navLinks = [
 		{ to: "/", label: "Dashboard" },
@@ -36,33 +37,43 @@ const Navbar = () => {
 	const walletConnect = () => {
 		if (!isConnected) {
 			open();
-		} else if (isConnected && !isSupportedChain(chainId)) {
-			switchNetwork(SUPPORTED_CHAIN_ID);
+		} else if (isConnected && !isSupportedChains(chainId)) {
+			switchNetwork(SUPPORTED_CHAINS_ID[0]);
 			setIsWalletDropdownOpen(false);
 		} else {
 			setIsWalletDropdownOpen((prev) => !prev);
 		}
 
 		setIsMobileMenuOpen(false);
+		setIsChainOpen(false)
 
 	};
 
 	const handleSignout = () => {
 		setIsWalletDropdownOpen(false);
 		setIsMobileMenuOpen(false)
+		setIsChainOpen(false)
 		open();
 	};
 
 	const toggleMobileMenu = () => {
 		setIsMobileMenuOpen(prev => !prev);
 		setIsWalletDropdownOpen(false);
+		setIsChainOpen(false)
+	};
+
+
+	const handleChainSwitch = (targetChainId: number) => {
+		if (chainId !== targetChainId) {
+		  switchNetwork(targetChainId);
+		}
 	};
 
 	useEffect(() => {
 		const fetchBalance = async () => {
-			if (isConnected && address) {
+			if (isConnected && address && chainId !== undefined) {
 				try {
-					const bal = await getEthBalance(address);
+					const bal = await getEthBalance(address, chainId);
 					setBalance(bal);
 				} catch (error) {
 					console.error("Error fetching balance:", error);
@@ -70,7 +81,7 @@ const Navbar = () => {
 			}
 		};
 		fetchBalance();
-	}, [isConnected, address]);
+	}, [isConnected, address, chainId]);
 
 
 	return (
@@ -153,40 +164,29 @@ const Navbar = () => {
 
 				{/* Right Side */}
 				<div className="flex items-center gap-2">
-					{/*{isConnected && isSupportedChain(chainId) && (*/}
-					{/*	<div className="hidden md:flex items-center gap-2 bg-[#1a1a1a] px-3 py-1 rounded-md">*/}
-					{/*		<img*/}
-					{/*			src="/Token-Logos/base-base.svg"*/}
-					{/*			alt="Base"*/}
-					{/*			className="w-8 h-8"*/}
-					{/*		/>*/}
-					{/*		<span className="text-lg text-orange-500">:</span>*/}
-					{/*	</div>*/}
-					{/*)}*/}
-
-					<ChainSelector />
-
+					
+					{isSupportedChains(chainId) &&
+						(<ChainSelector
+							selectedChainId={chainId || 84532}
+							onSwitchChain={handleChainSwitch}
+							open={isChainOpen}
+							setOpen={setIsChainOpen}
+							setIsWalletDropdownOpen ={setIsWalletDropdownOpen}
+							setIsMobileMenuOpen={setIsWalletDropdownOpen}
+					/>)
+					}
 					{/* Connect Button */}
 					<main className="relative cursor-pointer" ref={walletDropdownRef}>
 						<button
 							onClick={walletConnect}
-							className="bg-[#1a1a1a] text-orange-500 px-4 py-1 rounded-md text-sm flex items-center gap-1 cursor-pointer"
+							className="bg-[#1a1a1a] text-orange-500 px-1.5 md:px-4 py-1 rounded-md text-sm flex items-center gap-1 cursor-pointer"
 						>
 							{!isConnected ? (
 								<p>Connect</p>
-							) : !isSupportedChain(chainId) ? (
+							) : !isSupportedChains(chainId) ? (
 								<p className="leading-tight">Switch Network</p>
 							) : (
-								<p className="flex items-center gap-1">
-									<span className="md:hidden flex items-center gap-1">
-										<img
-											src="/Token-Logos/base-base.svg"
-											alt="Base"
-											className="w-6 h-6 md:hidden"
-										/>
-									{":"}{" "}
-									</span>
-									
+								<p className="">
 									{address ? formatAddress(address) : "Address"}
 								</p>
 							)}
@@ -205,7 +205,7 @@ const Navbar = () => {
 										{address ? formatAddress(address) : "Address"}
 									</span>
 									<span className="text-black text-xs md:text-sm">
-										{balance ? `${balance} ETH` : "wallet balance..."}
+									{balance ? `${balance} ${CHAIN_NATIVE_SYMBOLS[chainId ?? 0] || "ETH"}` : "wallet balance..."}
 									</span>
 									<button
 										className="w-full bg-orange-500 text-white py-2 rounded-md hover:bg-[#FF4D00] transition-colors text-xs md:text-sm"

@@ -3,7 +3,7 @@ import {
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
 import { useCallback } from "react";
-import { isSupportedChain } from "../../constants/utils/chains";
+import { isSupportedChains } from "../../constants/utils/chains";
 import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
 import useCheckAllowances from "../read/useCheckAllowances";
@@ -35,7 +35,7 @@ const useDepositCollateral = (
     const errorDecoder = ErrorDecoder.create([lendbit, erc20]);
 
     return useCallback(async () => {
-        if (!isSupportedChain(chainId)) return toast.warning("SWITCH NETWORK");
+        if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
         if (isLoading) return toast.loading("Checking allowance...");
 
 
@@ -43,7 +43,7 @@ const useDepositCollateral = (
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
         const signer = await readWriteProvider.getSigner();
         const erc20contract = getERC20Contract(signer, tokenTypeAddress);
-        const contract = getLendbitContract(signer, lendbit);
+        const contract = getLendbitContract(signer, chainId);
 
         const _weiAmount = ethers.parseUnits(_amount, tokenDecimal);
         let toastId: string | number | undefined;
@@ -56,7 +56,7 @@ const useDepositCollateral = (
                 toast.loading(`Approving ${tokenName} tokens...`, { id: toastId });
 
                 const allowance = await erc20contract.approve(
-                    envVars.lendbitContractAddress,
+                    envVars.lendbitHubContractAddress,
                     MaxUint256
                 );
                 const allowanceReceipt = await allowance.wait();

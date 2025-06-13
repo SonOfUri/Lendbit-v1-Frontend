@@ -3,11 +3,12 @@ import {
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
 import { useCallback } from "react";
-import { isSupportedChain } from "../../constants/utils/chains";
+import { isSupportedChains } from "../../constants/utils/chains";
 import { toast } from "sonner";
-import { getProvider } from "../../api/provider";
+import { getProvider, readOnlyProviderHub } from "../../api/provider";
 import {
     getLendbitContract,
+    getLendbitHubContract,
 } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import erc20 from "../../abi/erc20.json";
@@ -31,18 +32,30 @@ const useWithdrawPool = (
     const errorDecoder = ErrorDecoder.create([lendbit, erc20]);
 
     return useCallback(async () => {
-        if (!isSupportedChain(chainId)) return toast.warning("SWITCH NETWORK");
-
-
+        if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        console.log(lendbit.find((x: any) => x.name === "withdraw"));
+        
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
         const signer = await readWriteProvider.getSigner();
-        const contract = getLendbitContract(signer, lendbit);
+        const contract = getLendbitContract(signer, chainId);
 
+        const prankCall = getLendbitHubContract(readOnlyProviderHub) as ethers.Contract& {
+            withdraw: (token: string, amount: bigint) => Promise<ethers.ContractTransaction>;
+            callStatic: {
+              withdraw: (token: string, amount: bigint) => Promise<bigint>;
+            };
+        };
+        
         const _weiAmount = ethers.parseUnits(_amount, tokenDecimal);
         let toastId: string | number | undefined;
 
+        
         try {
-            toastId = toast.loading(`Processing withdrawal of supplies transaction...`);
+
+            toastId = toast.loading(`Checking withdrawal of ${_amount}${tokenName}...`);
+
+            await prankCall.callStatic.withdraw(tokenTypeAddress, _weiAmount);
 
             toast.loading(`Processing withdrawal of ${_amount}${tokenName} supplied...`, { id: toastId })
 
@@ -68,12 +81,13 @@ const useWithdrawPool = (
             try {
                 const decodedError = await errorDecoder.decode(error);
                 console.error("Transaction failed:", decodedError.reason);
-                toast.error(`Transaction failed: ${decodedError.reason}`, { id: toastId });
+                toast.error(`Transaction will fail: ${decodedError.reason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
+
     }, [chainId, walletProvider, _amount, tokenDecimal, tokenName, tokenTypeAddress, queryClient, address, navigate, errorDecoder]);
 };
 

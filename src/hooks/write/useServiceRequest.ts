@@ -3,7 +3,7 @@ import {
 	useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
 import { useCallback } from "react";
-import { isSupportedChain } from "../../constants/utils/chains";
+import { isSupportedChains } from "../../constants/utils/chains";
 import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
 import {
@@ -30,16 +30,16 @@ const useServiceRequest = () => {
 
 	return useCallback(
 		async (_amount: string, _requestId: number, tokenTypeAddress: string) => {
-			if (!isSupportedChain(chainId)) return toast.warning("SWITCH NETWORK");
+			if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
 
 			const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
 			const signer = await readWriteProvider.getSigner();
-			const contract = getLendbitContract(signer, lendbit);
+			const contract = getLendbitContract(signer, chainId);
 			const erc20contract = getERC20Contract(signer, tokenTypeAddress);
 
 			const allowance = await erc20contract.allowance(
 				address,
-				envVars.lendbitContractAddress
+				envVars.lendbitHubContractAddress
 			);
 			const allowanceVal = Number(allowance);
 
@@ -50,7 +50,7 @@ const useServiceRequest = () => {
 
 				if (allowanceVal == 0 || allowanceVal < Number(_amount)) {
 					const allowance = await erc20contract.approve(
-						envVars.lendbitContractAddress,
+						envVars.lendbitHubContractAddress,
 						MaxUint256
 					);
 					const allowanceReceipt = await allowance.wait();

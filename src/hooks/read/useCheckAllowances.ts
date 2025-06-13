@@ -22,7 +22,7 @@ const fetchAllowance = async ({
     }
 
     const provider = readOnlyProvider;
-    const destination = envVars.lendbitContractAddress;
+    const destination = envVars.lendbitHubContractAddress;
     const contract = getERC20Contract(provider, tokenTypeAddress);
 
     try {
