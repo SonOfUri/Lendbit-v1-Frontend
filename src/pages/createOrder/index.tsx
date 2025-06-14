@@ -17,7 +17,7 @@ const CreateOrder = () => {
 
 	const { dashboardData, isWalletConnected, dashboardDataLoading } = useDashboardData();
     const { tokenData, tokenDataLoading } = useTokenData();
-    const { address, isConnected } = useWeb3ModalAccount();
+    const { address, isConnected, chainId } = useWeb3ModalAccount();
 
     const { lending } = dashboardData || {};
 	const { availableBorrow = 0 } = lending || {};
@@ -218,7 +218,8 @@ const CreateOrder = () => {
 										actionType={id === "lend" ? "supply" : "borrow"}
 										tokenData={tokenData}
 										selectedToken={selectedToken}
-										availableBal = {availableBal}
+										availableBal={availableBal}
+										chainId={chainId}
 									/>
 								)}
 							</div>

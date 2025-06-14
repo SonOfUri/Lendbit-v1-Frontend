@@ -60,7 +60,8 @@ const SupplyBorrow = () => {
                         fetchBal = await getTokenBalance(
                             address,
                             selectedToken.address,
-                            selectedToken.decimals
+                            selectedToken.decimals,
+                            chainId
                         );
                     }
                     setWalletBalance(Number(fetchBal));

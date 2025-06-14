@@ -26,3 +26,8 @@ export const CHAIN_NATIVE_SYMBOLS: Record<number, string> = {
 };
   
 
+export const chainRpcMap: Record<number, string> = {
+  84532: envVars.httpHubRPC,          // Base Sepolia
+  421614: envVars.httpArbSpokeRPC,    // Arbitrum Sepolia
+  43113: envVars.httpAvaxSpokeRPC,    // Avalanche Fuji
+};

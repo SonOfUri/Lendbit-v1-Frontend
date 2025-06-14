@@ -6,11 +6,12 @@ import { useCallback } from "react";
 import { isSupportedChains } from "../../constants/utils/chains";
 import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
-import { getLendbitContract, } from "../../api/contractsInstance";
+import { getLendbitContract, simulateHubCall, } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import { ErrorDecoder } from "ethers-decode-error";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
+import { formatCustomError } from "../../constants/utils/formatCustomError";
 
 const useCloseListingAd = (
    
@@ -34,8 +35,13 @@ const useCloseListingAd = (
         let toastId: string | number | undefined;
 
         try {
-            toastId = toast.loading(`closing ads position...`);
 
+            toastId = toast.loading(`Checking closing Ad position of ${_requestId}...`);
+
+            await simulateHubCall("closeListingAd", [_requestId], address);
+
+
+            toast.loading(`closing ads position...`, { id: toastId });
 
             const transaction = await contract.closeListingAd(
                 _requestId,
@@ -52,14 +58,18 @@ const useCloseListingAd = (
                     queryClient.invalidateQueries({ queryKey: ["position"] }),
                 ])
             }
-        } catch (error: unknown) {
+        }catch (error: unknown) {
             try {
                 const decodedError = await errorDecoder.decode(error);
+                let friendlyReason = "error";
+                if (decodedError.reason !== null) {
+                    friendlyReason = formatCustomError(decodedError.reason);
+                }
                 console.error("Transaction failed:", decodedError.reason);
-                toast.error(`ads closing failed: ${decodedError.reason}`, { id: toastId });
+                toast.error(`This transaction is expected to fail: ${friendlyReason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
-                toast.error("Closing Ad failed: Unknown error", { id: toastId });
+                toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
     }, [chainId, walletProvider, queryClient, address, errorDecoder]);

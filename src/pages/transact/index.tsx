@@ -17,7 +17,7 @@ const Transact = () => {
 	const state = useMemo(() => location.state || {}, [location.state]);
 
 	const { tokenData, tokenDataLoading } = useTokenData();
-	const { address, isConnected } = useWeb3ModalAccount();
+	const { address, isConnected, chainId } = useWeb3ModalAccount();
 
 
 	const [selectedToken, setSelectedToken] = useState<TokenData | null>(null);
@@ -154,6 +154,7 @@ const Transact = () => {
 											tokenData={tokenData}
 											selectedToken={selectedToken}
 											availableBal={availableBal}
+											chainId = {chainId}
 										/>
 									)}
 								</div>

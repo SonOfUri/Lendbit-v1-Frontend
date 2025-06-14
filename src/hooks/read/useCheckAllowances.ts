@@ -11,9 +11,9 @@ const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
 const fetchAllowance = async ({
     queryKey,
 }: {
-    queryKey: [string, string, string];
+    queryKey: [string, string, string, number];
 }) => {
-    const [, tokenTypeAddress, userAddress] = queryKey;
+    const [, tokenTypeAddress, userAddress, chainId] = queryKey;
 
     if (!userAddress) return 0; 
     // Return MAX_SAFE_INTEGER for the special token address
@@ -21,7 +21,7 @@ const fetchAllowance = async ({
         return MAX_SAFE_INTEGER;
     }
 
-    const provider = readOnlyProvider;
+    const provider = readOnlyProvider(chainId);
     const destination = envVars.lendbitHubContractAddress;
     const contract = getERC20Contract(provider, tokenTypeAddress);
 
@@ -35,15 +35,15 @@ const fetchAllowance = async ({
 };
 
 const useCheckAllowances = (tokenTypeAddress: string) => {
-    const { address, isConnected } = useWeb3ModalAccount();
+    const { address, isConnected, chainId} = useWeb3ModalAccount();
 
     // Skip query entirely for the special token address
     const isSpecialToken = tokenTypeAddress === ETH_TOKEN_ADDRESS;
     
     return useQuery({
-        queryKey: ["allowance", tokenTypeAddress, address || ""],
+        queryKey: ["allowance", tokenTypeAddress, address || "", chainId ?? 0],
         queryFn: fetchAllowance,
-        enabled: !!(isConnected && tokenTypeAddress) && !isSpecialToken,
+        enabled: !!(isConnected && tokenTypeAddress && address && chainId) && !isSpecialToken,
         staleTime: 10_000, // Cache for 10 seconds
         ...(isSpecialToken ? { initialData: MAX_SAFE_INTEGER } : {}),
     });

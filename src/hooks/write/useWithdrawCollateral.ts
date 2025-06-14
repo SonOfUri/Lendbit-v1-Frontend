@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
 import {
     getLendbitContract,
+    getPrankLendbitHubContract,
 } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import erc20 from "../../abi/erc20.json";
@@ -16,6 +17,7 @@ import { ErrorDecoder } from "ethers-decode-error";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
+import { formatCustomError } from "../../constants/utils/formatCustomError";
 
 const useWithdrawCollateral = (
     tokenTypeAddress: string,
@@ -38,11 +40,17 @@ const useWithdrawCollateral = (
         const signer = await readWriteProvider.getSigner();
         const contract = getLendbitContract(signer, chainId);
 
+        const prankCall = getPrankLendbitHubContract(); 
+        
         const _weiAmount = ethers.parseUnits(_amount, tokenDecimal);
         let toastId: string | number | undefined;
 
         try {
-            toastId = toast.loading(`Processing withdraw collateral transaction...`);
+            toastId = toast.loading(`Checking Collateral withdrawal of ${_amount}${tokenName}...`);
+
+            await prankCall.withdrawCollateral.staticCall(tokenTypeAddress, _weiAmount, {
+                from: address, 
+            });
 
             toast.loading(`Processing withdrawal of ${_amount}${tokenName}...`, { id: toastId })
 
@@ -67,8 +75,12 @@ const useWithdrawCollateral = (
         } catch (error: unknown) {
             try {
                 const decodedError = await errorDecoder.decode(error);
+                let friendlyReason = "error";
+                if (decodedError.reason !== null) {
+                    friendlyReason = formatCustomError(decodedError.reason);
+                }
                 console.error("Transaction failed:", decodedError.reason);
-                toast.error(`Transaction failed: ${decodedError.reason}`, { id: toastId });
+                toast.error(`This transaction is expected to fail: ${friendlyReason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
                 toast.error("Transaction failed: Unknown error", { id: toastId });

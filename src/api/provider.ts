@@ -1,12 +1,9 @@
 import { ethers } from "ethers";
 import { envVars } from "../constants/config/envVars";
+import { chainRpcMap } from "../constants/config/chains";
 
 
-const chainRpcMap: Record<number, string> = {
-  84532: envVars.httpHubRPC,          // Base Sepolia
-  421614: envVars.httpArbSpokeRPC,    // Arbitrum Sepolia
-  43113: envVars.httpAvaxSpokeRPC,    // Avalanche Fuji
-};
+
 
 export const readOnlyProvider = (chainId: number) => {
   const rpcUrl = chainRpcMap[chainId];
