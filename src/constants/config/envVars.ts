@@ -5,11 +5,13 @@ export const envVars = {
 
     lendbitArbSpokeContractAddress: import.meta.env.VITE_LENDBIT_ARB_SPOKE_CONTRACT_ADDRESS,
 
-    lendbitAvaxSpokeContractAddress: import.meta.env.VITE_LENDBIT_AVAX_SPOKE_CONTRACT_ADDRESS,
+    lendbitOpSpokeContractAddress: import.meta.env.VITE_LENDBIT_OP_SPOKE_CONTRACT_ADDRESS,
 
     httpHubRPC: import.meta.env.VITE_HTTP_BASE_SEPOLIA_RPC,
 
     httpArbSpokeRPC: import.meta.env.VITE_HTTP_ARBITRUM_SEPOLIA_RPC,
+
+    httpOpSpokeRPC: import.meta.env.VITE_HTTP_OP_SEPOLIA_RPC,
 
     httpAvaxSpokeRPC: import.meta.env.VITE_HTTP_AVAX_SEPOLIA_RPC,
 

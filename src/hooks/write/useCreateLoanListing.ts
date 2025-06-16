@@ -9,6 +9,7 @@ import { getProvider } from "../../api/provider";
 import {
     getERC20Contract,
     getLendbitContract,
+    simulateHubCall,
 } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import erc20 from "../../abi/erc20.json";
@@ -19,6 +20,7 @@ import useCheckAllowances from "../read/useCheckAllowances";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
+import { formatCustomError } from "../../constants/utils/formatCustomError";
 
 const useCreateLoanListingOrder = (
     _amount: string,
@@ -55,7 +57,23 @@ const useCreateLoanListingOrder = (
         let toastId: string | number | undefined;
 
         try {
-            toastId = toast.loading(`Processing... Finding matches...`);
+
+            toastId = toast.loading(`Checking loan listing...`);
+
+            if (_min_amount_wei > _max_amount_wei) {
+                return toast.error("Minimum amount cannot be greater than maximum amount.", { id: toastId });
+            }
+            
+            await simulateHubCall("createLoanListing", [
+                _weiAmount,
+                _min_amount_wei,
+                _max_amount_wei,
+                _returnDate,
+                (_interest * 100),
+                tokenTypeAddress,
+                whitelist
+            ], address);
+            
 
             if (allowanceVal == 0 || allowanceVal < Number(_weiAmount)) {
                 toast.loading(`Approving ${tokenName} tokens...`, { id: toastId });
@@ -100,8 +118,12 @@ const useCreateLoanListingOrder = (
         } catch (error: unknown) {
             try {
                 const decodedError = await errorDecoder.decode(error);
+                let friendlyReason = "error";
+                if (decodedError.reason !== null) {
+                    friendlyReason = formatCustomError(decodedError.reason);
+                }
                 console.error("Transaction failed:", decodedError.reason);
-                toast.error(`Transaction failed: ${decodedError.reason}`, { id: toastId });
+                toast.error(`This transaction is expected to fail: ${friendlyReason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
                 toast.error("Transaction failed: Unknown error", { id: toastId });

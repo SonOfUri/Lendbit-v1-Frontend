@@ -12,6 +12,7 @@ import { getEthBalance } from "../../constants/utils/getBalances";
 import { formatAddress } from "../../constants/utils/formatAddress";
 import ChainSelector from "./ChainSelector.tsx";
 import { CHAIN_NATIVE_SYMBOLS, SUPPORTED_CHAINS_ID } from "../../constants/config/chains.ts";
+import { navLinks } from "../../constants/utils/navLink.ts";
 
 const Navbar = () => {
 	const { open } = useWeb3Modal();
@@ -26,14 +27,7 @@ const Navbar = () => {
 	const mobileMenuRef = useRef<HTMLDivElement>(null);
 	const [isChainOpen, setIsChainOpen] = useState(false);
 
-	const navLinks = [
-		{ to: "/", label: "Dashboard" },
-		{ to: "/markets", label: "Markets" },
-		{ to: "/positions", label: "Positions" },
-		{ to: "/supply-borrow", label: "Supply/Borrow" },
-		{ to: "/create/lend", label: "Create" },
-	];
-
+	
 	const walletConnect = () => {
 		if (!isConnected) {
 			open();

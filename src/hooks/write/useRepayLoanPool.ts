@@ -9,6 +9,7 @@ import { getProvider } from "../../api/provider";
 import {
     getERC20Contract,
     getLendbitContract,
+    simulateHubCall,
 } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import { ethers, MaxUint256 } from "ethers";
@@ -17,6 +18,7 @@ import { envVars } from "../../constants/config/envVars";
 import useCheckAllowances from "../read/useCheckAllowances";
 import { Eip1193Provider } from "ethers";
 import { useQueryClient } from "@tanstack/react-query";
+import { formatCustomError } from "../../constants/utils/formatCustomError";
 
 const useRepayPool = (
     _amount: string,
@@ -46,7 +48,10 @@ const useRepayPool = (
         let toastId: string | number | undefined;
 
         try {
-            toastId = toast.loading(`Processing repayments...`);
+            toastId = toast.loading(`Checking repayments...`);
+
+            await simulateHubCall("repay", [tokenTypeAddress, _weiAmount], address);
+            
 
             if (allowanceVal == 0 || allowanceVal < Number(_amount)) {
                 toast.loading(`Approving tokens...`, { id: toastId });
@@ -85,11 +90,15 @@ const useRepayPool = (
         } catch (error: unknown) {
             try {
                 const decodedError = await errorDecoder.decode(error);
+                let friendlyReason = "error";
+                if (decodedError.reason !== null) {
+                    friendlyReason = formatCustomError(decodedError.reason);
+                }
                 console.error("Transaction failed:", decodedError.reason);
-                toast.error(`Repayment failed: ${decodedError.reason}`, { id: toastId });
+                toast.error(`This transaction is expected to fail: ${friendlyReason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
-                toast.error("Repayment failed: Unknown error", { id: toastId });
+                toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
     }, [chainId, isLoading, walletProvider, tokenTypeAddress, _amount, tokenDecimal, allowanceVal, queryClient, address, errorDecoder]);

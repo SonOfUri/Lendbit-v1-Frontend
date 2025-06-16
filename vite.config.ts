@@ -8,7 +8,7 @@ export default defineConfig({
     proxy: process.env.NODE_ENV === 'development'
       ? {
           '/api': {
-            target: 'https://lendbit-backend-production.up.railway.app',
+            target: 'https://lendbit-backend-staging.up.railway.app',
             changeOrigin: true,
             secure: false,
           },

@@ -6,7 +6,7 @@ import { useCallback } from "react";
 import { isSupportedChains } from "../../constants/utils/chains";
 import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
-import { getLendbitContract } from "../../api/contractsInstance";
+import { getLendbitContract, simulateHubCall } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import erc20 from "../../abi/erc20.json";
 import { ethers } from "ethers";
@@ -14,6 +14,7 @@ import { ErrorDecoder } from "ethers-decode-error";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
+import { formatCustomError } from "../../constants/utils/formatCustomError";
 
 const useCreateBorrowOrder = (
     _amount: string,
@@ -45,7 +46,12 @@ const useCreateBorrowOrder = (
         let toastId: string | number | undefined;
 
         try {
-            toastId = toast.loading(`Processing order creation...`);
+
+            toastId = toast.loading(`Checking creation of lending request...`);
+
+            await simulateHubCall("closeRequest", [_weiAmount, (_interest * 100), _returnDate, tokenTypeAddress], address);
+
+            toastId = toast.loading(`Processing order creation...`,{ id: toastId });
 
             // console.log(_weiAmount, (_interest * 100));
 
@@ -69,8 +75,12 @@ const useCreateBorrowOrder = (
         } catch (error: unknown) {
             try {
                 const decodedError = await errorDecoder.decode(error);
+                let friendlyReason = "error";
+                if (decodedError.reason !== null) {
+                    friendlyReason = formatCustomError(decodedError.reason);
+                }
                 console.error("Transaction failed:", decodedError.reason);
-                toast.error(`Transaction failed: ${decodedError.reason}`, { id: toastId });
+                toast.error(`This transaction is expected to fail: ${friendlyReason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
                 toast.error("Transaction failed: Unknown error", { id: toastId });

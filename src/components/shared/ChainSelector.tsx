@@ -1,25 +1,6 @@
+import { chains } from "../../constants/config/chains";
 
-const chains = [
-    {
-      name: "Base",
-      icon: "/Token-Logos/base-base.svg",
-      type: "hub" as const,
-      chainId: 84532,
-    },
-    {
-      name: "Arbitrum",
-      icon: "/Token-Logos/op-op.svg",
-      type: "spoke" as const,
-      chainId: 421614,
-    },
-    {
-      name: "Avalanche",
-      icon: "/Token-Logos/avax-avax.svg",
-      type: "spoke" as const,
-      chainId: 43113,
-    },
-];
-  
+
 type ChainSelectorProps = {
     selectedChainId: number;
     onSwitchChain: (chainId: number) => void;

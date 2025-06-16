@@ -21,14 +21,22 @@ const arbitrumSepolia = {
     rpcUrl: `${envVars.httpArbSpokeRPC}`
 }
 
-const avaxFuji = {
-    chainId: 43113,
-    name: 'Avalanche Fuji Testnet',
-    currency: 'AVAX',
-    explorerUrl: 'https://43113.testnet.routescan.io/',
-    rpcUrl: `${envVars.httpAvaxSpokeRPC}`
-}
+// const avaxFuji = {
+//     chainId: 43113,
+//     name: 'Avalanche Fuji Testnet',
+//     currency: 'AVAX',
+//     explorerUrl: 'https://43113.testnet.routescan.io/',
+//     rpcUrl: `${envVars.httpAvaxSpokeRPC}`
+// }
 
+
+const optimismSepolia = {
+    chainId: 11155420,
+    name: 'OP Sepolia Testnet',
+    currency: 'ETH',
+    explorerUrl: 'https://sepolia-optimistic.etherscan.io/',
+    rpcUrl: `${envVars.httpOpSpokeRPC}`
+}
 
 
 const metadata = {
@@ -54,7 +62,7 @@ const ethersConfig = defaultConfig({
 // 5. Create a Web3Modal instance
 createWeb3Modal({
     ethersConfig,
-    chains: [baseSepolia, arbitrumSepolia, avaxFuji],
+    chains: [baseSepolia, arbitrumSepolia, optimismSepolia],
     projectId: `${projectId}`,
     enableAnalytics: true, // Optional - defaults to your Cloud configuration
     enableOnramp: true // Optional - false as default

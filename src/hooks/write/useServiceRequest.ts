@@ -9,6 +9,7 @@ import { getProvider } from "../../api/provider";
 import {
 	getERC20Contract,
 	getLendbitContract,
+	simulateHubCall,
 } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import erc20 from "../../abi/erc20.json";
@@ -17,6 +18,7 @@ import { ErrorDecoder } from "ethers-decode-error";
 import { envVars } from "../../constants/config/envVars";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
+import { formatCustomError } from "../../constants/utils/formatCustomError";
 
 const useServiceRequest = () => {
 	const { chainId, address } = useWeb3ModalAccount();
@@ -46,7 +48,12 @@ const useServiceRequest = () => {
 			let toastId: string | number | undefined;
 
 			try {
-				toastId = toast.loading(`Processing... Servicing request...`);
+				toastId = toast.loading(`Checking... Servicing request...`);
+
+				await simulateHubCall("serviceRequest", [_requestId, tokenTypeAddress], address);
+	
+				toast.loading(`Processing... Servicing request...`, { id: toastId });
+
 
 				if (allowanceVal == 0 || allowanceVal < Number(_amount)) {
 					const allowance = await erc20contract.approve(
@@ -79,10 +86,12 @@ const useServiceRequest = () => {
 			} catch (error: unknown) {
 				try {
 					const decodedError = await errorDecoder.decode(error);
+					let friendlyReason = "error";
+					if (decodedError.reason !== null) {
+						friendlyReason = formatCustomError(decodedError.reason);
+					}
 					console.error("Transaction failed:", decodedError.reason);
-					toast.error(`Transaction failed: ${decodedError.reason}`, {
-						id: toastId,
-					});
+					toast.error(`This transaction is expected to fail: ${friendlyReason}`, { id: toastId });
 				} catch (decodeError) {
 					console.error("Error decoding failed:", decodeError);
 					toast.error("Transaction failed: Unknown error", { id: toastId });
