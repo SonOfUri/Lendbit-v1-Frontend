@@ -3,8 +3,8 @@ import { envVars } from "./envVars";
 export const SUPPORTED_CHAINS_ID = [84532, 421614, 11155420];
 // baseSepolia, arbitrumSepolia, avaxSepolia, 
 
-export const CHAIN_CONTRACTS = {
-    84532: {
+export const CHAIN_CONTRACTS: Record<number, { name: string; lendbitAddress: string }> = {
+  84532: {
       name: "Base Sepolia",
       lendbitAddress: envVars.lendbitHubContractAddress,
     },
@@ -56,3 +56,7 @@ export const chains = [
     chainId: 421614,
   },
 ];
+
+
+export const isSpokeChain = (chainId?: number) =>
+  chainId === 421614 || chainId === 11155420; // Arbitrum Sepolia, Optimism Sepolia

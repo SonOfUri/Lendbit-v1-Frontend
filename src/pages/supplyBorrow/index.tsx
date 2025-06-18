@@ -11,6 +11,7 @@ import LoadingState from "../../components/shared/LoadingState";
 import ConnectPrompt from "../../components/shared/ConnectPrompt";
 import { TokenData } from "../../constants/types/tokenData";
 import { formatMoney2 } from "../../constants/utils/formatMoney";
+import { getTokenAddressByChain } from "../../constants/utils/getTokenAddressByChain";
 
 
 const percentages = [25, 50, 75, 100];
@@ -35,6 +36,8 @@ const SupplyBorrow = () => {
     const [walletBalance, setWalletBalance] = useState(0);
     const [availableBal, setAvailableBal] = useState(availableBorrow || 0);
 
+    
+
     useEffect(() => {
         if (tokenData && tokenData.length > 0) {
             const tokenMatch = tokenData.find(
@@ -57,9 +60,11 @@ const SupplyBorrow = () => {
                     if (selectedToken.name === "Ether") {
                         fetchBal = await getEthBalance(address, chainId);
                     } else {
+                        const resolvedTokenAddress = selectedToken ? getTokenAddressByChain(selectedToken, chainId) : "";
+                        
                         fetchBal = await getTokenBalance(
                             address,
-                            selectedToken.address,
+                            resolvedTokenAddress,
                             selectedToken.decimals,
                             chainId
                         );
@@ -73,6 +78,8 @@ const SupplyBorrow = () => {
         fetchBalance();
     }, [address, chainId, isWalletConnected, selectedToken]);
 
+    const resolvedTokenAddress = selectedToken ? getTokenAddressByChain(selectedToken, chainId) : "";
+    
     const fiatEquivalent =
         selectedToken && assetValue !== null
             ? (assetValue * selectedToken.price).toFixed(2)
@@ -88,7 +95,7 @@ const SupplyBorrow = () => {
 
     const supplyLiquidity = useSupplyLiquidity(
         String(assetValue),
-        selectedToken?.address || "",
+        resolvedTokenAddress,
         selectedToken?.decimals || 18,
         selectedToken?.name || ""
     );
@@ -304,7 +311,7 @@ const SupplyBorrow = () => {
                                     e.stopPropagation();
                                     createBorrowPosition(
                                         String(assetValue),
-                                        selectedToken.address,
+                                        resolvedTokenAddress,
                                         selectedToken.decimals,
                                         selectedToken.name
                                     );

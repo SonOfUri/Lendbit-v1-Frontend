@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { TokenData } from "../../constants/types/tokenData";
 import { getEthBalance, getTokenBalance } from "../../constants/utils/getBalances";
 import { formatMoney2 } from "../../constants/utils/formatMoney";
+import { getTokenAddressByChain } from "../../constants/utils/getTokenAddressByChain";
 
 type AssetSelectorProps = {
   onTokenSelect: (token: TokenData) => void;
@@ -45,9 +46,10 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
         if (selectedToken.symbol === "ETH") {
           balance = await getEthBalance(userAddress, chainId);
         } else {
+          const resolvedTokenAddress = selectedToken ? getTokenAddressByChain(selectedToken, chainId) : "";
           balance = await getTokenBalance(
             userAddress,
-            selectedToken.address,
+            resolvedTokenAddress,
             selectedToken.decimals,
             chainId
           );

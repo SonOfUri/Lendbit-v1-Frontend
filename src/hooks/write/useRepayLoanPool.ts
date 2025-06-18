@@ -9,16 +9,15 @@ import { getProvider } from "../../api/provider";
 import {
     getERC20Contract,
     getLendbitContract,
-    simulateHubCall,
 } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import { ethers, MaxUint256 } from "ethers";
 import { ErrorDecoder } from "ethers-decode-error";
-import { envVars } from "../../constants/config/envVars";
 import useCheckAllowances from "../read/useCheckAllowances";
 import { Eip1193Provider } from "ethers";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatCustomError } from "../../constants/utils/formatCustomError";
+import { CHAIN_CONTRACTS } from "../../constants/config/chains";
 
 const useRepayPool = (
     _amount: string,
@@ -50,21 +49,24 @@ const useRepayPool = (
         try {
             toastId = toast.loading(`Checking repayments...`);
 
-            await simulateHubCall("repay", [tokenTypeAddress, _weiAmount], address);
-            
-
-            if (allowanceVal == 0 || allowanceVal < Number(_amount)) {
-                toast.loading(`Approving tokens...`, { id: toastId });
-
-                const allowance = await erc20contract.approve(
-                    envVars.lendbitHubContractAddress,
-                    MaxUint256
-                );
-                const allowanceReceipt = await allowance.wait();
-
-                if (!allowanceReceipt.status)
-                    return toast.error("Approval failed!", { id: toastId });
+            if (allowanceVal == 0 || allowanceVal < Number(_weiAmount)) {
+            if (typeof chainId === 'undefined') {
+                toast.error("Chain ID is undefined - please connect your wallet");
+                return;
             }
+        
+            toast.loading(`Approving tokens...`, { id: toastId });
+            const allowanceTx = await erc20contract.approve(
+                CHAIN_CONTRACTS[chainId].lendbitAddress, 
+                MaxUint256
+            );
+            const allowanceReceipt = await allowanceTx.wait();
+        
+            if (!allowanceReceipt.status) {
+                toast.error("Approval failed!", { id: toastId });
+            }
+            }
+            
 
             toast.loading(`Processing repayment of ${_amount}...`, { id: toastId })
 
@@ -83,7 +85,7 @@ const useRepayPool = (
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
-                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position", address] }),
                     
                 ])
             }
@@ -95,7 +97,7 @@ const useRepayPool = (
                     friendlyReason = formatCustomError(decodedError.reason);
                 }
                 console.error("Transaction failed:", decodedError.reason);
-                toast.error(`This transaction is expected to fail: ${friendlyReason}`, { id: toastId });
+                toast.error(`Transaction failed: ${friendlyReason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
                 toast.error("Transaction failed: Unknown error", { id: toastId });

@@ -50,7 +50,7 @@ const useRequestLoanFromListing = (
             toast.loading(`Processing borrow transaction...`, { id: toastId });
 
             const transaction = await contract.requestLoanFromListing(_orderId, _weiAmount);
-            
+
             const receipt = await transaction.wait();
 
             if (receipt.status) {
@@ -60,7 +60,7 @@ const useRequestLoanFromListing = (
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
-                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position", address] }),
                    
                 ])
 

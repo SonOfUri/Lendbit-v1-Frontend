@@ -55,7 +55,7 @@ const useCloseListingAd = (
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
-                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position", address] }),
                 ])
             }
         }catch (error: unknown) {

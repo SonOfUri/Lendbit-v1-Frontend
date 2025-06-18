@@ -13,7 +13,7 @@ export const getLendbitContract = (
   providerOrSigner: ethers.Provider | ethers.Signer,
   chainId: any
 ) => {
-  const chainConfig = (CHAIN_CONTRACTS as Record<number, { name: string; lendbitAddress: string }>)[chainId];
+    const chainConfig = CHAIN_CONTRACTS[chainId];
   if (!chainConfig) throw new Error(`Unsupported chain ID: ${chainId}`);
 
   return new ethers.Contract(chainConfig.lendbitAddress, lendbit, providerOrSigner);

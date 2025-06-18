@@ -9,18 +9,17 @@ import { getProvider } from "../../api/provider";
 import {
     getERC20Contract,
     getLendbitContract,
-    simulateHubCall,
 } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import erc20 from "../../abi/erc20.json";
 import { ethers, MaxUint256 } from "ethers";
 import { ErrorDecoder } from "ethers-decode-error";
-import { envVars } from "../../constants/config/envVars";
 import useCheckAllowances from "../read/useCheckAllowances";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 import { formatCustomError } from "../../constants/utils/formatCustomError";
+import { CHAIN_CONTRACTS } from "../../constants/config/chains";
 
 const useCreateLoanListingOrder = (
     _amount: string,
@@ -63,29 +62,26 @@ const useCreateLoanListingOrder = (
             if (_min_amount_wei > _max_amount_wei) {
                 return toast.error("Minimum amount cannot be greater than maximum amount.", { id: toastId });
             }
-            
-            await simulateHubCall("createLoanListing", [
-                _weiAmount,
-                _min_amount_wei,
-                _max_amount_wei,
-                _returnDate,
-                (_interest * 100),
-                tokenTypeAddress,
-                whitelist
-            ], address);
-            
 
             if (allowanceVal == 0 || allowanceVal < Number(_weiAmount)) {
+                if (typeof chainId === 'undefined') {
+                    toast.error("Chain ID is undefined - please connect your wallet");
+                    return;
+                }
+            
                 toast.loading(`Approving ${tokenName} tokens...`, { id: toastId });
-                const allowance = await erc20contract.approve(
-                    envVars.lendbitHubContractAddress,
+                const allowanceTx = await erc20contract.approve(
+                    CHAIN_CONTRACTS[chainId].lendbitAddress, 
                     MaxUint256
                 );
-                const allowanceReceipt = await allowance.wait();
-
-                if (!allowanceReceipt.status)
-                    return toast.error("Approval failed!", { id: toastId });
+                const allowanceReceipt = await allowanceTx.wait();
+            
+                if (!allowanceReceipt.status) {
+                    toast.error("Approval failed!", { id: toastId });
+                }
             }
+            
+            
 
             toast.loading(`Processing loan listing of ${_amount}${tokenName}...`, { id: toastId })
 
@@ -110,7 +106,7 @@ const useCreateLoanListingOrder = (
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
-                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position", address] }),
                 ])
 
                 navigate("/markets")
@@ -123,7 +119,7 @@ const useCreateLoanListingOrder = (
                     friendlyReason = formatCustomError(decodedError.reason);
                 }
                 console.error("Transaction failed:", decodedError.reason);
-                toast.error(`This transaction is expected to fail: ${friendlyReason}`, { id: toastId });
+                toast.error(`Transaction failed: ${friendlyReason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
                 toast.error("Transaction failed: Unknown error", { id: toastId });

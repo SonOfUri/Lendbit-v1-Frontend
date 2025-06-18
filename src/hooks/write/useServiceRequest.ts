@@ -9,7 +9,6 @@ import { getProvider } from "../../api/provider";
 import {
 	getERC20Contract,
 	getLendbitContract,
-	simulateHubCall,
 } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import erc20 from "../../abi/erc20.json";
@@ -19,6 +18,7 @@ import { envVars } from "../../constants/config/envVars";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 import { formatCustomError } from "../../constants/utils/formatCustomError";
+import { CHAIN_CONTRACTS } from "../../constants/config/chains";
 
 const useServiceRequest = () => {
 	const { chainId, address } = useWeb3ModalAccount();
@@ -49,27 +49,32 @@ const useServiceRequest = () => {
 
 			try {
 				toastId = toast.loading(`Checking... Servicing request...`);
-
-				await simulateHubCall("serviceRequest", [_requestId, tokenTypeAddress], address);
-	
-				toast.loading(`Processing... Servicing request...`, { id: toastId });
-
-
+				
 				if (allowanceVal == 0 || allowanceVal < Number(_amount)) {
-					const allowance = await erc20contract.approve(
-						envVars.lendbitHubContractAddress,
+					if (typeof chainId === 'undefined') {
+						toast.error("Chain ID is undefined - please connect your wallet");
+						return;
+					}
+				
+					toast.loading(`Approving tokens...`, { id: toastId });
+					const allowanceTx = await erc20contract.approve(
+						CHAIN_CONTRACTS[chainId].lendbitAddress, 
 						MaxUint256
 					);
-					const allowanceReceipt = await allowance.wait();
-
-					if (!allowanceReceipt.status)
-						return toast.error("Approval failed!", { id: toastId });
+					const allowanceReceipt = await allowanceTx.wait();
+				
+					if (!allowanceReceipt.status) {
+						toast.error("Approval failed!", { id: toastId });
+					}
 				}
+	
+				toast.loading(`Processing... Servicing request...`, { id: toastId });
 
 				const transaction = await contract.serviceRequest(
 					_requestId,
 					tokenTypeAddress
 				);
+
 				const receipt = await transaction.wait();
 
 				if (receipt.status) {
@@ -80,7 +85,7 @@ const useServiceRequest = () => {
 					await Promise.all([
 						queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
 						queryClient.invalidateQueries({ queryKey: ["market"] }),
-						queryClient.invalidateQueries({ queryKey: ["position"] }),
+						queryClient.invalidateQueries({ queryKey: ["position", address] }),
 					]);
 				}
 			} catch (error: unknown) {
@@ -91,7 +96,7 @@ const useServiceRequest = () => {
 						friendlyReason = formatCustomError(decodedError.reason);
 					}
 					console.error("Transaction failed:", decodedError.reason);
-					toast.error(`This transaction is expected to fail: ${friendlyReason}`, { id: toastId });
+					toast.error(`Transaction failed: ${friendlyReason}`, { id: toastId });
 				} catch (decodeError) {
 					console.error("Error decoding failed:", decodeError);
 					toast.error("Transaction failed: Unknown error", { id: toastId });

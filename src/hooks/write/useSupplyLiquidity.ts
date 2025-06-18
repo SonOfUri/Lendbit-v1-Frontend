@@ -6,16 +6,16 @@ import { useCallback } from "react";
 import { isSupportedChains } from "../../constants/utils/chains";
 import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
-import { getERC20Contract, getLendbitContract, getPrankLendbitHubContract } from "../../api/contractsInstance";
+import { getERC20Contract, getLendbitContract } from "../../api/contractsInstance";
 import lendbit from "../../abi/LendBit.json";
 import erc20 from "../../abi/erc20.json";
 import { ethers, MaxUint256 } from "ethers";
 import { ErrorDecoder } from "ethers-decode-error";
 import useCheckAllowances from "../read/useCheckAllowances";
-import { envVars } from "../../constants/config/envVars";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 import { formatCustomError } from "../../constants/utils/formatCustomError";
+import { CHAIN_CONTRACTS } from "../../constants/config/chains";
 
 const useSupplyLiquidity = (
     _amount: string,
@@ -42,8 +42,6 @@ const useSupplyLiquidity = (
         const erc20contract = getERC20Contract(signer, tokenTypeAddress);
         const contract = getLendbitContract(signer, chainId);
 
-        const prankCall = getPrankLendbitHubContract(); 
-
         const _weiAmount = ethers.parseUnits(_amount, tokenDecimal);
 
 
@@ -51,26 +49,24 @@ const useSupplyLiquidity = (
 
             toastId = toast.loading(`Checking Deposit of ${_amount}${tokenName}...`);
 
-            await prankCall.deposit.staticCall(tokenTypeAddress, _weiAmount, {
-                from: address, 
-            });
-
-            toast.loading(`Processing supply...` , { id: toastId });
-            // console.log("AMOUNT OF SUPPLY IN WEI", _weiAmount);
-
-            if (allowanceVal === 0 || allowanceVal < Number(_weiAmount)) {
-                toast.loading(`Approving tokens...`, { id: toastId });
-
-                const allowance = await erc20contract.approve(
-                    envVars.lendbitHubContractAddress,
+            if (allowanceVal == 0 || allowanceVal < Number(_weiAmount)) {
+                if (typeof chainId === 'undefined') {
+                    toast.error("Chain ID is undefined - please connect your wallet");
+                    return;
+                }
+            
+                toast.loading(`Approving ${tokenName} tokens...`, { id: toastId });
+                const allowanceTx = await erc20contract.approve(
+                    CHAIN_CONTRACTS[chainId].lendbitAddress, 
                     MaxUint256
                 );
-                const allowanceReceipt = await allowance.wait();
-
+                const allowanceReceipt = await allowanceTx.wait();
+            
                 if (!allowanceReceipt.status) {
-                    return toast.error("Approval failed!", { id: toastId });
+                    toast.error("Approval failed!", { id: toastId });
                 }
             }
+
 
             toast.loading(`Processing supply of ${_amount} ${tokenName}...`, { id: toastId })
 
@@ -84,7 +80,7 @@ const useSupplyLiquidity = (
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
-                    queryClient.invalidateQueries({ queryKey: ["position"] }),
+                    queryClient.invalidateQueries({ queryKey: ["position", address] }),
                     
                 ])
             }
@@ -96,7 +92,7 @@ const useSupplyLiquidity = (
                     friendlyReason = formatCustomError(decodedError.reason);
                 }
                 console.error("Transaction failed:", decodedError.reason);
-                toast.error(`This transaction is expected to fail: ${friendlyReason}`, { id: toastId });
+                toast.error(`Transaction failed: ${friendlyReason}`, { id: toastId });
             } catch (decodeError) {
                 console.error("Error decoding failed:", decodeError);
                 toast.error("Transaction failed: Unknown error", { id: toastId });

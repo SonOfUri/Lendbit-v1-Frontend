@@ -10,6 +10,7 @@ import useDepositCollateral from "../../hooks/write/useDepositCollateral";
 import useWithdrawCollateral from "../../hooks/write/useWithdrawCollateral";
 import { toast } from "sonner";
 import useWithdrawPool from "../../hooks/write/useWithdrawPool";
+import { getTokenAddressByChain } from "../../constants/utils/getTokenAddressByChain";
 
 const Transact = () => {
 	const { id } = useParams();
@@ -38,6 +39,8 @@ const Transact = () => {
 		setAvailableBal(state?.available);
 	}, [state?.available]);
 
+	const resolvedTokenAddress = selectedToken ? getTokenAddressByChain(selectedToken, chainId) : "";
+
 	const handleTokenSelect = (token: TokenData) => {
 		setSelectedToken(token);
 	};
@@ -47,21 +50,21 @@ const Transact = () => {
 	};
 
 	const withdrawalCollateral = useWithdrawCollateral(
-		selectedToken?.address || "",
+		resolvedTokenAddress,
 		assetValue,
 		selectedToken?.decimals || 18,
 		selectedToken?.name || ""
 	);
 
 	const withdrawalPool = useWithdrawPool(
-		selectedToken?.address || "",
+		resolvedTokenAddress,
 		assetValue,
 		selectedToken?.decimals || 18,
 		selectedToken?.name || ""
 	);
 
 	const deposit = useDepositCollateral(
-		selectedToken?.address || "",
+		resolvedTokenAddress,
 		assetValue,
 		selectedToken?.decimals || 18,
 		selectedToken?.name || ""
