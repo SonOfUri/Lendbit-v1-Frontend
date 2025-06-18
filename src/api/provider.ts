@@ -17,5 +17,5 @@ export const getProvider = (provider: ethers.Eip1193Provider) =>
 export const wssProvider = new ethers.WebSocketProvider(envVars.webSocketUrl);
 
 export const readOnlyProviderHub = new ethers.JsonRpcProvider(
-    envVars.httpHubRPC
+  envVars.httpHubRPC
 );

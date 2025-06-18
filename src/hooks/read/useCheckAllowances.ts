@@ -2,10 +2,12 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { useQuery } from "@tanstack/react-query";
 import { getERC20Contract } from "../../api/contractsInstance";
 import { readOnlyProvider } from "../../api/provider";
-import { envVars } from "../../constants/config/envVars";
+import { CHAIN_CONTRACTS } from "../../constants/config/chains";
 
 // Define the special token address
 const ETH_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000001";
+
+
 const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
 
 const fetchAllowance = async ({
@@ -22,7 +24,7 @@ const fetchAllowance = async ({
     }
 
     const provider = readOnlyProvider(chainId);
-    const destination = envVars.lendbitHubContractAddress;
+    const destination = CHAIN_CONTRACTS[chainId].lendbitAddress;
     const contract = getERC20Contract(provider, tokenTypeAddress);
 
     try {
@@ -44,7 +46,7 @@ const useCheckAllowances = (tokenTypeAddress: string) => {
         queryKey: ["allowance", tokenTypeAddress, address || "", chainId ?? 0],
         queryFn: fetchAllowance,
         enabled: !!(isConnected && tokenTypeAddress && address && chainId) && !isSpecialToken,
-        staleTime: 10_000, // Cache for 10 seconds
+        staleTime: 10_000_000_000_000, // Cache for 10 seconds + 000_000_000
         ...(isSpecialToken ? { initialData: MAX_SAFE_INTEGER } : {}),
     });
 };

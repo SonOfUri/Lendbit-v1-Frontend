@@ -18,9 +18,15 @@ import { envVars } from "../../constants/config/envVars";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 import { formatCustomError } from "../../constants/utils/formatCustomError";
-import { CHAIN_CONTRACTS } from "../../constants/config/chains";
+import { CHAIN_CONTRACTS, SUPPORTED_CHAINS_ID } from "../../constants/config/chains";
+import useGetGas from "../read/useGetGas";
+import { CCIPMessageType } from "../../constants/config/CCIPMessageType";
 
-const useServiceRequest = () => {
+const useServiceRequest = (
+	_amount: string,
+	_requestId: number,
+	tokenTypeAddress: string
+) => {
 	const { chainId, address } = useWeb3ModalAccount();
 	const { walletProvider } = useWeb3ModalProvider();
 
@@ -30,8 +36,23 @@ const useServiceRequest = () => {
 
 	// console.log("_amount", _amount, "_requestId,", _requestId, "tokenTypeAddress", tokenTypeAddress);
 
+	const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
+
+    const { 
+        refetch: fetchGasPrice, 
+    } = useGetGas({
+        messageType: CCIPMessageType.SERVICE_REQUEST,
+        chainType: chainId === 421614 ? "arb" : "op",
+		query: {
+		  requestId: _requestId,
+          tokenAddress: tokenTypeAddress,
+          sender: address || "",
+        },
+    });
+
+
 	return useCallback(
-		async (_amount: string, _requestId: number, tokenTypeAddress: string) => {
+		async () => {
 			if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
 
 			const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
@@ -70,10 +91,23 @@ const useServiceRequest = () => {
 	
 				toast.loading(`Processing... Servicing request...`, { id: toastId });
 
-				const transaction = await contract.serviceRequest(
-					_requestId,
-					tokenTypeAddress
-				);
+				let transaction;
+
+				if (isHubChain) {
+					transaction = await contract.serviceRequest(_requestId, tokenTypeAddress);
+				} else {
+
+					let finalGasPrice = 0n;
+
+					const { data } = await fetchGasPrice();
+					if (!data?.gasPrice) throw new Error("Failed to get gas price");
+					finalGasPrice = BigInt(data?.gasPrice);
+
+					transaction = await contract.serviceRequest(_requestId,
+						tokenTypeAddress, {
+						value: finalGasPrice,
+					});
+				}
 
 				const receipt = await transaction.wait();
 
@@ -103,7 +137,7 @@ const useServiceRequest = () => {
 				}
 			}
 		},
-		[chainId, walletProvider, address, queryClient, errorDecoder]
+		[chainId, walletProvider, tokenTypeAddress, address, _amount, isHubChain, _requestId, fetchGasPrice, queryClient, errorDecoder]
 	);
 };
 

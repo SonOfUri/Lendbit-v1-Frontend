@@ -2,7 +2,7 @@ import {
     useWeb3ModalAccount,
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { isSupportedChains } from "../../constants/utils/chains";
 import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
@@ -18,6 +18,9 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 import { formatCustomError } from "../../constants/utils/formatCustomError";
+import { SUPPORTED_CHAINS_ID } from "../../constants/config/chains";
+import useGetGas from "../read/useGetGas";
+import { CCIPMessageType } from "../../constants/config/CCIPMessageType";
 
 const useWithdrawCollateral = (
     tokenTypeAddress: string,
@@ -32,8 +35,32 @@ const useWithdrawCollateral = (
 
     const errorDecoder = ErrorDecoder.create([lendbit, erc20]);
 
+    const _weiAmount = useMemo(() => {
+        if (!_amount || isNaN(Number(_amount))) return null;
+        try {
+            return ethers.parseUnits(_amount, tokenDecimal);
+        } catch {
+            return null;
+        }
+    }, [_amount, tokenDecimal]);
+
+    const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
+
+    const { 
+        refetch: fetchGasPrice, 
+    } = useGetGas({
+        messageType: CCIPMessageType.WITHDRAW_COLLATERAL,
+        chainType: chainId === 421614 ? "arb" : "op",
+        query: {
+          tokenAddress: tokenTypeAddress,
+          amount: _weiAmount ? _weiAmount.toString() : "0",
+          sender: address || "",
+        },
+    });
+
     return useCallback(async () => {
         if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
+        if (!_weiAmount) return toast.error("Invalid amount");
 
 
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
@@ -42,7 +69,6 @@ const useWithdrawCollateral = (
 
         const prankCall = getPrankLendbitHubContract(); 
         
-        const _weiAmount = ethers.parseUnits(_amount, tokenDecimal);
         let toastId: string | number | undefined;
 
         try {
@@ -54,8 +80,25 @@ const useWithdrawCollateral = (
 
             toast.loading(`Processing withdrawal of ${_amount}${tokenName}...`, { id: toastId })
 
-            // **Proceed with withdraw**
-            const transaction = await contract.withdrawCollateral(tokenTypeAddress, _weiAmount);
+            // **Proceed with withdraw**      
+
+            let transaction;
+
+            if (isHubChain) {
+                transaction = await contract.withdrawCollateral(tokenTypeAddress, _weiAmount);
+            } else {
+
+                let finalGasPrice = 0n;
+
+                const { data } = await fetchGasPrice();
+                if (!data?.gasPrice) throw new Error("Failed to get gas price");
+                finalGasPrice = BigInt(data?.gasPrice);
+
+                transaction = await contract.withdrawCollateral(tokenTypeAddress, _weiAmount, {
+                    value: finalGasPrice,
+                });
+            }
+
             const receipt = await transaction.wait();
 
             if (receipt.status) {
@@ -86,7 +129,7 @@ const useWithdrawCollateral = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, walletProvider, _amount, tokenDecimal, tokenName, tokenTypeAddress, queryClient, address, navigate, errorDecoder]);
+    }, [chainId, _weiAmount, walletProvider, _amount, tokenName, tokenTypeAddress, address, isHubChain, fetchGasPrice, queryClient, navigate, errorDecoder]);
 };
 
 export default useWithdrawCollateral;

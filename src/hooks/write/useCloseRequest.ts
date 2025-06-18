@@ -12,6 +12,9 @@ import { ErrorDecoder } from "ethers-decode-error";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 import { formatCustomError } from "../../constants/utils/formatCustomError";
+import { SUPPORTED_CHAINS_ID } from "../../constants/config/chains";
+import useGetGas from "../read/useGetGas";
+import { CCIPMessageType } from "../../constants/config/CCIPMessageType";
 
 const useCloseRequest = (
     _requestId: number,
@@ -23,9 +26,22 @@ const useCloseRequest = (
 
     const queryClient = useQueryClient();
 
+    const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
+
+    const { 
+        refetch: fetchGasPrice, 
+    } = useGetGas({
+        messageType: CCIPMessageType.CLOSE_REQUEST,
+        chainType: chainId === 421614 ? "arb" : "op",
+        query: {
+          requestId: _requestId,
+          sender: address || "",
+        },
+    });
 
     return useCallback(async () => {
         if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
+        if (!_requestId) return toast.error("Invalid requestId");
 
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
         const signer = await readWriteProvider.getSigner();
@@ -42,9 +58,23 @@ const useCloseRequest = (
 
             toast.loading(`closing ads position...`, { id: toastId });
 
-            const transaction = await contract.closeRequest(
-                _requestId,
-            );
+            let transaction;
+            
+            if (isHubChain) { 
+                transaction = await contract.closeRequest(
+                    _requestId,
+                );
+            } else {
+                let finalGasPrice = 0n;
+                const { data } = await fetchGasPrice();
+                if (!data?.gasPrice) throw new Error("Failed to get gas price");
+                finalGasPrice = BigInt(data?.gasPrice);
+
+                transaction = await contract.closeRequest(_requestId, {
+                    value: finalGasPrice,
+                });
+            }
+
             const receipt = await transaction.wait();
 
             if (receipt.status) {
@@ -72,7 +102,7 @@ const useCloseRequest = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, walletProvider, _requestId, queryClient, address, errorDecoder]);
+    }, [chainId, walletProvider, _requestId, address, isHubChain, fetchGasPrice, queryClient, errorDecoder]);
 };
 
 export default useCloseRequest;

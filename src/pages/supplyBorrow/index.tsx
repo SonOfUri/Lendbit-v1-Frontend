@@ -35,7 +35,6 @@ const SupplyBorrow = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [walletBalance, setWalletBalance] = useState(0);
     const [availableBal, setAvailableBal] = useState(availableBorrow || 0);
-
     
 
     useEffect(() => {
@@ -100,7 +99,14 @@ const SupplyBorrow = () => {
         selectedToken?.name || ""
     );
 
-    const createBorrowPosition = useCreatePositionPool();
+
+    const createBorrowPosition = useCreatePositionPool(
+        String(assetValue),
+        resolvedTokenAddress,
+        selectedToken?.decimals || 18,
+        selectedToken?.name || ""
+    );
+
 
     if ((dashboardDataLoading || tokenDataLoading) && (!dashboardData) ) {
         return (
@@ -309,12 +315,7 @@ const SupplyBorrow = () => {
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    createBorrowPosition(
-                                        String(assetValue),
-                                        resolvedTokenAddress,
-                                        selectedToken.decimals,
-                                        selectedToken.name
-                                    );
+                                    createBorrowPosition();
                                     setDropdownOpen(false);
                                     setAssetValue(0);
                                     setSelectedPercentage(null);

@@ -9,6 +9,7 @@ import ConnectPrompt from "../../components/shared/ConnectPrompt.tsx";
 import { formatMoney2 } from "../../constants/utils/formatMoney.ts";
 import { useLocation } from "react-router-dom";
 import { useLayoutEffect } from "react";
+import usePositionAnalytics from "../../hooks/read/usePositionAnalytics.ts";
 
 const Positions = () => {
 	const {
@@ -17,6 +18,9 @@ const Positions = () => {
 		positionDataError,
 		isWalletConnected,
 	} = usePositionData();
+
+	const { analyticsData, analyticsDataLoading } = usePositionAnalytics();
+
 
 	const location = useLocation();
 	const activeBorrowTab = location.state?.activeBorrowTab || 'liquidity';
@@ -33,7 +37,7 @@ const Positions = () => {
         }
     }, [shouldScrollToBorrows]);
 
-	if (positionDataLoading && !positionData) {
+	if (positionDataLoading && !positionData && analyticsDataLoading) {
 		return (
 			<div className="w-full h-screen flex items-center justify-center">
 				<LoadingState />
@@ -66,7 +70,7 @@ const Positions = () => {
 	return (
 		<div className="w-full pt-2 px-4 space-y-8 pb-4">
 			{/* 📈 Graph Placeholder */}
-			<PortfolioAreaChart positionData={positionData} />
+			<PortfolioAreaChart analyticsData={analyticsData} />
 
 			{/* 📊 Collateral + Borrow Power */}
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -2,7 +2,7 @@ import {
     useWeb3ModalAccount,
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { isSupportedChains } from "../../constants/utils/chains";
 import { toast } from "sonner";
 import { getProvider } from "../../api/provider";
@@ -15,7 +15,9 @@ import useCheckAllowances from "../read/useCheckAllowances";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eip1193Provider } from "ethers";
 import { formatCustomError } from "../../constants/utils/formatCustomError";
-import { CHAIN_CONTRACTS } from "../../constants/config/chains";
+import { CHAIN_CONTRACTS, SUPPORTED_CHAINS_ID } from "../../constants/config/chains";
+import { CCIPMessageType } from "../../constants/config/CCIPMessageType";
+import useGetGas from "../read/useGetGas";
 
 const useSupplyLiquidity = (
     _amount: string,
@@ -30,11 +32,36 @@ const useSupplyLiquidity = (
     const { data: allowanceVal = 0, isLoading } = useCheckAllowances(tokenTypeAddress);
     const queryClient = useQueryClient();
 
+    const _weiAmount = useMemo(() => {
+        if (!_amount || isNaN(Number(_amount))) return null;
+        try {
+            return ethers.parseUnits(_amount, tokenDecimal);
+        } catch {
+            return null;
+        }
+    }, [_amount, tokenDecimal]);
+
+    const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
+
+    const { 
+        refetch: fetchGasPrice, 
+    } = useGetGas({
+        messageType: CCIPMessageType.DEPOSIT,
+        chainType: chainId === 421614 ? "arb" : "op",
+        query: {
+          tokenAddress: tokenTypeAddress,
+          amount: _weiAmount ? _weiAmount.toString() : "0",
+          sender: address || "",
+        },
+    });
+
 
     return useCallback(async () => {
         let toastId: string | number | undefined;
         if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
         if (isLoading) return toast.loading("Checking allowance...");
+        if (!_weiAmount) return toast.error("Invalid amount");
+
 
 
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
@@ -42,7 +69,6 @@ const useSupplyLiquidity = (
         const erc20contract = getERC20Contract(signer, tokenTypeAddress);
         const contract = getLendbitContract(signer, chainId);
 
-        const _weiAmount = ethers.parseUnits(_amount, tokenDecimal);
 
 
         try {
@@ -70,7 +96,23 @@ const useSupplyLiquidity = (
 
             toast.loading(`Processing supply of ${_amount} ${tokenName}...`, { id: toastId })
 
-            const transaction = await contract.deposit(tokenTypeAddress, _weiAmount);
+            let transaction;
+
+            if (isHubChain) {
+                transaction = await contract.deposit(tokenTypeAddress, _weiAmount);
+            } else {
+
+                let finalGasPrice = 0n;
+
+                const { data } = await fetchGasPrice();
+                if (!data?.gasPrice) throw new Error("Failed to get gas price");
+                finalGasPrice = BigInt(data?.gasPrice);
+
+                transaction = await contract.deposit(tokenTypeAddress, _weiAmount, {
+                    value: finalGasPrice,
+                });
+            }
+            
             const receipt = await transaction.wait();
 
             if (receipt.status) {
@@ -98,7 +140,7 @@ const useSupplyLiquidity = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [_amount, address, allowanceVal, chainId, errorDecoder, isLoading, queryClient, tokenDecimal, tokenName, tokenTypeAddress, walletProvider]);
+    }, [_amount, _weiAmount, address, allowanceVal, chainId, errorDecoder, fetchGasPrice, isHubChain, isLoading, queryClient, tokenName, tokenTypeAddress, walletProvider]);
 };
 
 export default useSupplyLiquidity;
