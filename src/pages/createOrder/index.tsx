@@ -87,7 +87,7 @@ const CreateOrder = () => {
 			navigate("/allocation", {
 			state: {
 				_amount: assetValue,
-				_interest: (rate / 10000) || 0,
+				_interest: (rate) || 0,
 				_returnDate: unixReturnDate,
 				tokenTypeAddress: resolvedTokenAddress,
 				tokenDecimal: selectedToken.decimals, 
@@ -105,7 +105,7 @@ const CreateOrder = () => {
 
 	const createBorrowOrder = useCreateBorrowOrder(
 		assetValue || "0", 
-		rate / 10000,
+		rate || 0,
 		dateValue ? Math.floor(new Date(dateValue).getTime() / 1000) : 0,
 		resolvedTokenAddress, 
 		selectedToken?.decimals || 18, 

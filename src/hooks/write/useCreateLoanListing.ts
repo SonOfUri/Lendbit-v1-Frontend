@@ -129,7 +129,7 @@ const useCreateLoanListingOrder = (
 
             toast.loading(`Processing loan listing of ${_amount}${tokenName}...`, { id: toastId })
 
-            console.log("SEEING VALUES FOR createLoanListingWithMatching",_weiAmount,_min_amount_wei,_max_amount_wei,_returnDate,_interest,tokenTypeAddress );
+            // console.log("SEEING VALUES FOR createLoanListingWithMatching",_weiAmount,_min_amount_wei,_max_amount_wei,_returnDate,_interest,tokenTypeAddress );
 
             let transaction;
 
