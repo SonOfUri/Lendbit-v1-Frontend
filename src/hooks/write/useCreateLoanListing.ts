@@ -91,7 +91,7 @@ const useCreateLoanListingOrder = (
     return useCallback(async () => {
         if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
         if (isLoading) return toast.loading("Checking allowance...");
-        if (!_weiAmount || !_min_amount_wei || !_max_amount_wei) {
+        if (!_weiAmount || !_max_amount_wei) {
             return toast.error("Invalid amount values provided.");
         }
 
@@ -107,9 +107,6 @@ const useCreateLoanListingOrder = (
 
             toastId = toast.loading(`Checking loan listing...`);
 
-            if (_min_amount_wei > _max_amount_wei) {
-                return toast.error("Minimum amount cannot be greater than maximum amount.", { id: toastId });
-            }
 
             if (allowanceVal == 0 || allowanceVal < Number(_weiAmount)) {
                 if (typeof chainId === 'undefined') {
@@ -132,7 +129,7 @@ const useCreateLoanListingOrder = (
 
             toast.loading(`Processing loan listing of ${_amount}${tokenName}...`, { id: toastId })
 
-            // console.log("SEEING VALUES FOR createLoanListingWithMatching",_weiAmount,_min_amount_wei,_max_amount_wei,_returnDate,_interest,tokenTypeAddress );
+            console.log("SEEING VALUES FOR createLoanListingWithMatching",_weiAmount,_min_amount_wei,_max_amount_wei,_returnDate,_interest,tokenTypeAddress );
 
             let transaction;
 
@@ -190,10 +187,10 @@ const useCreateLoanListingOrder = (
                 if (decodedError.reason !== null) {
                     friendlyReason = formatCustomError(decodedError.reason);
                 }
-                console.error("Transaction failed:", decodedError.reason);
+                console.error("Transaction failed:", decodedError.reason, error);
                 toast.error(`Transaction failed: ${friendlyReason}`, { id: toastId });
             } catch (decodeError) {
-                console.error("Error decoding failed:", decodeError);
+                console.error("Error decoding failed:", decodeError, error);
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }

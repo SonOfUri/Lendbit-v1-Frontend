@@ -79,7 +79,7 @@ const useCreateBorrowOrder = (
 
             toastId = toast.loading(`Processing order creation...`,{ id: toastId });
 
-            // console.log(_weiAmount, (_interest * 100));
+            console.log(_weiAmount, (_interest * 100));
 
             let transaction;
             if (isHubChain) {

@@ -1,4 +1,7 @@
 export const formatCustomError = (reason: string): string => {
+    // Return as-is if reason is not in the expected format
+    if (!reason.includes("__")) return reason;
+
     // Split by double underscore to separate contract and error
     const [rawContract, rawError] = reason.split("__");
 
