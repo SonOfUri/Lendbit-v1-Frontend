@@ -69,7 +69,7 @@ const TransactionHistory = () => {
         date: Date;
     };
 
-    const [transactions, setTransactions] = React.useState<Transaction[]>([]);
+    const [, setTransactions] = React.useState<Transaction[]>([]);
     const [page, setPage] = React.useState(1);
     const [hasMore, setHasMore] = React.useState(true);
 
