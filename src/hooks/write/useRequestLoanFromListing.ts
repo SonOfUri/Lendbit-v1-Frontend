@@ -44,21 +44,21 @@ const useRequestLoanFromListing = (
 
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.BORROW_FROM_LISTING,
         chainType: chainId === 421614 ? "arb" : "op",
         query: {
-          listingId: _orderId,
-          amount: _weiAmount ? _weiAmount.toString() : "0",
-          sender: address || "",
+            listingId: _orderId,
+            amount: _weiAmount ? _weiAmount.toString() : "0",
+            sender: address || "",
         },
     });
 
 
     return useCallback(async (
-        
+
     ) => {
         if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
 
@@ -95,14 +95,20 @@ const useRequestLoanFromListing = (
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`${_amount} successfully borrowed!`, {
-                    id: toastId,
-                });
+                if (isHubChain) {
+                    toast.success(`${_amount} successfully borrowed!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`x-chain ${_amount} borrow message sent!`, {
+                        id: toastId,
+                    });
+                }
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
                     queryClient.invalidateQueries({ queryKey: ["position", address] }),
-                   
+
                 ])
 
                 navigate("/")

@@ -43,15 +43,15 @@ const useSupplyLiquidity = (
 
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.DEPOSIT,
         chainType: chainId === 421614 ? "arb" : "op",
         query: {
-          tokenAddress: tokenTypeAddress,
-          amount: _weiAmount ? _weiAmount.toString() : "0",
-          sender: address || "",
+            tokenAddress: tokenTypeAddress,
+            amount: _weiAmount ? _weiAmount.toString() : "0",
+            sender: address || "",
         },
     });
 
@@ -80,14 +80,14 @@ const useSupplyLiquidity = (
                     toast.error("Chain ID is undefined - please connect your wallet");
                     return;
                 }
-            
+
                 toast.loading(`Approving ${tokenName} tokens...`, { id: toastId });
                 const allowanceTx = await erc20contract.approve(
-                    CHAIN_CONTRACTS[chainId].lendbitAddress, 
+                    CHAIN_CONTRACTS[chainId].lendbitAddress,
                     MaxUint256
                 );
                 const allowanceReceipt = await allowanceTx.wait();
-            
+
                 if (!allowanceReceipt.status) {
                     toast.error("Approval failed!", { id: toastId });
                 }
@@ -112,21 +112,27 @@ const useSupplyLiquidity = (
                     value: finalGasPrice,
                 });
             }
-            
+
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`${_amount}${tokenName} successfully supplied, happy earning!`, {
-                    id: toastId,
-                });
+                if (isHubChain) {
+                    toast.success(`${_amount}${tokenName} successfully supplied, happy earning!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`${_amount}${tokenName} x-chain supply message sent, happy earning!`, {
+                        id: toastId,
+                    });
+                }
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
                     queryClient.invalidateQueries({ queryKey: ["position", address] }),
-                    
+
                 ])
             }
-        }catch (error: unknown) {
+        } catch (error: unknown) {
             try {
                 const decodedError = await errorDecoder.decode(error);
                 let friendlyReason = "error";

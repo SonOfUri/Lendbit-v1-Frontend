@@ -45,15 +45,15 @@ const useRepayPool = (
 
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.REPAY,
         chainType: chainId === 421614 ? "arb" : "op",
         query: {
-          tokenAddress: tokenTypeAddress,
-          amount: _weiAmount ? _weiAmount.toString() : "0",
-          sender: address || "",
+            tokenAddress: tokenTypeAddress,
+            amount: _weiAmount ? _weiAmount.toString() : "0",
+            sender: address || "",
         },
     });
 
@@ -74,23 +74,23 @@ const useRepayPool = (
             toastId = toast.loading(`Checking repayments...`);
 
             if (allowanceVal == 0 || allowanceVal < Number(_weiAmount)) {
-            if (typeof chainId === 'undefined') {
-                toast.error("Chain ID is undefined - please connect your wallet");
-                return;
+                if (typeof chainId === 'undefined') {
+                    toast.error("Chain ID is undefined - please connect your wallet");
+                    return;
+                }
+
+                toast.loading(`Approving tokens...`, { id: toastId });
+                const allowanceTx = await erc20contract.approve(
+                    CHAIN_CONTRACTS[chainId].lendbitAddress,
+                    MaxUint256
+                );
+                const allowanceReceipt = await allowanceTx.wait();
+
+                if (!allowanceReceipt.status) {
+                    toast.error("Approval failed!", { id: toastId });
+                }
             }
-        
-            toast.loading(`Approving tokens...`, { id: toastId });
-            const allowanceTx = await erc20contract.approve(
-                CHAIN_CONTRACTS[chainId].lendbitAddress, 
-                MaxUint256
-            );
-            const allowanceReceipt = await allowanceTx.wait();
-        
-            if (!allowanceReceipt.status) {
-                toast.error("Approval failed!", { id: toastId });
-            }
-            }
-            
+
             toast.loading(`Processing repayment of ${_amount}...`, { id: toastId })
 
             let transaction;
@@ -113,15 +113,21 @@ const useRepayPool = (
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`loan of ${_amount} successfully repayed!`, {
-                    id: toastId,
-                });
+                if (isHubChain) {
+                    toast.success(`loan of ${_amount} successfully repayed!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`x-chain loan of ${_amount} repay message sent!`, {
+                        id: toastId,
+                    });
+                }
 
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
                     queryClient.invalidateQueries({ queryKey: ["position", address] }),
-                    
+
                 ])
             }
         } catch (error: unknown) {

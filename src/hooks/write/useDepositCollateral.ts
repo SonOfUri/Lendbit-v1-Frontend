@@ -22,7 +22,7 @@ import { formatCustomError } from "../../constants/utils/formatCustomError";
 import { CHAIN_CONTRACTS, SUPPORTED_CHAINS_ID } from "../../constants/config/chains";
 import useGetGas from "../read/useGetGas";
 import { CCIPMessageType } from "../../constants/config/CCIPMessageType";
-  
+
 const useDepositCollateral = (
     tokenTypeAddress: string,
     _amount: string,
@@ -40,28 +40,28 @@ const useDepositCollateral = (
     const _weiAmount = useMemo(() => {
         if (!_amount || isNaN(Number(_amount))) return null;
         try {
-          return ethers.parseUnits(_amount, tokenDecimal);
+            return ethers.parseUnits(_amount, tokenDecimal);
         } catch {
-          return null;
+            return null;
         }
-      }, [_amount, tokenDecimal]);
+    }, [_amount, tokenDecimal]);
 
     // Only get gas for spoke chains
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.DEPOSIT_COLLATERAL,
         chainType: chainId === 421614 ? "arb" : "op",
         query: {
-          tokenAddress: tokenTypeAddress,
-          amount: _weiAmount ? _weiAmount.toString() : "0",
-          sender: address || "",
+            tokenAddress: tokenTypeAddress,
+            amount: _weiAmount ? _weiAmount.toString() : "0",
+            sender: address || "",
         },
-      });
+    });
 
-   
+
 
     return useCallback(async () => {
         if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
@@ -84,18 +84,18 @@ const useDepositCollateral = (
                     toast.error("Chain ID is undefined - please connect your wallet");
                     return;
                 }
-            
+
                 toast.loading(`Approving ${tokenName} tokens...`, { id: toastId });
                 const allowanceTx = await erc20contract.approve(
-                    CHAIN_CONTRACTS[chainId].lendbitAddress, 
+                    CHAIN_CONTRACTS[chainId].lendbitAddress,
                     MaxUint256
                 );
                 const allowanceReceipt = await allowanceTx.wait();
-            
+
                 if (!allowanceReceipt.status) {
                     toast.error("Approval failed!", { id: toastId });
                 }
-            } 
+            }
 
             toast.loading(`Processing deposit of ${_amount}${tokenName} as collateral...`, { id: toastId });
 
@@ -124,9 +124,16 @@ const useDepositCollateral = (
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`${_amount}${tokenName} successfully deposited as collateral!`, {
-                    id: toastId,
-                });
+                if (isHubChain) {
+                    toast.success(`${_amount}${tokenName} x-chain deposited as collateral message sent!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`${_amount}${tokenName} successfully deposited as collateral!`, {
+                        id: toastId,
+                    });
+                }
+
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
@@ -155,4 +162,3 @@ export default useDepositCollateral;
 
 
 
- 

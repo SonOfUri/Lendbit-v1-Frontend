@@ -19,7 +19,7 @@ import { CCIPMessageType } from "../../constants/config/CCIPMessageType";
 const useCloseRequest = (
     _requestId: number,
 ) => {
-    const { chainId, address} = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
 
     const errorDecoder = ErrorDecoder.create([lendbit]);
@@ -28,14 +28,14 @@ const useCloseRequest = (
 
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.CLOSE_REQUEST,
         chainType: chainId === 421614 ? "arb" : "op",
         query: {
-          requestId: _requestId,
-          sender: address || "",
+            requestId: _requestId,
+            sender: address || "",
         },
     });
 
@@ -59,8 +59,8 @@ const useCloseRequest = (
             toast.loading(`closing ads position...`, { id: toastId });
 
             let transaction;
-            
-            if (isHubChain) { 
+
+            if (isHubChain) {
                 transaction = await contract.closeRequest(
                     _requestId,
                 );
@@ -78,9 +78,15 @@ const useCloseRequest = (
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`request of id #${_requestId} closed!`, {
-                    id: toastId,
-                });
+                if (isHubChain) {
+                    toast.success(`request of id #${_requestId} closed!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`x-chain close request id #${_requestId} message sent!`, {
+                        id: toastId,
+                    });
+                }
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),

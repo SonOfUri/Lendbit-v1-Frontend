@@ -27,7 +27,7 @@ const useRepayP2P = (
     tokenTypeAddress: string,
     tokenDecimal: number,
 ) => {
-    const { chainId,address } = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
     const { data: allowanceVal = 0, isLoading } = useCheckAllowances(tokenTypeAddress);
 
@@ -46,15 +46,15 @@ const useRepayP2P = (
 
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.REPAY_LOAN,
         chainType: chainId === 421614 ? "arb" : "op",
         query: {
-          requestId: _requestId,
-          amount: _weiAmount ? _weiAmount.toString() : "0",
-          sender: address || "",
+            requestId: _requestId,
+            amount: _weiAmount ? _weiAmount.toString() : "0",
+            sender: address || "",
         },
     });
 
@@ -67,26 +67,26 @@ const useRepayP2P = (
         const signer = await readWriteProvider.getSigner();
         const contract = getLendbitContract(signer, chainId);
         const erc20contract = getERC20Contract(signer, tokenTypeAddress);
-    
+
         let toastId: string | number | undefined;
 
         try {
             toastId = toast.loading(`Checking repayments...`);
-            
+
 
             if (allowanceVal == 0 || allowanceVal < Number(_weiAmount)) {
                 if (typeof chainId === 'undefined') {
                     toast.error("Chain ID is undefined - please connect your wallet");
                     return;
                 }
-            
+
                 toast.loading(`Approving tokens...`, { id: toastId });
                 const allowanceTx = await erc20contract.approve(
-                    CHAIN_CONTRACTS[chainId].lendbitAddress, 
+                    CHAIN_CONTRACTS[chainId].lendbitAddress,
                     MaxUint256
                 );
                 const allowanceReceipt = await allowanceTx.wait();
-            
+
                 if (!allowanceReceipt.status) {
                     toast.error("Approval failed!", { id: toastId });
                 }
@@ -114,14 +114,20 @@ const useRepayP2P = (
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`loan ${_requestId} successfully repayed!`, {
-                    id: toastId,
-                });
+                if (isHubChain) {
+                    toast.success(`loan ${_requestId} successfully repayed!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`x-chain loan #${_requestId} repay message sent!`, {
+                        id: toastId,
+                    });
+                }
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
                     queryClient.invalidateQueries({ queryKey: ["position", address] }),
-                   
+
                 ])
 
             }

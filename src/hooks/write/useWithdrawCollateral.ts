@@ -46,15 +46,15 @@ const useWithdrawCollateral = (
 
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.WITHDRAW_COLLATERAL,
         chainType: chainId === 421614 ? "arb" : "op",
         query: {
-          tokenAddress: tokenTypeAddress,
-          amount: _weiAmount ? _weiAmount.toString() : "0",
-          sender: address || "",
+            tokenAddress: tokenTypeAddress,
+            amount: _weiAmount ? _weiAmount.toString() : "0",
+            sender: address || "",
         },
     });
 
@@ -67,15 +67,15 @@ const useWithdrawCollateral = (
         const signer = await readWriteProvider.getSigner();
         const contract = getLendbitContract(signer, chainId);
 
-        const prankCall = getPrankLendbitHubContract(); 
-        
+        const prankCall = getPrankLendbitHubContract();
+
         let toastId: string | number | undefined;
 
         try {
             toastId = toast.loading(`Checking Collateral withdrawal of ${_amount}${tokenName}...`);
 
             await prankCall.withdrawCollateral.staticCall(tokenTypeAddress, _weiAmount, {
-                from: address, 
+                from: address,
             });
 
             toast.loading(`Processing withdrawal of ${_amount}${tokenName}...`, { id: toastId })
@@ -102,15 +102,21 @@ const useWithdrawCollateral = (
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`${_amount}${tokenName} successfully withdrawn!`, {
-                    id: toastId,
-                });
-                
+                if (isHubChain) {
+                    toast.success(`${_amount}${tokenName} successfully withdrawn!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`${_amount}${tokenName} x-chain withdraw message sent!`, {
+                        id: toastId,
+                    });
+                }
+
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
                     queryClient.invalidateQueries({ queryKey: ["position", address] }),
-                    
+
                 ])
 
                 navigate("/")

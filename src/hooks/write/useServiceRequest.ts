@@ -38,17 +38,17 @@ const useServiceRequest = (
 
 	const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
-    } = useGetGas({
-        messageType: CCIPMessageType.SERVICE_REQUEST,
-        chainType: chainId === 421614 ? "arb" : "op",
+	const {
+		refetch: fetchGasPrice,
+	} = useGetGas({
+		messageType: CCIPMessageType.SERVICE_REQUEST,
+		chainType: chainId === 421614 ? "arb" : "op",
 		query: {
-		  requestId: _requestId,
-          tokenAddress: tokenTypeAddress,
-          sender: address || "",
-        },
-    });
+			requestId: _requestId,
+			tokenAddress: tokenTypeAddress,
+			sender: address || "",
+		},
+	});
 
 
 	return useCallback(
@@ -70,25 +70,25 @@ const useServiceRequest = (
 
 			try {
 				toastId = toast.loading(`Checking... Servicing request...`);
-				
+
 				if (allowanceVal == 0 || allowanceVal < Number(_amount)) {
 					if (typeof chainId === 'undefined') {
 						toast.error("Chain ID is undefined - please connect your wallet");
 						return;
 					}
-				
+
 					toast.loading(`Approving tokens...`, { id: toastId });
 					const allowanceTx = await erc20contract.approve(
-						CHAIN_CONTRACTS[chainId].lendbitAddress, 
+						CHAIN_CONTRACTS[chainId].lendbitAddress,
 						MaxUint256
 					);
 					const allowanceReceipt = await allowanceTx.wait();
-				
+
 					if (!allowanceReceipt.status) {
 						toast.error("Approval failed!", { id: toastId });
 					}
 				}
-	
+
 				toast.loading(`Processing... Servicing request...`, { id: toastId });
 
 				let transaction;
@@ -112,9 +112,15 @@ const useServiceRequest = (
 				const receipt = await transaction.wait();
 
 				if (receipt.status) {
-					toast.success(`request ${_requestId} successfully serviced!`, {
-						id: toastId,
-					});
+					if (isHubChain) {
+						toast.success(`request ${_requestId} successfully serviced!`, {
+							id: toastId,
+						});
+					} else {
+						toast.success(`x-chain request ${_requestId} service message sent!`, {
+							id: toastId,
+						});
+					}
 
 					await Promise.all([
 						queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),

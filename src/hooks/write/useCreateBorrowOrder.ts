@@ -39,27 +39,27 @@ const useCreateBorrowOrder = (
     const _weiAmount = useMemo(() => {
         if (!_amount || isNaN(Number(_amount))) return null;
         try {
-          return ethers.parseUnits(_amount, tokenDecimal);
+            return ethers.parseUnits(_amount, tokenDecimal);
         } catch {
-          return null;
+            return null;
         }
     }, [_amount, tokenDecimal]);
-    
+
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.CREATE_REQUEST,
         chainType: chainId === 421614 ? "arb" : "op",
         query: {
-          amount: _weiAmount ? _weiAmount.toString() : "0",
-          interest: (_interest * 100),
-          returnDate: _returnDate,
-          tokenAddress: tokenTypeAddress,
-          sender: address || "",
+            amount: _weiAmount ? _weiAmount.toString() : "0",
+            interest: (_interest * 100),
+            returnDate: _returnDate,
+            tokenAddress: tokenTypeAddress,
+            sender: address || "",
         },
-      });
+    });
 
 
     return useCallback(async () => {
@@ -77,7 +77,7 @@ const useCreateBorrowOrder = (
 
             await simulateHubCall("createLendingRequest", [_weiAmount, (_interest * 100), _returnDate, tokenTypeAddress], address);
 
-            toastId = toast.loading(`Processing order creation...`,{ id: toastId });
+            toastId = toast.loading(`Processing order creation...`, { id: toastId });
 
             // console.log(_weiAmount, (_interest * 100));
 
@@ -100,9 +100,15 @@ const useCreateBorrowOrder = (
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`${_amount} ${tokenName} lending request successfully created!`, {
-                    id: toastId,
-                });
+                if (isHubChain) {
+                    toast.success(`${_amount} ${tokenName} lending request successfully created!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`${_amount} ${tokenName} x-chain lending request message sent!`, {
+                        id: toastId,
+                    });
+                }
 
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),

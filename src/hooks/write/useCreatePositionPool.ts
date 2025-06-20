@@ -41,21 +41,21 @@ const useCreatePositionPool = (
 
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.BORROW,
         chainType: chainId === 421614 ? "arb" : "op",
         query: {
-          tokenAddress: tokenTypeAddress,
-          amount: _weiAmount ? _weiAmount.toString() : "0",
-          sender: address || "",
+            tokenAddress: tokenTypeAddress,
+            amount: _weiAmount ? _weiAmount.toString() : "0",
+            sender: address || "",
         },
-      });
+    });
 
 
     return useCallback(async (
-        
+
     ) => {
         if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
 
@@ -73,7 +73,7 @@ const useCreatePositionPool = (
             toastId = toast.loading(`Checking borrowing from pool...`);
 
             await simulateHubCall("borrowFromPool", [tokenTypeAddress, _weiAmount], address);
-            
+
             toast.loading(`Processing borrowing...`, { id: toastId });
 
 
@@ -97,9 +97,16 @@ const useCreatePositionPool = (
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`${_amount} ${tokenName} borrowed successfully!`, {
-                    id: toastId,
-                });
+                if (isHubChain) {
+                    toast.success(`${_amount} ${tokenName} borrowed successfully!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`${_amount} ${tokenName} x-chain borrow message sent!`, {
+                        id: toastId,
+                    });
+                }
+
 
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),

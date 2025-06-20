@@ -45,34 +45,34 @@ const useCreateLoanListingOrder = (
     const _weiAmount = useMemo(() => {
         if (!_amount || isNaN(Number(_amount))) return null;
         try {
-          return ethers.parseUnits(_amount, tokenDecimal);
+            return ethers.parseUnits(_amount, tokenDecimal);
         } catch {
-          return null;
+            return null;
         }
     }, [_amount, tokenDecimal]);
 
     const _min_amount_wei = useMemo(() => {
         if (!_min_amount || isNaN(Number(_min_amount))) return null;
         try {
-          return ethers.parseUnits(_min_amount, tokenDecimal);
+            return ethers.parseUnits(_min_amount, tokenDecimal);
         } catch {
-          return null;
+            return null;
         }
     }, [_min_amount, tokenDecimal]);
 
     const _max_amount_wei = useMemo(() => {
         if (!_max_amount || isNaN(Number(_max_amount))) return null;
         try {
-          return ethers.parseUnits(_max_amount, tokenDecimal);
+            return ethers.parseUnits(_max_amount, tokenDecimal);
         } catch {
-          return null;
+            return null;
         }
     }, [_max_amount, tokenDecimal]);
-    
+
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.CREATE_LISTING,
         chainType: chainId === 421614 ? "arb" : "op",
@@ -86,7 +86,7 @@ const useCreateLoanListingOrder = (
             whitelist: whitelist,
             sender: address || "",
         },
-      });
+    });
 
     return useCallback(async () => {
         if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
@@ -113,19 +113,19 @@ const useCreateLoanListingOrder = (
                     toast.error("Chain ID is undefined - please connect your wallet");
                     return;
                 }
-            
+
                 toast.loading(`Approving ${tokenName} tokens...`, { id: toastId });
                 const allowanceTx = await erc20contract.approve(
-                    CHAIN_CONTRACTS[chainId].lendbitAddress, 
+                    CHAIN_CONTRACTS[chainId].lendbitAddress,
                     MaxUint256
                 );
                 const allowanceReceipt = await allowanceTx.wait();
-            
+
                 if (!allowanceReceipt.status) {
                     toast.error("Approval failed!", { id: toastId });
                 }
             }
-            
+
 
             toast.loading(`Processing loan listing of ${_amount}${tokenName}...`, { id: toastId })
 
@@ -151,7 +151,7 @@ const useCreateLoanListingOrder = (
                 if (!data?.gasPrice) throw new Error("Failed to get gas price");
                 finalGasPrice = BigInt(data?.gasPrice);
 
-    
+
                 transaction = await contract.createLoanListing(
                     _weiAmount,
                     _min_amount_wei,
@@ -169,9 +169,16 @@ const useCreateLoanListingOrder = (
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`${_amount}${tokenName} loan listing order successfully created!`, {
-                    id: toastId,
-                });
+                if (isHubChain) {
+                    toast.success(`${_amount}${tokenName} loan listing order successfully created!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`${_amount}${tokenName} x-chain loan listing order message sent!`, {
+                        id: toastId,
+                    });
+                }
+
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),

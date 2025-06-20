@@ -46,15 +46,15 @@ const useWithdrawPool = (
 
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.WITHDRAW,
         chainType: chainId === 421614 ? "arb" : "op",
         query: {
-          tokenAddress: tokenTypeAddress,
-          amount: _weiAmount ? _weiAmount.toString() : "0",
-          sender: address || "",
+            tokenAddress: tokenTypeAddress,
+            amount: _weiAmount ? _weiAmount.toString() : "0",
+            sender: address || "",
         },
     });
 
@@ -62,7 +62,7 @@ const useWithdrawPool = (
         if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
         if (!_weiAmount) return toast.error("Invalid amount");
 
-        
+
         const readWriteProvider = getProvider(walletProvider as Eip1193Provider);
         const signer = await readWriteProvider.getSigner();
         const contract = getLendbitContract(signer, chainId);
@@ -71,7 +71,7 @@ const useWithdrawPool = (
 
         let toastId: string | number | undefined;
 
-        
+
         try {
 
             toastId = toast.loading(`Checking withdrawal of ${_amount}${tokenName}...`);
@@ -104,15 +104,21 @@ const useWithdrawPool = (
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`${_amount}${tokenName} supplied successfully withdrawn!`, {
-                    id: toastId,
-                });
-                
+                if (isHubChain) {
+                    toast.success(`${_amount}${tokenName} supplied successfully withdrawn!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`${_amount}${tokenName} x-chain withdrawal message sent!`, {
+                        id: toastId,
+                    });
+                }
+
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
                     queryClient.invalidateQueries({ queryKey: ["position", address] }),
-                    
+
                 ])
 
                 navigate("/")
@@ -122,7 +128,7 @@ const useWithdrawPool = (
                 const decodedError = await errorDecoder.decode(error);
                 let friendlyReason = "error";
                 if (decodedError.reason !== null) {
-                 friendlyReason = formatCustomError(decodedError.reason);
+                    friendlyReason = formatCustomError(decodedError.reason);
                 }
                 console.error("Transaction failed:", decodedError.reason);
                 toast.error(`This transaction is expected to fail: ${friendlyReason}`, { id: toastId });

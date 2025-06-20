@@ -19,7 +19,7 @@ import { CCIPMessageType } from "../../constants/config/CCIPMessageType";
 const useCloseListingAd = (
     _requestId: number,
 ) => {
-    const { chainId,address } = useWeb3ModalAccount();
+    const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
 
     const errorDecoder = ErrorDecoder.create([lendbit]);
@@ -28,18 +28,18 @@ const useCloseListingAd = (
 
     const isHubChain = chainId === SUPPORTED_CHAINS_ID[0];
 
-    const { 
-        refetch: fetchGasPrice, 
+    const {
+        refetch: fetchGasPrice,
     } = useGetGas({
         messageType: CCIPMessageType.CLOSE_LISTING_AD,
         chainType: chainId === 421614 ? "arb" : "op",
         query: {
-          requestId: _requestId,
-          sender: address || "",
+            requestId: _requestId,
+            sender: address || "",
         },
-      });
+    });
 
-    return useCallback(async ( ) => {
+    return useCallback(async () => {
         if (!isSupportedChains(chainId)) return toast.warning("SWITCH NETWORK");
         if (!_requestId) return toast.error("Invalid requestId");
 
@@ -60,7 +60,7 @@ const useCloseListingAd = (
             toast.loading(`closing ads position...`, { id: toastId });
 
             let transaction;
-            if (isHubChain) { 
+            if (isHubChain) {
                 transaction = await contract.closeListingAd(
                     _requestId,
                 );
@@ -74,20 +74,26 @@ const useCloseListingAd = (
                     value: finalGasPrice,
                 });
             }
-            
+
             const receipt = await transaction.wait();
 
             if (receipt.status) {
-                toast.success(`ads position of ${_requestId} closed!`, {
-                    id: toastId,
-                });
+                if (isHubChain) {
+                    toast.success(`ads position of ${_requestId} closed!`, {
+                        id: toastId,
+                    });
+                } else {
+                    toast.success(`x-chain close ads id #${_requestId} message sent!`, {
+                        id: toastId,
+                    });
+                }
                 await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ["dashboard", address] }),
                     queryClient.invalidateQueries({ queryKey: ["market"] }),
                     queryClient.invalidateQueries({ queryKey: ["position", address] }),
                 ])
             }
-        }catch (error: unknown) {
+        } catch (error: unknown) {
             try {
                 const decodedError = await errorDecoder.decode(error);
                 let friendlyReason = "error";
