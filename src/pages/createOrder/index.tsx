@@ -12,12 +12,13 @@ import LoadingState from "../../components/shared/LoadingState";
 import ConnectPrompt from "../../components/shared/ConnectPrompt";
 import { TokenData } from "../../constants/types/tokenData";
 import { toast } from "sonner";
+import { getTokenAddressByChain } from "../../constants/utils/getTokenAddressByChain";
 
 const CreateOrder = () => {
 
 	const { dashboardData, isWalletConnected, dashboardDataLoading } = useDashboardData();
     const { tokenData, tokenDataLoading } = useTokenData();
-    const { address, isConnected } = useWeb3ModalAccount();
+    const { address, isConnected, chainId } = useWeb3ModalAccount();
 
     const { lending } = dashboardData || {};
 	const { availableBorrow = 0 } = lending || {};
@@ -65,15 +66,16 @@ const CreateOrder = () => {
 
 
 	const unixReturnDate = Math.floor(new Date(dateValue).getTime() / 1000);
+	const resolvedTokenAddress = selectedToken ? getTokenAddressByChain(selectedToken, chainId) : "";
 
 
     const handleNavigation = () => {
 		const missingFields = [];
-		
+
+		if (!resolvedTokenAddress) missingFields.push("Token Address");
 		if (!assetValue) missingFields.push("Amount");
 		if (!rate) missingFields.push("Interest");
 		if (!dateValue) missingFields.push("Return Date");
-		if (!selectedToken?.address) missingFields.push("Token Address");
 		if (!selectedToken?.decimals) missingFields.push("Token Decimal");
 		if (!selectedToken?.name) missingFields.push("Token Name");
 
@@ -85,9 +87,9 @@ const CreateOrder = () => {
 			navigate("/allocation", {
 			state: {
 				_amount: assetValue,
-				_interest: (rate / 10000) || 0,
+				_interest: (rate) || 0,
 				_returnDate: unixReturnDate,
-				tokenTypeAddress: selectedToken.address,
+				tokenTypeAddress: resolvedTokenAddress,
 				tokenDecimal: selectedToken.decimals, 
 				tokenName: selectedToken.name,
 				tokenSymbol: selectedToken.symbol,
@@ -103,9 +105,9 @@ const CreateOrder = () => {
 
 	const createBorrowOrder = useCreateBorrowOrder(
 		assetValue || "0", 
-		rate / 10000,
+		rate || 0,
 		dateValue ? Math.floor(new Date(dateValue).getTime() / 1000) : 0,
-		selectedToken?.address || "", 
+		resolvedTokenAddress, 
 		selectedToken?.decimals || 18, 
 		selectedToken?.name || ""
 	);
@@ -218,7 +220,8 @@ const CreateOrder = () => {
 										actionType={id === "lend" ? "supply" : "borrow"}
 										tokenData={tokenData}
 										selectedToken={selectedToken}
-										availableBal = {availableBal}
+										availableBal={availableBal}
+										chainId={chainId}
 									/>
 								)}
 							</div>

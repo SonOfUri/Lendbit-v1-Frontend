@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { TokenData } from "../../constants/types/tokenData";
 import { getEthBalance, getTokenBalance } from "../../constants/utils/getBalances";
 import { formatMoney2 } from "../../constants/utils/formatMoney";
+import { getTokenAddressByChain } from "../../constants/utils/getTokenAddressByChain";
 
 type AssetSelectorProps = {
   onTokenSelect: (token: TokenData) => void;
@@ -11,7 +12,8 @@ type AssetSelectorProps = {
   actionType: "supply" | "withdraw" | "borrow" | "deposit";
   tokenData: TokenData[];
   selectedToken: TokenData | null;
-  availableBal : number | null
+  availableBal: number | null;
+  chainId: number | undefined;
 };
 
 const AssetSelector: React.FC<AssetSelectorProps> = ({
@@ -23,6 +25,7 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
   tokenData,
   selectedToken,
   availableBal,
+  chainId,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [walletBalance, setWalletBalance] = useState("0");
@@ -36,17 +39,19 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
   // Fetch balances when token or address changes
   useEffect(() => {
     const fetchBalance = async () => {
-      if (!userAddress || !selectedToken) return;
+      if (!userAddress || !selectedToken || !chainId) return;
       
       try {
         let balance;
         if (selectedToken.symbol === "ETH") {
-          balance = await getEthBalance(userAddress);
+          balance = await getEthBalance(userAddress, chainId);
         } else {
+          const resolvedTokenAddress = selectedToken ? getTokenAddressByChain(selectedToken, chainId) : "";
           balance = await getTokenBalance(
             userAddress,
-            selectedToken.address,
-            selectedToken.decimals
+            resolvedTokenAddress,
+            selectedToken.decimals,
+            chainId
           );
         }
         setWalletBalance(balance || "0");
@@ -57,7 +62,7 @@ const AssetSelector: React.FC<AssetSelectorProps> = ({
     };
 
     fetchBalance();
-  }, [selectedToken, userAddress]);
+  }, [selectedToken, userAddress, chainId]);
 
   const handleTokenSelect = (token: TokenData) => {
     onTokenSelect(token);

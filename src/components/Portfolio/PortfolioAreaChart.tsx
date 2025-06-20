@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     AreaChart,
     Area,
@@ -10,87 +9,17 @@ import {
     Legend,
 } from "recharts";
 import { formatMoney } from "../../constants/utils/formatMoney";
-
-
-
-interface AssetData {
-    asset: string;
-    amount: number;
-    value: number;
-    collateralFactor?: number;
-    apy?: number;
-}
-
-interface OrderData {
-    asset: string;
-    amount: number;
-    apr: number;
-    duration: number;
-    orderId: string;
-    whitelist?: string[];
-    min_amount?: number;
-    max_amount?: number;
-    dueDate?: string;
-}
-
-interface PositionData {
-    totalCollateral: number;
-    availableToBorrow: number;
-    borrowPowerLeft: number;
-    collateralAssets: AssetData[];
-    lendOrders: OrderData[];
-    supplyToLP: AssetData[];
-    borrowOrders: OrderData[];
-    borrowFromLP: any[];
-}
-
-interface ChartDataPoint {
-    name: string;
-    date: string;
-    collateral: number;
-    supply: number;
-    borrow: number;
-}
-
-const generateSevenDayDataFromPosition = (positionData: PositionData | undefined): ChartDataPoint[] => {
-    if (!positionData) return [];
-    
-    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const currentDate = new Date();
-    
-    // Calculate daily variation factors to simulate some movement
-    const dailyVariation = Array(7).fill(0).map(() => (Math.random() * 0.1) - 0.05); // ±5% variation
-    
-    return Array.from({ length: 7 }, (_, i) => {
-        const date = new Date(currentDate);
-        date.setDate(date.getDate() - (6 - i)); // Last 7 days including today
-        
-        const dayName = dayNames[date.getDay()];
-        const dateNum = date.getDate();
-        
-        // Calculate values with slight daily variation
-        const variationFactor = 1 + dailyVariation[i];
-        const collateral = positionData?.totalCollateral * variationFactor;
-        const supply = positionData?.supplyToLP.reduce((sum, asset) => sum + asset.value, 0) * variationFactor;
-        const borrow = positionData?.borrowOrders.reduce((sum, order) => sum + order.amount, 0) * variationFactor;
-        
-        return {
-            name: `${dayName} ${dateNum}`,
-            date: date.toISOString().split('T')[0],
-            collateral: Math.round(collateral),
-            supply: Math.round(supply),
-            borrow: Math.round(borrow)
-        };
-    });
-};
+import { AnalyticsData } from "../../constants/types/analyticsData";
 
 interface PortfolioAreaChartProps {
-    positionData?: PositionData;
+    analyticsData?: AnalyticsData;
 }
 
-const PortfolioAreaChart: React.FC<PortfolioAreaChartProps> = ({ positionData }) => {
-    const data = generateSevenDayDataFromPosition(positionData);
+const PortfolioAreaChart: React.FC<PortfolioAreaChartProps> = ({ analyticsData }) => {
     
+    // Use actual chart data from analytics or empty array if not available
+    const data = analyticsData?.chartData || [];
+
     // Custom YAxis tick formatter
     const formatYAxisTick = (value: number) => {
         return `$${formatMoney(value)}`;
@@ -100,6 +29,16 @@ const PortfolioAreaChart: React.FC<PortfolioAreaChartProps> = ({ positionData })
     const formatTooltipValue = (value: number, name: string) => {
         return [`$${formatMoney(value)}`, name.charAt(0).toUpperCase() + name.slice(1)];
     };
+
+ 
+
+    if (!data || data.length === 0) {
+        return (
+            <div className="w-full h-[400px] bg-[#050505] p-4 rounded-md noise shadow-1 flex items-center justify-center">
+                <p className="text-gray-400">No chart data available</p>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full h-[400px] bg-[#050505] p-4 rounded-md noise shadow-1">
@@ -131,10 +70,6 @@ const PortfolioAreaChart: React.FC<PortfolioAreaChartProps> = ({ positionData })
                     />
                     <Tooltip 
                         formatter={formatTooltipValue}
-                        labelFormatter={(label: string) => {
-                            const item = data.find(d => d.name === label);
-                            return item ? item.date : label;
-                        }}
                         contentStyle={{
                             backgroundColor: '#1a1a1a',
                             borderColor: '#444',
@@ -178,3 +113,5 @@ const PortfolioAreaChart: React.FC<PortfolioAreaChartProps> = ({ positionData })
 };
 
 export default PortfolioAreaChart;
+
+

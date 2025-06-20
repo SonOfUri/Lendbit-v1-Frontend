@@ -3,8 +3,8 @@ import TokenDropdown from "../plugins/TokenDropdown";
 import LendBorrowRow from "../plugins/LendBorrowRow";
 import FilterModal from "../plugins/FilterModal";
 import { formatMoney } from "../../constants/utils/formatMoney";
-import { TokenItem } from "../../constants/types";
 import { tokenMockedData } from "../../constants/utils/tokenMockedData";
+import { TokenItem } from "../../constants/types";
 
 interface LendBorrowOrderBase {
   asset: string;

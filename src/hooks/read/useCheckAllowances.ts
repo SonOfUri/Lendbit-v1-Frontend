@@ -2,18 +2,20 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { useQuery } from "@tanstack/react-query";
 import { getERC20Contract } from "../../api/contractsInstance";
 import { readOnlyProvider } from "../../api/provider";
-import { envVars } from "../../constants/config/envVars";
+import { CHAIN_CONTRACTS } from "../../constants/config/chains";
 
 // Define the special token address
 const ETH_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000001";
+
+
 const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
 
 const fetchAllowance = async ({
     queryKey,
 }: {
-    queryKey: [string, string, string];
+    queryKey: [string, string, string, number];
 }) => {
-    const [, tokenTypeAddress, userAddress] = queryKey;
+    const [, tokenTypeAddress, userAddress, chainId] = queryKey;
 
     if (!userAddress) return 0; 
     // Return MAX_SAFE_INTEGER for the special token address
@@ -21,8 +23,8 @@ const fetchAllowance = async ({
         return MAX_SAFE_INTEGER;
     }
 
-    const provider = readOnlyProvider;
-    const destination = envVars.lendbitContractAddress;
+    const provider = readOnlyProvider(chainId);
+    const destination = CHAIN_CONTRACTS[chainId].lendbitAddress;
     const contract = getERC20Contract(provider, tokenTypeAddress);
 
     try {
@@ -35,16 +37,16 @@ const fetchAllowance = async ({
 };
 
 const useCheckAllowances = (tokenTypeAddress: string) => {
-    const { address, isConnected } = useWeb3ModalAccount();
+    const { address, isConnected, chainId} = useWeb3ModalAccount();
 
     // Skip query entirely for the special token address
     const isSpecialToken = tokenTypeAddress === ETH_TOKEN_ADDRESS;
     
     return useQuery({
-        queryKey: ["allowance", tokenTypeAddress, address || ""],
+        queryKey: ["allowance", tokenTypeAddress, address || "", chainId ?? 0],
         queryFn: fetchAllowance,
-        enabled: !!(isConnected && tokenTypeAddress) && !isSpecialToken,
-        staleTime: 10_000, // Cache for 10 seconds
+        enabled: !!(isConnected && tokenTypeAddress && address && chainId) && !isSpecialToken,
+        staleTime: 10_000_000_000_000, // Cache for 10 seconds + 000_000_000
         ...(isSpecialToken ? { initialData: MAX_SAFE_INTEGER } : {}),
     });
 };

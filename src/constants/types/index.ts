@@ -1,4 +1,4 @@
 export interface TokenItem {
-  symbol: string;
-  icon: string;
-}
+    symbol: string;
+    icon: string;
+  }

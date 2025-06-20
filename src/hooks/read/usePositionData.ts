@@ -9,7 +9,7 @@ const usePositionData = () => {
   const { positionData, setPositionData } = usePositionStore();
   
     const { data, isLoading, error } = useQuery<PositionData>({
-      queryKey: ['position'],
+      queryKey: ['position', address],
       queryFn: () => getFetch2<PositionData>(`/position/${address}`),
       enabled: isConnected && !!address && !positionData,
       staleTime: 1000 * 60 * 5, 

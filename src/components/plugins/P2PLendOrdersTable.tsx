@@ -18,8 +18,16 @@ interface P2PLendOrdersTableProps {
 const P2PLendOrdersTable: React.FC<P2PLendOrdersTableProps> = ({ lendOrders }) => {
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
+    const [currentRequestId, setCurrentRequestId] = useState<number | null>(null);
 
-    const loanListClose = useCloseListingAd();
+
+    const loanListClose = useCloseListingAd(Number(currentRequestId));
+
+    const handleCloseListing = (orderId: string) => {
+        const requestId = Number(orderId);
+        setCurrentRequestId(requestId);
+        loanListClose(); 
+    };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -87,8 +95,7 @@ const P2PLendOrdersTable: React.FC<P2PLendOrdersTableProps> = ({ lendOrders }) =
                                 <CustomBtn1
                                     label="Close"
                                     variant="primary"
-                                    onClick={() => 
-                                        loanListClose(Number(order.orderId))}
+                                    onClick={() => handleCloseListing(order.orderId)}
                                 />
                             </div>
 
@@ -121,7 +128,7 @@ const P2PLendOrdersTable: React.FC<P2PLendOrdersTableProps> = ({ lendOrders }) =
                                             label="Close" 
                                             variant="primary"
                                             onClick={() => {
-                                                loanListClose(Number(order.orderId));
+                                                handleCloseListing(order.orderId);
                                                 setOpenDropdown(null);
                                             }}
                                         />

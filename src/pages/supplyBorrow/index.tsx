@@ -4,13 +4,14 @@ import useSupplyLiquidity from "../../hooks/write/useSupplyLiquidity";
 import useCreatePositionPool from "../../hooks/write/useCreatePositionPool";
 import useDashboardData from "../../hooks/read/useDashboardData";
 import useTokenData from "../../hooks/read/useTokenData";
-import { isSupportedChain } from "../../constants/utils/chains";
+import { isSupportedChains } from "../../constants/utils/chains";
 import { getEthBalance, getTokenBalance } from "../../constants/utils/getBalances";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import LoadingState from "../../components/shared/LoadingState";
 import ConnectPrompt from "../../components/shared/ConnectPrompt";
 import { TokenData } from "../../constants/types/tokenData";
 import { formatMoney2 } from "../../constants/utils/formatMoney";
+import { getTokenAddressByChain } from "../../constants/utils/getTokenAddressByChain";
 
 
 const percentages = [25, 50, 75, 100];
@@ -34,6 +35,7 @@ const SupplyBorrow = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [walletBalance, setWalletBalance] = useState(0);
     const [availableBal, setAvailableBal] = useState(availableBorrow || 0);
+    
 
     useEffect(() => {
         if (tokenData && tokenData.length > 0) {
@@ -51,16 +53,19 @@ const SupplyBorrow = () => {
 
     useEffect(() => {
         const fetchBalance = async () => {
-            if (isWalletConnected && address && isSupportedChain(chainId) && selectedToken) {
+            if (isWalletConnected && address && isSupportedChains(chainId) && selectedToken && chainId !== undefined) {
                 try {
                     let fetchBal;
                     if (selectedToken.name === "Ether") {
-                        fetchBal = await getEthBalance(address);
+                        fetchBal = await getEthBalance(address, chainId);
                     } else {
+                        const resolvedTokenAddress = selectedToken ? getTokenAddressByChain(selectedToken, chainId) : "";
+                        
                         fetchBal = await getTokenBalance(
                             address,
-                            selectedToken.address,
-                            selectedToken.decimals
+                            resolvedTokenAddress,
+                            selectedToken.decimals,
+                            chainId
                         );
                     }
                     setWalletBalance(Number(fetchBal));
@@ -72,6 +77,8 @@ const SupplyBorrow = () => {
         fetchBalance();
     }, [address, chainId, isWalletConnected, selectedToken]);
 
+    const resolvedTokenAddress = selectedToken ? getTokenAddressByChain(selectedToken, chainId) : "";
+    
     const fiatEquivalent =
         selectedToken && assetValue !== null
             ? (assetValue * selectedToken.price).toFixed(2)
@@ -87,12 +94,19 @@ const SupplyBorrow = () => {
 
     const supplyLiquidity = useSupplyLiquidity(
         String(assetValue),
-        selectedToken?.address || "",
+        resolvedTokenAddress,
         selectedToken?.decimals || 18,
         selectedToken?.name || ""
     );
 
-    const createBorrowPosition = useCreatePositionPool();
+
+    const createBorrowPosition = useCreatePositionPool(
+        String(assetValue),
+        resolvedTokenAddress,
+        selectedToken?.decimals || 18,
+        selectedToken?.name || ""
+    );
+
 
     if ((dashboardDataLoading || tokenDataLoading) && (!dashboardData) ) {
         return (
@@ -301,12 +315,7 @@ const SupplyBorrow = () => {
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    createBorrowPosition(
-                                        String(assetValue),
-                                        selectedToken.address,
-                                        selectedToken.decimals,
-                                        selectedToken.name
-                                    );
+                                    createBorrowPosition();
                                     setDropdownOpen(false);
                                     setAssetValue(0);
                                     setSelectedPercentage(null);
