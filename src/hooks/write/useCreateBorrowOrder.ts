@@ -29,6 +29,7 @@ const useCreateBorrowOrder = (
     tokenName: string,
     // collateralTokens: string[],
     // collateralAmounts: number[],
+    hubTokenAddress: string,
 ) => {
     const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
@@ -75,7 +76,7 @@ const useCreateBorrowOrder = (
 
             toastId = toast.loading(`Checking creation of lending request...`);
 
-            await simulateHubCall("createLendingRequest", [_weiAmount, (_interest * 100), _returnDate, tokenTypeAddress], address);
+            await simulateHubCall("createLendingRequest", [_weiAmount, (_interest * 100), _returnDate, hubTokenAddress], address);
 
             toastId = toast.loading(`Processing order creation...`, { id: toastId });
 
@@ -132,7 +133,7 @@ const useCreateBorrowOrder = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, walletProvider, _weiAmount, _interest, _returnDate, tokenTypeAddress, address, isHubChain, fetchGasPrice, _amount, tokenName, queryClient, navigate, errorDecoder]);
+    }, [chainId, walletProvider, _weiAmount, _interest, _returnDate, hubTokenAddress, address, isHubChain, tokenTypeAddress, fetchGasPrice, queryClient, navigate, _amount, tokenName, errorDecoder]);
 };
 
 export default useCreateBorrowOrder;

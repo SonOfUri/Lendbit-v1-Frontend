@@ -27,6 +27,7 @@ const useWithdrawCollateral = (
     _amount: string,
     tokenDecimal: number,
     tokenName: string,
+    hubTokenAddress: string,
 ) => {
     const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
@@ -74,7 +75,7 @@ const useWithdrawCollateral = (
         try {
             toastId = toast.loading(`Checking Collateral withdrawal of ${_amount}${tokenName}...`);
 
-            await prankCall.withdrawCollateral.staticCall(tokenTypeAddress, _weiAmount, {
+            await prankCall.withdrawCollateral.staticCall(hubTokenAddress, _weiAmount, {
                 from: address,
             });
 
@@ -135,7 +136,7 @@ const useWithdrawCollateral = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, _weiAmount, walletProvider, _amount, tokenName, tokenTypeAddress, address, isHubChain, fetchGasPrice, queryClient, navigate, errorDecoder]);
+    }, [chainId, _weiAmount, walletProvider, _amount, tokenName, hubTokenAddress, address, isHubChain, tokenTypeAddress, fetchGasPrice, queryClient, navigate, errorDecoder]);
 };
 
 export default useWithdrawCollateral;

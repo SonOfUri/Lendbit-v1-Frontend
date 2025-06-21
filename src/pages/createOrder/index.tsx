@@ -109,7 +109,8 @@ const CreateOrder = () => {
 		dateValue ? Math.floor(new Date(dateValue).getTime() / 1000) : 0,
 		resolvedTokenAddress, 
 		selectedToken?.decimals || 18, 
-		selectedToken?.name || ""
+		selectedToken?.name || "",
+		selectedToken?.address || "",
 	);
 
 	const handleCreateBorrowOrder = () => {

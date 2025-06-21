@@ -22,7 +22,8 @@ const useCreatePositionPool = (
     _amount: string,
     tokenTypeAddress: string,
     tokenDecimal: number,
-    tokenName: string
+    tokenName: string,
+    hubTokenAddress: string,
 ) => {
     const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
@@ -72,7 +73,7 @@ const useCreatePositionPool = (
 
             toastId = toast.loading(`Checking borrowing from pool...`);
 
-            await simulateHubCall("borrowFromPool", [tokenTypeAddress, _weiAmount], address);
+            await simulateHubCall("borrowFromPool", [hubTokenAddress, _weiAmount], address);
 
             toast.loading(`Processing borrowing...`, { id: toastId });
 
@@ -128,7 +129,7 @@ const useCreatePositionPool = (
                 toast.error("Transaction failed: Unknown error", { id: toastId });
             }
         }
-    }, [chainId, walletProvider, tokenTypeAddress, _weiAmount, address, isHubChain, fetchGasPrice, _amount, tokenName, queryClient, errorDecoder]);
+    }, [chainId, walletProvider, hubTokenAddress, _weiAmount, address, isHubChain, tokenTypeAddress, fetchGasPrice, queryClient, _amount, tokenName, errorDecoder]);
 };
 
 export default useCreatePositionPool;

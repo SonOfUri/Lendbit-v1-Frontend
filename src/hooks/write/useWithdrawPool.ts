@@ -27,6 +27,7 @@ const useWithdrawPool = (
     _amount: string,
     tokenDecimal: number,
     tokenName: string,
+    hubTokenAddress: string,
 ) => {
     const { chainId, address } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
@@ -76,7 +77,7 @@ const useWithdrawPool = (
 
             toastId = toast.loading(`Checking withdrawal of ${_amount}${tokenName}...`);
 
-            await prankCall.withdraw.staticCall(tokenTypeAddress, _weiAmount, {
+            await prankCall.withdraw.staticCall(hubTokenAddress, _weiAmount, {
                 from: address, // address of the connected user
             });
 
@@ -138,7 +139,7 @@ const useWithdrawPool = (
             }
         }
 
-    }, [chainId, _weiAmount, walletProvider, _amount, tokenName, tokenTypeAddress, address, isHubChain, fetchGasPrice, queryClient, navigate, errorDecoder]);
+    }, [chainId, _weiAmount, walletProvider, _amount, tokenName, hubTokenAddress, address, isHubChain, tokenTypeAddress, fetchGasPrice, queryClient, navigate, errorDecoder]);
 };
 
 export default useWithdrawPool;

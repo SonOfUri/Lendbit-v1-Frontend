@@ -104,7 +104,8 @@ const SupplyBorrow = () => {
         String(assetValue),
         resolvedTokenAddress,
         selectedToken?.decimals || 18,
-        selectedToken?.name || ""
+        selectedToken?.name || "",
+        selectedToken?.address || ""
     );
 
 

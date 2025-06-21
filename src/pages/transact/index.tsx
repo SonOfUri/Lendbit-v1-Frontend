@@ -53,14 +53,16 @@ const Transact = () => {
 		resolvedTokenAddress,
 		assetValue,
 		selectedToken?.decimals || 18,
-		selectedToken?.name || ""
+		selectedToken?.name || "",
+		selectedToken?.address || ""
 	);
 
 	const withdrawalPool = useWithdrawPool(
 		resolvedTokenAddress,
 		assetValue,
 		selectedToken?.decimals || 18,
-		selectedToken?.name || ""
+		selectedToken?.name || "",
+		selectedToken?.address || ""
 	);
 
 	const deposit = useDepositCollateral(
