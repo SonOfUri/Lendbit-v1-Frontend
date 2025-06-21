@@ -51,7 +51,7 @@ export const chains = [
 
   {
     name: "Arbitrum",
-    icon: "/Token-Logos/uni-uni.svg",
+    icon: "/Token-Logos/arb-arb.svg",
     type: "spoke" as const,
     chainId: 421614,
   },
