@@ -75,6 +75,11 @@ const useSupplyLiquidity = (
 
             toastId = toast.loading(`Checking Deposit of ${_amount}${tokenName}...`);
 
+            console.log(allowanceVal, "allowanceVal");
+            console.log(_weiAmount, "_weiAmount");
+            
+            
+
             if (allowanceVal == 0 || allowanceVal < Number(_weiAmount)) {
                 if (typeof chainId === 'undefined') {
                     toast.error("Chain ID is undefined - please connect your wallet");
@@ -139,6 +144,8 @@ const useSupplyLiquidity = (
                 if (decodedError.reason !== null) {
                     friendlyReason = formatCustomError(decodedError.reason);
                 }
+                console.error("Transaction failed:", error);
+
                 console.error("Transaction failed:", decodedError.reason);
                 toast.error(`Transaction failed: ${friendlyReason}`, { id: toastId });
             } catch (decodeError) {

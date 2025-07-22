@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export default function getMessageId(receipt: any): string | undefined {
     if (!receipt || !receipt.logs) return undefined;
 

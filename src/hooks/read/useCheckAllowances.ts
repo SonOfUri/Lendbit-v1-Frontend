@@ -3,12 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { getERC20Contract } from "../../api/contractsInstance";
 import { readOnlyProvider } from "../../api/provider";
 import { CHAIN_CONTRACTS } from "../../constants/config/chains";
+import { MaxUint256 } from "ethers";
 
 // Define the special token address
 const ETH_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000001";
 
 
-const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
+const MAX_SAFE_INTEGER = Number(MaxUint256);
+console.log("MAX_SAFE_INTEGER", MAX_SAFE_INTEGER);
 
 const fetchAllowance = async ({
     queryKey,
@@ -18,11 +20,8 @@ const fetchAllowance = async ({
     const [, tokenTypeAddress, userAddress, chainId] = queryKey;
 
     if (!userAddress) return 0; 
-    // Return MAX_SAFE_INTEGER for the special token address
-    if (tokenTypeAddress === ETH_TOKEN_ADDRESS) {
-        return MAX_SAFE_INTEGER;
-    }
-
+    
+ 
     const provider = readOnlyProvider(chainId);
     const destination = CHAIN_CONTRACTS[chainId].lendbitAddress;
     const contract = getERC20Contract(provider, tokenTypeAddress);
@@ -36,19 +35,21 @@ const fetchAllowance = async ({
     }
 };
 
-const useCheckAllowances = (tokenTypeAddress: string) => {
-    const { address, isConnected, chainId} = useWeb3ModalAccount();
 
-    // Skip query entirely for the special token address
+const useCheckAllowances = (tokenTypeAddress: string) => {
+    const { address, isConnected, chainId } = useWeb3ModalAccount();
+  
     const isSpecialToken = tokenTypeAddress === ETH_TOKEN_ADDRESS;
+
     
+  
     return useQuery({
-        queryKey: ["allowance", tokenTypeAddress, address || "", chainId ?? 0],
-        queryFn: fetchAllowance,
-        enabled: !!(isConnected && tokenTypeAddress && address && chainId) && !isSpecialToken,
-        staleTime: 10_000_000_000_000, // Cache for 10 seconds + 000_000_000
-        ...(isSpecialToken ? { initialData: MAX_SAFE_INTEGER } : {}),
+      queryKey: ["allowance", tokenTypeAddress, address || "", chainId ?? 0],
+      queryFn: fetchAllowance,
+      enabled: !!(isConnected && tokenTypeAddress && address && chainId) && !isSpecialToken,
+      staleTime: 10_000_000_000_000,
+      initialData: isSpecialToken ? MAX_SAFE_INTEGER : undefined,
     });
-};
+  };
 
 export default useCheckAllowances;

@@ -1,6 +1,6 @@
 import { envVars } from "./envVars";
 
-export const SUPPORTED_CHAINS_ID = [84532, 421614, 11155420];
+export const SUPPORTED_CHAINS_ID = [84532, 421614, 11155420, 43113];
 // baseSepolia, arbitrumSepolia, avaxSepolia, 
 
 export const CHAIN_CONTRACTS: Record<number, { name: string; lendbitAddress: string }> = {
@@ -15,6 +15,11 @@ export const CHAIN_CONTRACTS: Record<number, { name: string; lendbitAddress: str
     11155420: {
       name: "Optimism Sepolia",
       lendbitAddress: envVars.lendbitOpSpokeContractAddress,
+    },
+    
+    43113: {
+      name: "Avalanche Fuji Testnet",
+      lendbitAddress: envVars.lendbitAvaxSpokeContractAddress,
     },
 };
   
@@ -42,6 +47,7 @@ export const chains = [
     type: "hub" as const,
     chainId: 84532,
   },
+
   {
     name: "Optimism",
     icon: "/Token-Logos/op-op.svg",
@@ -49,6 +55,13 @@ export const chains = [
     chainId: 11155420,
   },
 
+  {
+    name: "Avalanche",
+    icon: "/Token-Logos/avax-avax.svg",
+    type: "spoke" as const,
+    chainId: 43113,
+  },
+  
   {
     name: "Arbitrum",
     icon: "/Token-Logos/arb-arb.svg",
@@ -59,4 +72,4 @@ export const chains = [
 
 
 export const isSpokeChain = (chainId?: number) =>
-  chainId === 421614 || chainId === 11155420; // Arbitrum Sepolia, Optimism Sepolia
+  chainId === 421614 || chainId === 11155420 || chainId === 43113; // Arbitrum Sepolia, Optimism Sepolia, Avax F T,

@@ -43,5 +43,14 @@ export const tokenMockedData =[
     "address": "0x0000000000000000000000000000000000000001",
     "apy": 0,
     "apr": 0
-  }
+  },
+  {
+    "name": "Avalanche",
+    "symbol": "AVAX",
+    "price": 16.39045599,
+    "decimals": 18,
+    "address": "0x0000000000000000000000000000000000000001",
+    "apy": 0,
+    "apr": 0
+  },
 ]

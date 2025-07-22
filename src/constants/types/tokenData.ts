@@ -6,6 +6,7 @@ export interface TokenData {
   address: string;
   address_arb: string;
   address_op: string;
+  address_avax: string;
   apy: number;
   apr: number;
 }
