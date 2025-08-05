@@ -68,7 +68,7 @@ export const getWalletBalances = async (address: string, chainId: number): Promi
     
     // Get ETH balance
     const ethBalance = await alchemy.core.getBalance(address);
-    const ethFormatted = Number(BigInt(ethBalance)) / 10 ** 18;
+    const ethFormatted = Number(ethBalance.toString()) / 10 ** 18;
     
     const tokens: TokenBalance[] = [];
     
@@ -78,14 +78,14 @@ export const getWalletBalances = async (address: string, chainId: number): Promi
       
       try {
         const metadata = await alchemy.core.getTokenMetadata(token.contractAddress);
-        const formattedBalance = Number(BigInt(token.tokenBalance)) / 10 ** metadata.decimals;
+        const formattedBalance = Number(BigInt(token.tokenBalance)) / 10 ** (metadata.decimals || 18);
         
         tokens.push({
-          name: metadata.name,
-          symbol: metadata.symbol,
+          name: metadata.name || 'Unknown Token',
+          symbol: metadata.symbol || 'UNKNOWN',
           balance: formattedBalance,
           contractAddress: token.contractAddress,
-          decimals: metadata.decimals,
+          decimals: metadata.decimals || 18,
         });
       } catch (error) {
         console.warn(`Failed to get metadata for token ${token.contractAddress}:`, error);
@@ -113,9 +113,9 @@ export const getTokenMetadata = async (contractAddress: string, chainId: number)
   try {
     const metadata = await alchemy.core.getTokenMetadata(contractAddress);
     return {
-      name: metadata.name,
-      symbol: metadata.symbol,
-      decimals: metadata.decimals,
+      name: metadata.name || 'Unknown Token',
+      symbol: metadata.symbol || 'UNKNOWN',
+      decimals: metadata.decimals || 18,
       contractAddress: contractAddress,
     };
   } catch (error) {

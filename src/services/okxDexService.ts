@@ -78,7 +78,6 @@ export const getQuote = async (
 
 // Check token allowance
 export const checkAllowance = async (
-  chainId: number,
   tokenAddress: string,
   ownerAddress: string,
   spenderAddress: string

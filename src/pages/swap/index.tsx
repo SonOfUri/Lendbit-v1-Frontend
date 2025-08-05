@@ -1,5 +1,4 @@
 import { SwapWidget } from "../../components/swapWidget";
-import LoadingState from "../../components/shared/LoadingState";
 import { useSwapContext } from "../../contexts/SwapContext";
 import { useEffect } from "react";
 

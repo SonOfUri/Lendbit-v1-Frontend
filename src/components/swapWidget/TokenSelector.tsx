@@ -10,7 +10,7 @@ interface TokenSelectorProps {
 	isToField?: boolean; // Add prop to determine if this is for "To" field
 }
 
-const TokenSelector: React.FC<TokenSelectorProps> = ({ tokens, onSelect, onClose, chainId, isToField = false }) => {
+const TokenSelector: React.FC<TokenSelectorProps> = ({ tokens, onSelect, chainId, isToField = false }) => {
 	const [showImportModal, setShowImportModal] = React.useState(false);
 
 	const handleImportToken = (importedToken: TokenItem) => {

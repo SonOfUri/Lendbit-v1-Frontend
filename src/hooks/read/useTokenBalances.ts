@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getWalletBalances, TokenBalance as AlchemyTokenBalance, WalletBalances } from '../../services/alchemyService';
+import { getWalletBalances } from '../../services/alchemyService';
 import { getMainnetChainId } from '../../constants/utils/chainMapping';
-import { getTokenImage, getTokenPrice, isChainSupported } from '../../services/dexscreenerService';
+import { getTokenPrice, isChainSupported } from '../../services/dexscreenerService';
 
 interface TokenBalance {
 	symbol: string;

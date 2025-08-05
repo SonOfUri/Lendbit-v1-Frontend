@@ -51,14 +51,6 @@ export const getTokenImage = async (contractAddress: string, chainId: number): P
     if (response.data && response.data.length > 0) {
       const tokenData = response.data[0];
       
-      // Find the token information from baseToken or quoteToken
-      let tokenInfo = null;
-      if (tokenData.baseToken && tokenData.baseToken.address.toLowerCase() === contractAddress.toLowerCase()) {
-        tokenInfo = tokenData.baseToken;
-      } else if (tokenData.quoteToken && tokenData.quoteToken.address.toLowerCase() === contractAddress.toLowerCase()) {
-        tokenInfo = tokenData.quoteToken;
-      }
-      
       // DexScreener doesn't provide image URLs in this format, so return null
       return null;
     }

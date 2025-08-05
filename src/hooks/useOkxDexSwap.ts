@@ -7,8 +7,6 @@ import {
   checkAllowance, 
   getApprovalTransaction, 
   getSwapTransaction, 
-  getGasLimit,
-  simulateTransaction,
   isChainSupported 
 } from '../services/okxDexService';
 
@@ -82,7 +80,6 @@ export const useOkxDexSwap = () => {
 
     try {
       const allowance = await checkAllowance(
-        chainId,
         tokenAddress,
         address,
         spenderAddress
@@ -211,7 +208,7 @@ export const useOkxDexSwap = () => {
       console.log('- Is contract deployment?', tx.to === '0x0000000000000000000000000000000000000000' ? 'YES - WRONG!' : 'NO - Correct');
 
       // Get provider and signer
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum as any);
       const signer = await provider.getSigner();
 
       // Send transaction
@@ -390,7 +387,7 @@ export const useOkxDexSwap = () => {
        console.log('- Is contract deployment?', tx.to === '0x0000000000000000000000000000000000000000' ? 'YES - WRONG!' : 'NO - Correct');
 
       // Get provider and signer
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum as any);
       const signer = await provider.getSigner();
 
       // Send transaction

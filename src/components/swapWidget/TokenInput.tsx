@@ -28,7 +28,7 @@ const TokenInput: React.FC<TokenInputProps> = ({
 }) => {
 	const [isTokenSelectorOpen, setIsTokenSelectorOpen] = useState(false);
 	
-	const { getTokenBalance, getTokenBalanceByAddress } = useTokenBalances({
+	const { getTokenBalance } = useTokenBalances({
 		walletAddress,
 		chainId
 	});
