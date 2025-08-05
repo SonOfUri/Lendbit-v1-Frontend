@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
-import { getEthBalance, getTokenBalance } from '../../constants/utils/getBalances';
-import { tokenMockedData } from '../../constants/utils/tokenMockedData';
+import { getWalletBalances, TokenBalance as AlchemyTokenBalance, WalletBalances } from '../../services/alchemyService';
+import { getMainnetChainId } from '../../constants/utils/chainMapping';
+import { getTokenImage, getTokenPrice, isChainSupported } from '../../services/dexscreenerService';
 
 interface TokenBalance {
 	symbol: string;
 	balance: string;
 	decimals: number;
 	address: string;
-	price?: number;
+	name: string;
+	image?: string | null; // Add image field for DexScreener images
+	price?: number; // Add price field for ETH and other tokens
 }
 
 interface UseTokenBalancesProps {
@@ -30,52 +33,111 @@ const useTokenBalances = ({ walletAddress, chainId }: UseTokenBalancesProps) => 
 			setIsLoading(true);
 			setError(null);
 
-					try {
-			// Fetch real balances using existing utilities
-			const balances: TokenBalance[] = [];
-			
-			// Get ETH balance
-			const ethBalance = await getEthBalance(walletAddress, chainId);
-			const ethTokenData = tokenMockedData.find(t => t.symbol === 'ETH');
-			
-			if (ethTokenData) {
-				balances.push({
-					symbol: 'ETH',
-					balance: ethBalance,
-					decimals: 18,
-					address: '0x0000000000000000000000000000000000000000',
-					price: ethTokenData.price
-				});
-			}
-			
-			// Get token balances for other tokens
-			for (const token of tokenMockedData) {
-				if (token.symbol !== 'ETH') {
-					try {
-						const balance = await getTokenBalance(
-							walletAddress,
-							token.address,
-							token.decimals,
-							chainId
-						);
+			try {
+				// Get mainnet chain ID for Alchemy (since Alchemy only supports mainnet)
+				const mainnetChainId = parseInt(getMainnetChainId(chainId));
+				
+				// Fetch balances using Alchemy
+				const walletBalances = await getWalletBalances(walletAddress, mainnetChainId);
+				
+				if (walletBalances) {
+					const formattedBalances: TokenBalance[] = [];
+					
+					// Add ETH balance (only if > 0) - Handle ETH specially
+					if (walletBalances.eth > 0) {
+						// Get ETH price using WETH contract
+						let ethPrice = null;
 						
-						// Only add tokens with non-zero balance
-						if (parseFloat(balance) > 0) {
-							balances.push({
-								symbol: token.symbol,
-								balance: parseFloat(balance).toFixed(6),
-								decimals: token.decimals,
-								address: token.address,
-								price: token.price
+						if (isChainSupported(mainnetChainId)) {
+							try {
+								// Use WETH contract for ETH price
+								const wethAddress = '0x4200000000000000000000000000000000000006'; // WETH contract
+								ethPrice = await getTokenPrice(wethAddress, mainnetChainId);
+							} catch (err) {
+								console.warn('Failed to fetch ETH price:', err);
+							}
+						}
+						
+						// Use official Ethereum logo as primary image
+						const ethImage = '/Token-Logos/eth.png';
+						
+						// Only include ETH if it has price data and complete info
+						if (ethPrice && ethPrice > 0) {
+							formattedBalances.push({
+								symbol: 'ETH',
+								balance: walletBalances.eth.toFixed(6),
+								decimals: 18,
+								address: '0x0000000000000000000000000000000000000000', // ETH doesn't have a contract
+								name: 'Ethereum',
+								image: ethImage,
+								price: ethPrice
 							});
 						}
-					} catch (err) {
-						console.warn(`Failed to fetch balance for ${token.symbol}:`, err);
 					}
+					
+					// Add token balances (only if > 0 and has price data)
+					for (const token of walletBalances.tokens) {
+						if (token.balance > 0) {
+							// Try to get token price from DexScreener
+							let tokenPrice = null;
+							
+							if (isChainSupported(mainnetChainId)) {
+								try {
+									tokenPrice = await getTokenPrice(token.contractAddress, mainnetChainId);
+								} catch (err) {
+									console.warn(`Failed to fetch price for ${token.symbol}:`, err);
+								}
+							}
+							
+							// Only include tokens that have price data (price > 0) and complete info
+							if (tokenPrice && tokenPrice > 0 && token.symbol && token.name) {
+								// Get token image based on symbol
+								let tokenImage = '/Token-Logos/default-base.svg'; // Default fallback
+								
+								// Map common tokens to their specific logos
+								const tokenImageMap: Record<string, string> = {
+									'USDC': '/Token-Logos/usdc-base.svg',
+									'USDT': '/Token-Logos/usdt-base.svg',
+									'DAI': '/Token-Logos/dai-base.svg',
+									'WETH': '/Token-Logos/weth-base.svg',
+									'WBTC': '/Token-Logos/wbtc-base.svg',
+									'LINK': '/Token-Logos/link-base.svg',
+									'UNI': '/Token-Logos/uni-uni.svg',
+									'ARB': '/Token-Logos/arb-arb.svg',
+									'OP': '/Token-Logos/op-op.svg',
+									'AVAX': '/Token-Logos/avax-avax.svg',
+									'LISK': '/Token-Logos/lisk-lisk.svg'
+								};
+								
+								// Use specific logo if available, otherwise default
+								if (tokenImageMap[token.symbol]) {
+									tokenImage = tokenImageMap[token.symbol];
+								}
+								
+								formattedBalances.push({
+									symbol: token.symbol,
+									balance: token.balance.toFixed(6),
+									decimals: token.decimals,
+									address: token.contractAddress,
+									name: token.name,
+									image: tokenImage,
+									price: tokenPrice
+								});
+							}
+						}
+					}
+					
+					// Sort tokens by USD value (most valuable to least)
+					formattedBalances.sort((a, b) => {
+						const aValue = (parseFloat(a.balance) * (a.price || 0));
+						const bValue = (parseFloat(b.balance) * (b.price || 0));
+						return bValue - aValue; // Descending order (highest to lowest)
+					});
+					
+					setBalances(formattedBalances);
+				} else {
+					setBalances([]);
 				}
-			}
-
-			setBalances(balances);
 			} catch (err) {
 				setError('Failed to fetch token balances');
 				console.error('Error fetching token balances:', err);

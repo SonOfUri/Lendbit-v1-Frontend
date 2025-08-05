@@ -4,9 +4,11 @@ interface SwapButtonProps {
 	onClick: () => void;
 	isLoading: boolean;
 	disabled: boolean;
+	isTestnet?: boolean;
+	chainName?: string;
 }
 
-const SwapButton: React.FC<SwapButtonProps> = ({ onClick, isLoading, disabled }) => {
+const SwapButton: React.FC<SwapButtonProps> = ({ onClick, isLoading, disabled, isTestnet, chainName }) => {
 	return (
 		<button
 			onClick={onClick}
@@ -15,8 +17,8 @@ const SwapButton: React.FC<SwapButtonProps> = ({ onClick, isLoading, disabled })
 				disabled
 					? 'bg-gray-600 text-gray-400 cursor-not-allowed'
 					: isLoading
-					? 'bg-blue-600 text-white cursor-wait'
-					: 'bg-blue-500 hover:bg-blue-600 text-white cursor-pointer transform hover:scale-[1.02]'
+					? 'bg-[#DD4F00] text-white cursor-wait'
+					: 'bg-[#DD4F00] hover:bg-black text-white cursor-pointer transform hover:scale-[1.02]'
 			}`}
 		>
 			{isLoading ? (
@@ -24,6 +26,8 @@ const SwapButton: React.FC<SwapButtonProps> = ({ onClick, isLoading, disabled })
 					<div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
 					<span>Swapping...</span>
 				</div>
+			) : isTestnet ? (
+				`Switch to ${chainName || 'Mainnet'} Mainnet`
 			) : (
 				'Swap'
 			)}

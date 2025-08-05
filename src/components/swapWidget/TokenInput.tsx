@@ -85,10 +85,25 @@ const TokenInput: React.FC<TokenInputProps> = ({
 						<TokenSelector
 							tokens={tokenList}
 							onSelect={(selectedToken) => {
+								// Log all details when token is selected (especially for "From" field)
+								if (label === "From") {
+									console.log('=== FROM TOKEN SELECTED ===');
+									console.log('Selected Token Details:', selectedToken);
+									console.log('Token Symbol:', selectedToken.symbol);
+									console.log('Token Icon:', selectedToken.icon);
+									console.log('Token Address:', selectedToken.address);
+									console.log('Available Balance:', actualBalance);
+									console.log('Wallet Address:', walletAddress);
+									console.log('Chain ID:', chainId);
+									console.log('========================');
+								}
+								
 								onTokenSelect(selectedToken);
 								setIsTokenSelectorOpen(false);
 							}}
 							onClose={() => setIsTokenSelectorOpen(false)}
+							chainId={chainId}
+							isToField={label === "To"}
 						/>
 					)}
 				</div>
@@ -108,33 +123,39 @@ const TokenInput: React.FC<TokenInputProps> = ({
 				{token && (
 					<button
 						onClick={handleMaxClick}
-						className="text-blue-500 hover:text-blue-400 text-sm font-medium px-2 py-1 rounded transition-colors"
+						className="text-[#DD4F00] hover:text-[#DD4F00] text-sm font-medium px-2 py-1 rounded transition-colors"
 					>
 						MAX
 					</button>
 				)}
 			</div>
 
-			{/* Percentage Buttons - Below the input */}
-			{token && parseFloat(actualBalance) > 0 && (
+			{/* Percentage Buttons - Below the input (only for "From" input) */}
+			{label === "From" && token && parseFloat(actualBalance) > 0 && (
 				<div className="flex space-x-2 mt-2">
 					<button
 						onClick={() => handlePercentageClick(25)}
-						className="text-blue-500 hover:text-blue-400 text-xs font-medium px-3 py-1 rounded transition-colors border border-blue-500/20 hover:border-blue-400/40"
+						className="text-[#DD4F00] hover:text-[#DD4F00] text-xs font-medium px-3 py-1 rounded transition-colors border border-[#DD4F00]/20 hover:border-[#DD4F00]/40"
 					>
 						25%
 					</button>
 					<button
 						onClick={() => handlePercentageClick(50)}
-						className="text-blue-500 hover:text-blue-400 text-xs font-medium px-3 py-1 rounded transition-colors border border-blue-500/20 hover:border-blue-400/40"
+						className="text-[#DD4F00] hover:text-[#DD4F00] text-xs font-medium px-3 py-1 rounded transition-colors border border-[#DD4F00]/20 hover:border-[#DD4F00]/40"
 					>
 						50%
 					</button>
 					<button
 						onClick={() => handlePercentageClick(75)}
-						className="text-blue-500 hover:text-blue-400 text-xs font-medium px-3 py-1 rounded transition-colors border border-blue-500/20 hover:border-blue-400/40"
+						className="text-[#DD4F00] hover:text-[#DD4F00] text-xs font-medium px-3 py-1 rounded transition-colors border border-[#DD4F00]/20 hover:border-[#DD4F00]/40"
 					>
 						75%
+					</button>
+					<button
+						onClick={handleMaxClick}
+						className="text-[#DD4F00] hover:text-[#DD4F00] text-xs font-medium px-3 py-1 rounded transition-colors border border-[#DD4F00]/20 hover:border-[#DD4F00]/40"
+					>
+						100%
 					</button>
 				</div>
 			)}

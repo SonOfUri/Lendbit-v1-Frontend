@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { TokenItem } from '../../constants/types';
+import { getTokenDetails, isChainSupported } from '../../services/dexscreenerService';
 
 interface TokenAddressInputProps {
 	onTokenFound: (token: TokenItem) => void;
 	onClose: () => void;
+	chainId?: number;
 }
 
-const TokenAddressInput: React.FC<TokenAddressInputProps> = ({ onTokenFound, onClose }) => {
+const TokenAddressInput: React.FC<TokenAddressInputProps> = ({ onTokenFound, onClose, chainId }) => {
 	const [address, setAddress] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState('');
@@ -27,22 +29,58 @@ const TokenAddressInput: React.FC<TokenAddressInputProps> = ({ onTokenFound, onC
 		setError('');
 
 		try {
-			// TODO: Replace with actual token details API call
-			// Example: Fetch token details from blockchain or API
-			// const tokenDetails = await getTokenDetails(address);
-			
-			// Mock API call - replace with actual API call later
-			await new Promise(resolve => setTimeout(resolve, 1000));
-			
-			// Mock token data - replace with actual API response
-			const mockToken: TokenItem = {
-				symbol: 'CUSTOM',
-				icon: '/Token-Logos/default-base.svg'
-			};
+			// Fetch token details from DexScreener
+			if (!chainId || !isChainSupported(chainId)) {
+				setError('Chain not supported for token import');
+				return;
+			}
 
-			onTokenFound(mockToken);
-			onClose();
+			console.log('=== TOKEN IMPORT DEBUG ===');
+			console.log('Address:', address.trim());
+			console.log('Chain ID:', chainId);
+			console.log('Is Chain Supported:', isChainSupported(chainId));
+
+			const tokenDetails = await getTokenDetails(address.trim(), chainId);
+			console.log('Token Details Response:', tokenDetails);
+			
+			if (tokenDetails && tokenDetails.symbol && tokenDetails.name) {
+				console.log('Token Import Success:', {
+					symbol: tokenDetails.symbol,
+					name: tokenDetails.name,
+					image: tokenDetails.image,
+					price: tokenDetails.price
+				});
+
+				const importedToken: TokenItem = {
+					symbol: tokenDetails.symbol,
+					icon: '/Token-Logos/default-base.svg', // Use default since DexScreener doesn't provide images
+					address: address.trim() // Include the contract address
+				};
+
+				onTokenFound(importedToken);
+				onClose();
+			} else {
+				console.log('Token Import Failed - Missing Data:', {
+					hasTokenDetails: !!tokenDetails,
+					symbol: tokenDetails?.symbol,
+					name: tokenDetails?.name,
+					price: tokenDetails?.price,
+					image: tokenDetails?.image
+				});
+				
+				// Provide more specific error messages
+				if (!tokenDetails) {
+					setError('Token not found on this network. Please check the address and try again.');
+				} else if (!tokenDetails.symbol) {
+					setError('Token found but missing symbol. This token may not be supported.');
+				} else if (!tokenDetails.name) {
+					setError('Token found but missing name. This token may not be supported.');
+				} else {
+					setError('Token data is incomplete. Please try again.');
+				}
+			}
 		} catch (err) {
+			console.error('Token Import Error:', err);
 			setError('Failed to fetch token details. Please try again.');
 		} finally {
 			setIsLoading(false);

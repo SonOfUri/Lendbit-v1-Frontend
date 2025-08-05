@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { TokenItem } from '../../constants/types';
-import { tokenMockedData } from '../../constants/utils/tokenMockedData';
+import { getExchangeRate, isChainSupported } from '../../services/dexscreenerService';
 
 interface SwapInfoProps {
 	fromToken: TokenItem | null;
@@ -8,6 +8,8 @@ interface SwapInfoProps {
 	fromAmount: string;
 	toAmount: string;
 	slippage: number;
+	chainId?: number;
+	okxQuote?: any;
 }
 
 const SwapInfo: React.FC<SwapInfoProps> = ({
@@ -15,21 +17,63 @@ const SwapInfo: React.FC<SwapInfoProps> = ({
 	toToken,
 	fromAmount,
 	toAmount,
-	slippage
+	slippage,
+	chainId,
+	okxQuote
 }) => {
-	// Calculate exchange rate based on token prices
-	const fromTokenData = fromToken ? tokenMockedData.find(t => t.symbol === fromToken.symbol) : null;
-	const toTokenData = toToken ? tokenMockedData.find(t => t.symbol === toToken.symbol) : null;
+	const [realExchangeRate, setRealExchangeRate] = useState<string>('1.0');
+	const [isLoadingRate, setIsLoadingRate] = useState(false);
+
+	// Fetch real exchange rate from DexScreener
+	useEffect(() => {
+		const fetchExchangeRate = async () => {
+			if (!fromToken || !toToken || !chainId || !isChainSupported(chainId) || !fromToken.address || !toToken.address) {
+				setRealExchangeRate('1.0');
+				return;
+			}
+
+			setIsLoadingRate(true);
+			try {
+				const rate = await getExchangeRate(fromToken.address, toToken.address, chainId);
+				
+				if (rate) {
+					setRealExchangeRate(rate.toFixed(6));
+				} else {
+					setRealExchangeRate('1.0');
+				}
+			} catch (error) {
+				console.error('Error fetching exchange rate:', error);
+				setRealExchangeRate('1.0');
+			} finally {
+				setIsLoadingRate(false);
+			}
+		};
+
+		fetchExchangeRate();
+	}, [fromToken, toToken, chainId]);
+
+	// Parse OKX quote data if available
+	const okxExchangeRate = okxQuote?.toTokenAmount && okxQuote?.fromTokenAmount
+		? (parseInt(okxQuote.toTokenAmount) / parseInt(okxQuote.fromTokenAmount)).toFixed(6)
+		: null;
 	
-	const exchangeRate = fromTokenData && toTokenData 
-		? (toTokenData.price / fromTokenData.price).toFixed(6)
-		: '0.0';
+	const exchangeRate = okxExchangeRate 
+		? okxExchangeRate
+		: fromToken && toToken && fromAmount && toAmount
+			? (parseFloat(toAmount) / parseFloat(fromAmount)).toFixed(6)
+			: realExchangeRate;
 	
-	// Calculate price impact (simplified)
-	const priceImpact = fromToken && toToken ? '0.12' : '0.0';
-	const minimumReceived = fromToken && toToken && toAmount 
-		? (parseFloat(toAmount) * (1 - slippage / 100)).toFixed(6)
-		: '0.0';
+	// Calculate price impact from OKX quote or use simplified calculation
+	const priceImpact = okxQuote?.priceImpactPercentage 
+		? Math.abs(parseFloat(okxQuote.priceImpactPercentage)).toFixed(2)
+		: fromToken && toToken ? '0.12' : '0.0';
+	
+	// Calculate minimum received based on OKX quote and slippage
+	const minimumReceived = okxQuote?.toTokenAmount
+		? (parseInt(okxQuote.toTokenAmount) * (1 - slippage / 100) / Math.pow(10, parseInt(okxQuote.toToken.decimal))).toFixed(6)
+		: fromToken && toToken && toAmount 
+			? (parseFloat(toAmount) * (1 - slippage / 100)).toFixed(6)
+			: '0.0';
 
 	if (!fromToken || !toToken) {
 		return null;
@@ -60,6 +104,13 @@ const SwapInfo: React.FC<SwapInfoProps> = ({
 				<span className="text-gray-400 text-sm">Slippage Tolerance</span>
 				<span className="text-white text-sm">{slippage}%</span>
 			</div>
+
+			{okxQuote?.estimateGasFee && (
+				<div className="flex justify-between items-center">
+					<span className="text-gray-400 text-sm">Estimated Gas Fee</span>
+					<span className="text-white text-sm">{okxQuote.estimateGasFee} wei</span>
+				</div>
+			)}
 		</div>
 	);
 };
