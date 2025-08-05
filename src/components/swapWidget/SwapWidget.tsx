@@ -5,7 +5,7 @@ import SwapSettings from './SwapSettings';
 import SwapInfo from './SwapInfo';
 import OkxPoweredBy from './OkxPoweredBy';
 import { TokenItem } from '../../constants/types';
-import { useWeb3ModalAccount, useWeb3Modal, useSwitchNetwork } from '@web3modal/ethers/react';
+import { useWeb3ModalAccount, useSwitchNetwork } from '@web3modal/ethers/react';
 import ConnectPrompt from '../shared/ConnectPrompt';
 import MainnetSwitchPrompt from './MainnetSwitchPrompt';
 import { isTestnetChain, getMainnetChainId, getChainName } from '../../constants/utils/chainMapping';
