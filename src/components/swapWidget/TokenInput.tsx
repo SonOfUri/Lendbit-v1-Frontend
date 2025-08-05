@@ -22,7 +22,6 @@ const TokenInput: React.FC<TokenInputProps> = ({
 	onTokenSelect,
 	onAmountChange,
 	tokenList,
-	balance,
 	walletAddress,
 	chainId
 }) => {

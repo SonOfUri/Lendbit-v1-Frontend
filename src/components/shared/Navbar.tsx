@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { isSupportedChains, isSupportedChainsIncludingMainnet } from "../../constants/utils/chains";
+import { isSupportedChainsIncludingMainnet } from "../../constants/utils/chains";
 import {
 	useSwitchNetwork,
 	useWalletInfo,

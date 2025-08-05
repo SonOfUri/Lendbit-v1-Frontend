@@ -22,7 +22,6 @@ const SwapInfo: React.FC<SwapInfoProps> = ({
 	okxQuote
 }) => {
 	const [realExchangeRate, setRealExchangeRate] = useState<string>('1.0');
-	const [isLoadingRate, setIsLoadingRate] = useState(false);
 
 	// Fetch real exchange rate from DexScreener
 	useEffect(() => {
@@ -32,7 +31,6 @@ const SwapInfo: React.FC<SwapInfoProps> = ({
 				return;
 			}
 
-			setIsLoadingRate(true);
 			try {
 				const rate = await getExchangeRate(fromToken.address, toToken.address, chainId);
 				
@@ -44,8 +42,6 @@ const SwapInfo: React.FC<SwapInfoProps> = ({
 			} catch (error) {
 				console.error('Error fetching exchange rate:', error);
 				setRealExchangeRate('1.0');
-			} finally {
-				setIsLoadingRate(false);
 			}
 		};
 

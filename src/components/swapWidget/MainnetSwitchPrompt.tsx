@@ -1,5 +1,5 @@
 import React from 'react';
-import { getChainName } from '../../constants/utils/chainMapping';
+import { getChainName, getMainnetChainId } from '../../constants/utils/chainMapping';
 
 interface MainnetSwitchPromptProps {
 	onSwitchToMainnet: () => void;

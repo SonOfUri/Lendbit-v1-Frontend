@@ -49,8 +49,6 @@ export const getTokenImage = async (contractAddress: string, chainId: number): P
     const response = await axios.get(`${baseUrl}${contractAddress}`, axiosConfig);
     
     if (response.data && response.data.length > 0) {
-      const tokenData = response.data[0];
-      
       // DexScreener doesn't provide image URLs in this format, so return null
       return null;
     }

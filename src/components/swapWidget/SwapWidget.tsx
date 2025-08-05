@@ -5,8 +5,6 @@ import SwapSettings from './SwapSettings';
 import SwapInfo from './SwapInfo';
 import OkxPoweredBy from './OkxPoweredBy';
 import { TokenItem } from '../../constants/types';
-import { tokenMockedData } from '../../constants/utils/tokenMockedData';
-import { getTokenLogo } from '../../constants/utils/getTokenLogo';
 import { useWeb3ModalAccount, useWeb3Modal, useSwitchNetwork } from '@web3modal/ethers/react';
 import ConnectPrompt from '../shared/ConnectPrompt';
 import MainnetSwitchPrompt from './MainnetSwitchPrompt';
@@ -17,7 +15,6 @@ import { useOkxDexSwap } from '../../hooks/useOkxDexSwap';
 
 const SwapWidget: React.FC = () => {
 	const { isConnected, address, chainId } = useWeb3ModalAccount();
-	const { open } = useWeb3Modal();
 	const { switchNetwork } = useSwitchNetwork();
 	const { balances } = useTokenBalances({ walletAddress: address, chainId });
 	const [fromToken, setFromToken] = useState<TokenItem | null>(null);
