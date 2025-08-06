@@ -1,13 +1,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { isSupportedChains } from "../../constants/utils/chains";
+import { isSupportedChainsIncludingMainnet } from "../../constants/utils/chains";
 import {
 	useSwitchNetwork,
 	useWalletInfo,
 	useWeb3Modal,
 	useWeb3ModalAccount,
 } from "@web3modal/ethers/react";
+import { useSwapContext } from "../../contexts/SwapContext";
 import { getEthBalance } from "../../constants/utils/getBalances";
 import { formatAddress } from "../../constants/utils/formatAddress";
 import ChainSelector from "./ChainSelector.tsx";
@@ -19,6 +20,7 @@ const Navbar = () => {
 	const { isConnected, chainId, address } = useWeb3ModalAccount();
 	const { walletInfo } = useWalletInfo();
 	const { switchNetwork } = useSwitchNetwork();
+	const { isOnSwapPage } = useSwapContext();
 
 	const [isWalletDropdownOpen, setIsWalletDropdownOpen] = useState(false);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -31,7 +33,7 @@ const Navbar = () => {
 	const walletConnect = () => {
 		if (!isConnected) {
 			open();
-		} else if (isConnected && !isSupportedChains(chainId)) {
+		} else if (isConnected && !isSupportedChainsIncludingMainnet(chainId, isOnSwapPage)) {
 			switchNetwork(SUPPORTED_CHAINS_ID[0]);
 			setIsWalletDropdownOpen(false);
 		} else {
@@ -62,6 +64,13 @@ const Navbar = () => {
 		  switchNetwork(targetChainId);
 		}
 	};
+
+	// Ensure Base is selected by default when user connects
+	useEffect(() => {
+		if (isConnected && (!chainId || !isSupportedChainsIncludingMainnet(chainId, isOnSwapPage))) {
+			switchNetwork(SUPPORTED_CHAINS_ID[0]); // Switch to Base
+		}
+	}, [isConnected, chainId, isOnSwapPage, switchNetwork]);
 
 	useEffect(() => {
 		const fetchBalance = async () => {
@@ -159,9 +168,9 @@ const Navbar = () => {
 				{/* Right Side */}
 				<div className="flex items-center gap-2">
 					
-					{isSupportedChains(chainId) &&
+					{isSupportedChainsIncludingMainnet(chainId, isOnSwapPage) &&
 						(<ChainSelector
-							selectedChainId={chainId || 84532}
+							selectedChainId={chainId || SUPPORTED_CHAINS_ID[0]}
 							onSwitchChain={handleChainSwitch}
 							open={isChainOpen}
 							setOpen={setIsChainOpen}
@@ -177,7 +186,7 @@ const Navbar = () => {
 						>
 							{!isConnected ? (
 								<p>Connect</p>
-							) : !isSupportedChains(chainId) ? (
+							) : !isSupportedChainsIncludingMainnet(chainId, isOnSwapPage) ? (
 								<p className="leading-tight">Switch Network</p>
 							) : (
 								<p className="">

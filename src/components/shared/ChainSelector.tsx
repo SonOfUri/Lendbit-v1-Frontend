@@ -56,7 +56,9 @@ const ChainSelector = (
                   <div
                     key={c.name}
                     onClick={() => handleSelect(c.chainId)}
-                    className="flex items-center justify-between px-3 py-2 hover:bg-zinc-800 rounded-md cursor-pointer"
+                    className={`flex items-center justify-between px-3 py-2 hover:bg-zinc-800 rounded-md cursor-pointer ${
+                      c.chainId === selectedChainId ? 'bg-zinc-800' : ''
+                    }`}
                   >
                     <div className="flex items-center gap-2">
                       <img src={c.icon} alt={c.name} className="w-5 h-5" />
@@ -75,7 +77,9 @@ const ChainSelector = (
                   <div
                     key={c.name}
                     onClick={() => handleSelect(c.chainId)}
-                    className="flex items-center gap-2 px-3 py-2 hover:bg-zinc-800 rounded-md cursor-pointer"
+                    className={`flex items-center gap-2 px-3 py-2 hover:bg-zinc-800 rounded-md cursor-pointer ${
+                      c.chainId === selectedChainId ? 'bg-zinc-800' : ''
+                    }`}
                   >
                     <img src={c.icon} alt={c.name} className="w-5 h-5" />
                     <span>{c.name}</span>
